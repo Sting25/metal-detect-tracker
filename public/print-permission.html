@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PK15CRVY76"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-PK15CRVY76');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Permission Request Letter - Signal Bouncer</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#5c4033">
+</head>
+<body>
+    <nav class="navbar no-print">
+        <a href="/landing.html" class="nav-brand"><img src="/icons/logo-nav.png" alt="" class="nav-brand-logo" width="28" height="28"><span class="nav-brand-full" data-i18n="app.name">Signal Bouncer</span><span class="nav-brand-short">Signal Bouncer</span></a>
+        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">&#9776;</button>
+        <div class="nav-links">
+            <a href="/index.html" data-i18n="nav.dashboard">Dashboard</a>
+            <a href="/sites.html" data-i18n="nav.sites">Sites</a>
+            <a href="/finds.html" data-i18n="nav.finds">Finds</a>
+            <a href="/hunts.html" data-i18n="nav.hunts">Hunts</a>
+            <a href="/permissions.html" data-i18n="nav.permissions">Permissions</a>
+            <a href="/legal.html" data-i18n="nav.legal">Legal Reference</a>
+        </div>
+    </nav>
+
+    <div class="print-toolbar no-print">
+        <button class="btn btn-primary" id="btn-print" onclick="window.print()" data-i18n="print.printLetter">Print Letter</button>
+        <button class="btn btn-secondary" onclick="if(window.opener||window.history.length<=1){window.close();setTimeout(function(){location.href='/permissions.html'},100)}else{history.back()}" data-i18n="print.back">Back</button>
+    </div>
+
+    <!-- Letter Settings Panel (hidden on print) -->
+    <div class="letter-settings no-print" id="letter-settings">
+        <div class="letter-settings-header" id="settings-toggle">
+            <span>&#9881; <span data-i18n="letterPrefs.settingsTitle">Letter Settings</span></span>
+            <span class="letter-settings-chevron" id="settings-chevron">&#9660;</span>
+        </div>
+        <div class="letter-settings-body" id="settings-body">
+            <!-- Your Information -->
+            <fieldset class="form-fieldset">
+                <legend data-i18n="letterPrefs.yourInfo">Your Information</legend>
+                <div class="form-group">
+                    <label for="pref-full-name" data-i18n="letterPrefs.fullName">Full Name</label>
+                    <input type="text" id="pref-full-name" class="form-control" placeholder="Your full legal name" data-i18n-placeholder="letterPrefs.fullNamePlaceholder">
+                </div>
+                <div class="form-group">
+                    <label for="pref-address" data-i18n="letterPrefs.address">Mailing Address</label>
+                    <textarea id="pref-address" class="form-control" rows="2" placeholder="Your mailing address" data-i18n-placeholder="letterPrefs.addressPlaceholder"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="pref-phone" data-i18n="letterPrefs.phone">Phone</label>
+                        <input type="tel" id="pref-phone" class="form-control" placeholder="(555) 555-5555">
+                    </div>
+                    <div class="form-group">
+                        <label for="pref-email" data-i18n="letterPrefs.email">Email</label>
+                        <input type="email" id="pref-email" class="form-control" placeholder="you@example.com">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="pref-sig-name" data-i18n="letterPrefs.signatureName">Signature Name</label>
+                        <input type="text" id="pref-sig-name" class="form-control" placeholder="Name as it appears in signature" data-i18n-placeholder="letterPrefs.sigNamePlaceholder">
+                    </div>
+                    <div class="form-group">
+                        <label for="pref-sig-title" data-i18n="letterPrefs.signatureTitle">Title / Organization</label>
+                        <input type="text" id="pref-sig-title" class="form-control" placeholder="e.g., Member, Local Detecting Club" data-i18n-placeholder="letterPrefs.sigTitlePlaceholder">
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Recipient -->
+            <fieldset class="form-fieldset">
+                <legend data-i18n="letterPrefs.recipient">Recipient</legend>
+                <div class="form-group">
+                    <label for="pref-to-name" data-i18n="letterPrefs.recipientName">Recipient Name</label>
+                    <input type="text" id="pref-to-name" class="form-control" placeholder="Property owner or agency name" data-i18n-placeholder="letterPrefs.recipientNamePlaceholder">
+                </div>
+                <div class="form-group">
+                    <label for="pref-to-address" data-i18n="letterPrefs.recipientAddress">Recipient Address</label>
+                    <textarea id="pref-to-address" class="form-control" rows="2" placeholder="Recipient mailing address" data-i18n-placeholder="letterPrefs.recipientAddrPlaceholder"></textarea>
+                </div>
+            </fieldset>
+
+            <!-- Letter Body -->
+            <fieldset class="form-fieldset">
+                <legend data-i18n="letterPrefs.letterBody">Letter Body</legend>
+                <div class="form-group">
+                    <label for="pref-intro" data-i18n="letterPrefs.introText">Introduction</label>
+                    <textarea id="pref-intro" class="form-control" rows="3"></textarea>
+                    <small class="form-help" data-i18n="letterPrefs.introHelp">Use {name} for your name and {location} for the site location.</small>
+                </div>
+                <div class="form-group">
+                    <label for="pref-commitments" data-i18n="letterPrefs.commitments">Commitments (one per line)</label>
+                    <textarea id="pref-commitments" class="form-control" rows="7"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="pref-insurance" data-i18n="letterPrefs.insurance">Insurance Statement</label>
+                    <textarea id="pref-insurance" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="pref-closing" data-i18n="letterPrefs.closingText">Closing Paragraph</label>
+                    <textarea id="pref-closing" class="form-control" rows="3"></textarea>
+                </div>
+            </fieldset>
+
+            <!-- Actions -->
+            <div class="letter-settings-actions">
+                <button type="button" class="btn btn-secondary" id="btn-reset-defaults" data-i18n="letterPrefs.resetGeneric">Reset to Generic</button>
+                <div style="display:flex;gap:0.5rem;">
+                    <button type="button" class="btn btn-secondary" id="btn-save-prefs" data-i18n="letterPrefs.saveDefaults">Save as My Defaults</button>
+                    <button type="button" class="btn btn-primary" id="btn-apply-letter" data-i18n="letterPrefs.applyToLetter">Apply to Letter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- The actual letter (contenteditable for final tweaks) -->
+    <main class="print-page print-letter" id="letter-content">
+        <div class="letter-from" id="letter-from">
+            <div contenteditable="true" class="editable-field no-print-border" id="from-name">[Your Name]</div>
+            <div contenteditable="true" class="editable-field no-print-border" id="from-address">[Your Address]</div>
+            <div contenteditable="true" class="editable-field no-print-border" id="from-contact">[Your Phone / Email]</div>
+        </div>
+
+        <div class="letter-date" id="letter-date"></div>
+
+        <div class="letter-to">
+            <div id="to-name" class="editable-field" contenteditable="true">[Property Owner / Agency Name]</div>
+            <div id="to-address" class="editable-field" contenteditable="true">[Property Owner Address]</div>
+        </div>
+
+        <div class="letter-subject">
+            <strong data-i18n="print.letterSubject">Re: Request for Permission to Metal Detect on Your Property</strong>
+        </div>
+
+        <div class="letter-body" id="letter-body" contenteditable="true">
+            <p>Dear <span id="owner-greeting">[Property Owner]</span>,</p>
+
+            <div id="letter-intro"></div>
+
+            <p>Metal detecting is a hobby I enjoy that combines an appreciation for history with time spent outdoors. I am committed to being a responsible and respectful detectorist. If granted permission, I will abide by the following commitments:</p>
+
+            <div id="letter-commitments"></div>
+
+            <div id="letter-insurance"></div>
+
+            <div id="letter-closing"></div>
+
+            <p>Sincerely,</p>
+
+            <div class="letter-signature">
+                <div class="signature-line"></div>
+                <div id="sig-name">[Your Name]</div>
+                <div id="sig-title" style="display:none;font-style:italic;font-size:0.9em;"></div>
+                <div id="sig-date">[Date]</div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/i18n.js"></script>
+    <script src="/js/offline-store.js"></script>
+    <script src="/js/sync-engine.js"></script>
+    <script src="/js/offline-ui.js"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/print-permission.js"></script>
+    <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js');}</script>
+</body>
+</html>

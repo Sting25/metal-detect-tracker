@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PK15CRVY76"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-PK15CRVY76');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Metal Detecting Laws by Country & State - Signal Bouncer Legal Reference</title>
+    <meta name="description" content="Metal detecting laws and regulations for the US, UK, Australia, Canada, and New Zealand. Find federal and state-level rules for metal detecting on public and private land.">
+    <link rel="canonical" href="https://signalbouncer.com/legal.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://signalbouncer.com/legal.html">
+    <meta property="og:title" content="Metal Detecting Laws by Country & State - Signal Bouncer Legal Reference">
+    <meta property="og:description" content="Metal detecting laws and regulations for the US, UK, Australia, Canada, and New Zealand. Federal and state-level rules for detecting on public and private land.">
+    <meta property="og:site_name" content="Signal Bouncer">
+    <meta property="og:image" content="https://signalbouncer.com/icons/og-image.png">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@Signal_Bouncer">
+    <meta name="twitter:title" content="Metal Detecting Laws by Country & State - Legal Reference">
+    <meta name="twitter:description" content="Metal detecting laws and regulations for the US, UK, Australia, Canada, and New Zealand. Federal and state-level rules for public and private land.">
+    <meta name="twitter:image" content="https://signalbouncer.com/icons/og-image.png">
+
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#5c4033">
+</head>
+<body>
+    <!-- Authenticated nav (shown when logged in) -->
+    <nav class="navbar" id="nav-authed" style="display:none;">
+        <a href="/landing.html" class="nav-brand"><img src="/icons/logo-nav.png" alt="" class="nav-brand-logo" width="28" height="28"><span class="nav-brand-full" data-i18n="app.name">Signal Bouncer</span><span class="nav-brand-short">Signal Bouncer</span></a>
+        <button class="nav-toggle" onclick="document.querySelector('#nav-authed .nav-links').classList.toggle('open')">&#9776;</button>
+        <div class="nav-links">
+            <a href="/index.html" data-i18n="nav.dashboard">Dashboard</a>
+            <a href="/sites.html" data-i18n="nav.sites">Sites</a>
+            <a href="/finds.html" data-i18n="nav.finds">Finds</a>
+            <a href="/hunts.html" data-i18n="nav.hunts">Hunts</a>
+            <a href="/permissions.html" data-i18n="nav.permissions">Permissions</a>
+            <a href="/legal.html" class="active" data-i18n="nav.legal">Legal Reference</a>
+        </div>
+    </nav>
+    <!-- Public nav (shown when not logged in) -->
+    <nav class="navbar" id="nav-public">
+        <a href="/landing.html" class="nav-brand"><img src="/icons/logo-nav.png" alt="" class="nav-brand-logo" width="28" height="28"><span class="nav-brand-full" data-i18n="app.name">Signal Bouncer</span><span class="nav-brand-short">Signal Bouncer</span></a>
+        <div class="nav-links">
+            <a href="/landing.html" data-i18n="auth.backToHome">Home</a>
+            <a href="/legal.html" class="active" data-i18n="nav.legal">Legal Reference</a>
+            <a href="/login.html" data-i18n="auth.login">Login</a>
+            <a href="/login.html#register" class="btn btn-primary btn-sm" style="color:#fff;border-radius:var(--radius-md);padding:6px 16px;">Sign Up</a>
+        </div>
+    </nav>
+    <script>
+        // Show correct nav based on auth state
+        if (localStorage.getItem('mdt_token')) {
+            document.getElementById('nav-authed').style.display = '';
+            document.getElementById('nav-public').style.display = 'none';
+        }
+    </script>
+
+    <main class="container legal-page">
+        <h1 data-i18n="legal.title">Metal Detecting - Legal Reference</h1>
+
+        <!-- Disclaimer banner -->
+        <div class="legal-disclaimer" style="background:var(--color-warning-bg, #fff3cd);border:1px solid var(--color-warning-border, #ffc107);border-radius:var(--radius-md, 8px);padding:1rem 1.25rem;margin-bottom:1.5rem;">
+            <p style="margin:0;font-size:0.95rem;" data-i18n-html="legal.disclaimer"><strong>Important:</strong> This information is provided as a general reference only. Laws change frequently and vary by jurisdiction. Always verify current regulations with local authorities before detecting. This is not legal advice.</p>
+        </div>
+
+        <!-- Country / Region selectors -->
+        <div class="legal-selectors" style="display:flex;flex-wrap:wrap;gap:1rem;align-items:center;margin-bottom:1.5rem;">
+            <div>
+                <label for="legal-country" style="font-weight:600;margin-right:0.5rem;" data-i18n="legal.countryLabel">Country:</label>
+                <select id="legal-country" class="form-control" style="display:inline-block;width:auto;min-width:180px;">
+                    <option value="US" data-i18n="legal.country.US">United States</option>
+                    <option value="GB" data-i18n="legal.country.GB">United Kingdom</option>
+                    <option value="AU" data-i18n="legal.country.AU">Australia</option>
+                    <option value="CA" data-i18n="legal.country.CA">Canada</option>
+                    <option value="NZ" data-i18n="legal.country.NZ">New Zealand</option>
+                </select>
+            </div>
+            <div id="region-selector-wrapper" style="display:none;">
+                <label for="legal-region" style="font-weight:600;margin-right:0.5rem;" data-i18n="legal.regionLabel">State / Region:</label>
+                <select id="legal-region" class="form-control" style="display:inline-block;width:auto;min-width:200px;">
+                    <option value="" data-i18n="legal.selectRegion">Select a state or region...</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- National content rendered here -->
+        <div id="legal-national-content">
+            <p class="text-muted" data-i18n="common.loading">Loading...</p>
+        </div>
+
+        <!-- Regional content rendered here -->
+        <div id="legal-regional-content"></div>
+
+        <!-- Suggest Update (logged-in users only) -->
+        <div id="legal-suggest-section" style="display:none;margin-top:2rem;padding:1.25rem;border:1px solid var(--color-border, #e0e0e0);border-radius:var(--radius-md, 8px);background:var(--color-surface, #fff);">
+            <h3 style="margin:0 0 0.5rem;font-size:1.1rem;" data-i18n="legal.suggest.title">Suggest an Update</h3>
+            <p style="margin:0 0 0.75rem;font-size:0.9rem;color:var(--color-text-muted, #888);" data-i18n="legal.suggest.description">See something outdated or incorrect? Let us know and we'll review it.</p>
+            <div style="display:flex;flex-wrap:wrap;gap:0.75rem;margin-bottom:0.75rem;">
+                <div style="flex:1;min-width:150px;">
+                    <label for="legal-suggest-type" style="font-size:0.85rem;font-weight:600;" data-i18n="legal.suggest.type">Type:</label>
+                    <select id="legal-suggest-type" class="form-control" style="margin-top:0.25rem;">
+                        <option value="correction" data-i18n="legal.suggest.type.correction">Correction</option>
+                        <option value="outdated" data-i18n="legal.suggest.type.outdated">Outdated Info</option>
+                        <option value="new_section" data-i18n="legal.suggest.type.new_section">New Section</option>
+                        <option value="add_region" data-i18n="legal.suggest.type.add_region">Add Region</option>
+                        <option value="other" data-i18n="legal.suggest.type.other">Other</option>
+                    </select>
+                </div>
+                <div style="flex:1;min-width:150px;">
+                    <label for="legal-suggest-section-ref" style="font-size:0.85rem;font-weight:600;" data-i18n="legal.suggest.section">Related Section:</label>
+                    <select id="legal-suggest-section-ref" class="form-control" style="margin-top:0.25rem;">
+                        <option value="">(None / General)</option>
+                    </select>
+                </div>
+            </div>
+            <textarea id="legal-suggest-text" class="form-control" rows="3" placeholder="Describe what needs updating..." style="margin-bottom:0.75rem;" data-i18n-placeholder="legal.suggest.textPlaceholder"></textarea>
+            <textarea id="legal-suggest-reason" class="form-control" rows="2" placeholder="Why is this change needed? (optional)" style="margin-bottom:0.75rem;" data-i18n-placeholder="legal.suggest.reasonPlaceholder"></textarea>
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+                <button class="btn btn-primary btn-sm" id="btn-suggest-legal" data-i18n="legal.suggest.submit">Submit Suggestion</button>
+                <span id="legal-suggest-status" style="font-size:0.85rem;"></span>
+            </div>
+        </div>
+
+        <!-- My Suggestions (logged-in users only) -->
+        <div id="legal-my-suggestions" style="display:none;margin-top:1.5rem;">
+            <h3 style="margin:0 0 0.75rem;font-size:1.1rem;" data-i18n="legal.suggest.history">My Suggestions</h3>
+            <div id="legal-my-suggestions-list"></div>
+        </div>
+    </main>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/i18n.js"></script>
+    <script src="/js/offline-store.js"></script>
+    <script src="/js/sync-engine.js"></script>
+    <script src="/js/offline-ui.js"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/legal.js"></script>
+    <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js');}</script>
+</body>
+</html>

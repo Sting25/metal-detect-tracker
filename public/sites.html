@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PK15CRVY76"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-PK15CRVY76');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Sites - Signal Bouncer</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#5c4033">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/landing.html" class="nav-brand"><img src="/icons/logo-nav.png" alt="" class="nav-brand-logo" width="28" height="28"><span class="nav-brand-full" data-i18n="app.name">Signal Bouncer</span><span class="nav-brand-short">Signal Bouncer</span></a>
+        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">&#9776;</button>
+        <div class="nav-links">
+            <a href="/index.html" data-i18n="nav.dashboard">Dashboard</a>
+            <a href="/sites.html" class="active" data-i18n="nav.sites">Sites</a>
+            <a href="/finds.html" data-i18n="nav.finds">Finds</a>
+            <a href="/hunts.html" data-i18n="nav.hunts">Hunts</a>
+            <a href="/permissions.html" data-i18n="nav.permissions">Permissions</a>
+            <a href="/legal.html" data-i18n="nav.legal">Legal Reference</a>
+        </div>
+    </nav>
+
+    <main class="sites-page">
+        <div class="page-header">
+            <h1 class="page-title" data-i18n="sites.title">Sites</h1>
+            <div class="page-header-actions">
+                <button class="btn btn-secondary" id="btn-bulk-import" data-i18n="sites.bulkImport">Bulk Import</button>
+                <button class="btn btn-primary" id="btn-add-site" data-i18n="sites.addNew">+ Add New Site</button>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <select id="filter-status" class="filter-input">
+                <option value="" data-i18n="sites.filter.allStatuses">All Statuses</option>
+                <option value="identified" data-i18n="sites.status.identified">Identified</option>
+                <option value="scouted" data-i18n="sites.status.scouted">Scouted</option>
+                <option value="detecting" data-i18n="sites.status.detecting">Detecting</option>
+                <option value="exhausted" data-i18n="sites.status.exhausted">Exhausted</option>
+            </select>
+            <select id="filter-land-type" class="filter-input">
+                <option value="" data-i18n="sites.filter.allLandTypes">All Land Types</option>
+                <option value="private">Private</option>
+                <option value="blm">BLM</option>
+                <option value="national_grassland">National Grassland</option>
+                <option value="state_trust">State Trust</option>
+                <option value="state_park">State Park</option>
+                <option value="usfs">National Forest (USFS)</option>
+                <option value="county">County</option>
+                <option value="municipal">Municipal</option>
+                <option value="unknown">Unknown</option>
+            </select>
+            <select id="filter-priority" class="filter-input">
+                <option value="" data-i18n="sites.filter.allPriorities">All Priorities</option>
+                <option value="5" data-i18n="sites.filter.stars5">5 Stars</option>
+                <option value="4" data-i18n="sites.filter.stars4">4+ Stars</option>
+                <option value="3" data-i18n="sites.filter.stars3">3+ Stars</option>
+                <option value="2" data-i18n="sites.filter.stars2">2+ Stars</option>
+                <option value="1" data-i18n="sites.filter.stars1">1+ Star</option>
+            </select>
+            <input type="text" id="filter-tags" class="filter-input" placeholder="Search tags..." data-i18n-placeholder="sites.filter.searchTags">
+        </div>
+
+        <!-- Mobile Map Toggle -->
+        <div class="mobile-map-toggle" id="mobile-map-toggle">
+            <button class="btn btn-secondary mobile-map-toggle-btn" id="btn-toggle-map">
+                <span id="toggle-map-icon">&#128506;</span> <span id="toggle-map-label" data-i18n="sites.showMap">Show Map</span>
+            </button>
+            <button class="btn btn-secondary mobile-quick-add-btn" id="btn-quick-add-header" title="Quick Add Site">
+                &#128247; <span data-i18n="sites.quickAdd">Quick Add</span>
+            </button>
+        </div>
+
+        <!-- Split View -->
+        <div class="split-view">
+            <div class="list-panel" id="sites-list-panel">
+                <div id="sites-list" class="sites-card-list">
+                    <p class="loading-text" data-i18n="sites.loading">Loading sites...</p>
+                </div>
+            </div>
+            <div class="map-panel map-panel-collapsed" id="sites-map-panel">
+                <div id="sites-map" style="width:100%;height:100%;"></div>
+            </div>
+        </div>
+
+        <!-- Site Detail Panel (slides in from right) -->
+        <div class="detail-panel" id="site-detail-panel"></div>
+    </main>
+
+    <!-- Bulk Import Modal -->
+    <div class="modal-overlay" id="bulk-modal-overlay">
+        <div class="modal" id="bulk-modal">
+            <div class="modal-header">
+                <h2 data-i18n="sites.bulk.title">Bulk Import Sites</h2>
+                <button class="modal-close" id="btn-bulk-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="bulk-help" data-i18n="sites.bulk.instructions">Paste CSV or JSON data to import multiple sites at once.</p>
+                <div class="form-group">
+                    <label for="bulk-format" data-i18n="sites.bulk.formatLabel">Format</label>
+                    <select id="bulk-format" class="form-control">
+                        <option value="csv" data-i18n="sites.bulk.formatCsv">CSV (name,latitude,longitude,land_type,description,tags)</option>
+                        <option value="json" data-i18n="sites.bulk.formatJson">JSON (array of site objects)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="bulk-data" data-i18n="sites.bulk.dataLabel">Data</label>
+                    <textarea id="bulk-data" class="form-control" rows="10" placeholder="Paste your data here..." data-i18n-placeholder="sites.bulk.placeholder"></textarea>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="sites.bulk.uploadFile">Or upload a file</label>
+                    <input type="file" id="bulk-file" accept=".csv,.json,.txt" class="form-control">
+                </div>
+                <div id="bulk-preview" class="bulk-preview" style="display:none;">
+                    <h4>Preview (<span id="bulk-count">0</span> sites)</h4>
+                    <div id="bulk-preview-list" class="bulk-preview-list"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btn-bulk-preview" data-i18n="sites.bulk.btnPreview">Preview</button>
+                    <button type="button" class="btn btn-primary" id="btn-bulk-submit" disabled data-i18n="sites.bulk.btnImport">Import All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Site Modal -->
+    <div class="modal-overlay" id="site-modal-overlay">
+        <div class="modal" id="site-modal">
+            <div class="modal-header">
+                <h2 id="site-modal-title" data-i18n="sites.modal.addTitle">Add New Site</h2>
+                <button class="modal-close" id="btn-modal-close">&times;</button>
+            </div>
+            <form id="site-form" class="modal-body">
+                <input type="hidden" id="site-id" name="id">
+
+                <div class="form-group">
+                    <label for="site-name" data-i18n="sites.label.name">Name *</label>
+                    <input type="text" id="site-name" name="name" required class="form-control" placeholder="Site name" data-i18n-placeholder="sites.placeholder.name">
+                </div>
+
+                <div class="form-group">
+                    <label for="site-description" data-i18n="sites.label.description">Description</label>
+                    <textarea id="site-description" name="description" class="form-control" rows="3" placeholder="Describe this site..." data-i18n-placeholder="sites.placeholder.description"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="site-latitude" data-i18n="sites.label.latitude">Latitude *</label>
+                        <input type="number" id="site-latitude" name="latitude" required class="form-control" step="any" placeholder="e.g. 39.7392" data-i18n-placeholder="sites.placeholder.latitude">
+                    </div>
+                    <div class="form-group">
+                        <label for="site-longitude" data-i18n="sites.label.longitude">Longitude *</label>
+                        <input type="number" id="site-longitude" name="longitude" required class="form-control" step="any" placeholder="e.g. -104.9903" data-i18n-placeholder="sites.placeholder.longitude">
+                    </div>
+                    <div class="form-group form-group-btn">
+                        <button type="button" class="btn btn-secondary" id="btn-pick-on-map" data-i18n="sites.btn.pickOnMap">Pick on Map</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="site-image" data-i18n="sites.label.siteImage">Site Image</label>
+                    <div class="upload-area" id="site-upload-area">
+                        <div class="upload-placeholder" id="site-upload-placeholder">
+                            <span class="upload-icon">&#128247;</span>
+                            <p>Drag &amp; drop an image here or click to browse</p>
+                        </div>
+                        <img id="site-image-preview" class="upload-preview" style="display:none;" alt="Preview">
+                        <input type="file" id="site-image" name="image" accept="image/*" class="upload-input">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="site-land-type" data-i18n="sites.label.landType">Land Type</label>
+                        <select id="site-land-type" name="land_type" class="form-control">
+                            <option value="" data-i18n="common.select">Select...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="site-permission-status" data-i18n="sites.label.permissionStatus">Permission Status</label>
+                        <select id="site-permission-status" name="permission_status" class="form-control">
+                            <option value="not_requested" data-i18n="sites.permStatus.notRequested">Not Requested</option>
+                            <option value="requested" data-i18n="sites.permStatus.requested">Requested</option>
+                            <option value="granted" data-i18n="sites.permStatus.granted">Granted</option>
+                            <option value="denied" data-i18n="sites.permStatus.denied">Denied</option>
+                            <option value="not_required" data-i18n="sites.permStatus.notRequired">Not Required</option>
+                        </select>
+                    </div>
+                </div>
+
+                <fieldset class="form-fieldset">
+                    <legend data-i18n="sites.label.contactInfo">Contact Information</legend>
+                    <div class="form-group">
+                        <label for="site-contact-name" data-i18n="sites.label.contactName">Contact Name</label>
+                        <input type="text" id="site-contact-name" name="contact_name" class="form-control" placeholder="Owner/Manager name" data-i18n-placeholder="sites.placeholder.contactName">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="site-contact-phone" data-i18n="sites.label.phone">Phone</label>
+                            <input type="tel" id="site-contact-phone" name="contact_phone" class="form-control" placeholder="(555) 555-5555" data-i18n-placeholder="sites.placeholder.phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="site-contact-email" data-i18n="sites.label.email">Email</label>
+                            <input type="email" id="site-contact-email" name="contact_email" class="form-control" placeholder="email@example.com" data-i18n-placeholder="sites.placeholder.email">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div class="form-group">
+                    <label for="site-legal-notes" data-i18n="sites.label.legalNotes">Legal Notes</label>
+                    <textarea id="site-legal-notes" name="legal_notes" class="form-control" rows="2" placeholder="Any legal considerations..." data-i18n-placeholder="sites.placeholder.legalNotes"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="site-status" data-i18n="sites.label.status">Site Status</label>
+                        <select id="site-status" name="status" class="form-control">
+                            <option value="identified" data-i18n="sites.status.identified">Identified</option>
+                            <option value="scouted" data-i18n="sites.status.scouted">Scouted</option>
+                            <option value="detecting" data-i18n="sites.status.detecting">Detecting</option>
+                            <option value="exhausted" data-i18n="sites.status.exhausted">Exhausted</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="sites.label.priority">Priority</label>
+                        <div class="star-selector" id="site-priority-selector">
+                            <span class="star" data-value="1">&#9733;</span>
+                            <span class="star" data-value="2">&#9733;</span>
+                            <span class="star" data-value="3">&#9733;</span>
+                            <span class="star" data-value="4">&#9733;</span>
+                            <span class="star" data-value="5">&#9733;</span>
+                        </div>
+                        <input type="hidden" id="site-priority" name="priority" value="3">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="site-notes" data-i18n="sites.label.notes">Notes</label>
+                    <textarea id="site-notes" name="notes" class="form-control" rows="3" placeholder="Additional notes..." data-i18n-placeholder="sites.placeholder.notes"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="site-tags-input" data-i18n="sites.label.tags">Tags</label>
+                    <div class="tags-input-wrapper">
+                        <div id="site-tags-display" class="tags-display"></div>
+                        <input type="text" id="site-tags-input" class="form-control" placeholder="Type a tag and press Enter..." data-i18n-placeholder="sites.placeholder.tags">
+                        <input type="hidden" id="site-tags" name="tags">
+                    </div>
+                    <div class="tag-suggestions" id="tag-suggestions">
+                        <span class="tag-chip suggestion" data-tag="homestead">homestead</span>
+                        <span class="tag-chip suggestion" data-tag="ghost_town">ghost_town</span>
+                        <span class="tag-chip suggestion" data-tag="foundation">foundation</span>
+                        <span class="tag-chip suggestion" data-tag="tree_cluster">tree_cluster</span>
+                        <span class="tag-chip suggestion" data-tag="windmill">windmill</span>
+                        <span class="tag-chip suggestion" data-tag="cistern">cistern</span>
+                        <span class="tag-chip suggestion" data-tag="dump_site">dump_site</span>
+                        <span class="tag-chip suggestion" data-tag="cellar_hole">cellar_hole</span>
+                        <span class="tag-chip suggestion" data-tag="old_road">old_road</span>
+                        <span class="tag-chip suggestion" data-tag="windbreak">windbreak</span>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="btn-delete-site" style="display:none;" data-i18n="sites.modal.delete">Delete</button>
+                    <div class="modal-footer-right">
+                        <button type="button" class="btn btn-secondary" id="btn-cancel-site" data-i18n="sites.modal.cancel">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="btn-save-site" data-i18n="sites.modal.save">Save Site</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Share Site Modal -->
+    <div class="modal-overlay" id="share-modal-overlay">
+        <div class="modal modal-sm" id="share-modal">
+            <div class="modal-header">
+                <h2 id="share-modal-title" data-i18n="sites.share.title">Share Site</h2>
+                <button class="modal-close" id="btn-share-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="share-site-id">
+                <div class="form-group">
+                    <label for="share-email" data-i18n="sites.share.userEmail">User Email</label>
+                    <input type="email" id="share-email" class="form-control" placeholder="Enter user's email address" data-i18n-placeholder="sites.share.userEmailPlaceholder">
+                </div>
+                <div class="form-group">
+                    <label for="share-permission" data-i18n="sites.share.permissionLevel">Permission Level</label>
+                    <select id="share-permission" class="form-control">
+                        <option value="view" data-i18n="sites.share.viewOnly">View Only</option>
+                        <option value="edit" data-i18n="sites.share.canEdit">Can Edit</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btn-cancel-share" data-i18n="common.cancel">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="btn-submit-share" data-i18n="sites.share.btn">Share</button>
+                </div>
+                <div id="share-list-section" style="display:none;">
+                    <h3 class="share-list-title" data-i18n="sites.share.currentlyShared">Currently Shared With</h3>
+                    <div id="share-list" class="share-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/i18n.js"></script>
+    <script src="/js/offline-store.js"></script>
+    <script src="/js/sync-engine.js"></script>
+    <script src="/js/offline-ui.js"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/map.js"></script>
+    <script src="/js/quick-add.js"></script>
+    <script src="/js/sites.js"></script>
+    <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js');}</script>
+</body>
+</html>

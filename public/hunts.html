@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PK15CRVY76"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-PK15CRVY76');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Hunts - Signal Bouncer</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#5c4033">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/landing.html" class="nav-brand"><img src="/icons/logo-nav.png" alt="" class="nav-brand-logo" width="28" height="28"><span class="nav-brand-full" data-i18n="app.name">Signal Bouncer</span><span class="nav-brand-short">Signal Bouncer</span></a>
+        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">&#9776;</button>
+        <div class="nav-links">
+            <a href="/index.html" data-i18n="nav.dashboard">Dashboard</a>
+            <a href="/sites.html" data-i18n="nav.sites">Sites</a>
+            <a href="/finds.html" data-i18n="nav.finds">Finds</a>
+            <a href="/hunts.html" class="active" data-i18n="nav.hunts">Hunts</a>
+            <a href="/permissions.html" data-i18n="nav.permissions">Permissions</a>
+            <a href="/legal.html" data-i18n="nav.legal">Legal Reference</a>
+        </div>
+    </nav>
+
+    <main class="hunts-page">
+        <!-- Hunt List View -->
+        <section id="hunt-list-view">
+            <div class="page-header">
+                <h1 class="page-title" data-i18n="hunts.title">Hunts</h1>
+                <button class="btn btn-primary" id="btn-start-hunt" data-i18n="hunts.startNew">Start New Hunt</button>
+            </div>
+
+            <!-- Filters -->
+            <div class="filter-bar" style="display: flex; gap: var(--space-sm); flex-wrap: wrap; margin-bottom: var(--space-md);">
+                <select id="filter-status" class="form-input" style="width: auto; min-width: 140px;">
+                    <option value="" data-i18n="hunts.allStatuses">All statuses</option>
+                    <option value="active" data-i18n="hunts.status.active">Active</option>
+                    <option value="paused" data-i18n="hunts.status.paused">Paused</option>
+                    <option value="completed" data-i18n="hunts.status.completed">Completed</option>
+                </select>
+                <select id="filter-site" class="form-input" style="width: auto; min-width: 160px;">
+                    <option value="" data-i18n="hunts.allSites">All sites</option>
+                </select>
+            </div>
+
+            <div id="hunts-container" class="cards-grid"></div>
+            <div id="hunts-empty" class="empty-state" style="display: none;">
+                <p class="text-muted" data-i18n="hunts.noSessions">No hunt sessions yet. Start your first hunt!</p>
+            </div>
+            <div id="hunts-pagination" style="display: flex; justify-content: center; gap: var(--space-sm); margin-top: var(--space-md);"></div>
+        </section>
+
+        <!-- Active Hunt View -->
+        <section id="active-hunt-view" style="display: none;">
+            <div id="hunt-map" style="height: 55vh; min-height: 300px; border-radius: var(--radius-md); overflow: hidden;"></div>
+            <div class="hunt-control-bar">
+                <div class="hunt-stats">
+                    <div class="hunt-stat-item">
+                        <span class="hunt-stat-label" data-i18n="hunts.duration">Duration</span>
+                        <span class="hunt-stat-value" id="hunt-duration">00:00:00</span>
+                    </div>
+                    <div class="hunt-stat-item">
+                        <span class="hunt-stat-label" data-i18n="hunts.distance">Distance</span>
+                        <span class="hunt-stat-value" id="hunt-distance">0 m</span>
+                    </div>
+                    <div class="hunt-stat-item">
+                        <span class="hunt-stat-label" data-i18n="hunts.trackpoints">Track Points</span>
+                        <span class="hunt-stat-value" id="hunt-points">0</span>
+                    </div>
+                    <div class="hunt-stat-item">
+                        <span class="hunt-stat-label">GPS</span>
+                        <span id="gps-indicator" class="gps-dot off"></span>
+                    </div>
+                </div>
+                <div class="hunt-actions">
+                    <button class="btn" id="btn-pause-hunt" data-i18n="hunts.pause">Pause</button>
+                    <button class="btn btn-danger" id="btn-end-hunt" data-i18n="hunts.end">End Hunt</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Session Detail View -->
+        <section id="hunt-detail-view" style="display: none;">
+            <div style="margin-bottom: var(--space-md);">
+                <button class="btn btn-sm" id="btn-back-to-list" data-i18n="hunts.backToList">&larr; Back to Hunts</button>
+            </div>
+            <div id="detail-map" style="height: 400px; border-radius: var(--radius-md); overflow: hidden; margin-bottom: var(--space-md);"></div>
+
+            <div class="settings-card" style="margin-bottom: var(--space-md);">
+                <h3 data-i18n="hunts.sessionDetail">Hunt Detail</h3>
+                <div class="hunt-detail-grid" id="detail-stats">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <div class="settings-card" style="margin-bottom: var(--space-md);">
+                <h3 data-i18n="hunts.notes">Notes</h3>
+                <textarea id="detail-notes" class="form-input" rows="3" style="width: 100%;"></textarea>
+                <div style="margin-top: var(--space-sm); display: flex; gap: var(--space-sm);">
+                    <button class="btn btn-sm btn-primary" id="btn-save-notes">Save Notes</button>
+                    <span id="notes-msg" class="text-muted" style="font-size: var(--font-size-sm);"></span>
+                </div>
+            </div>
+
+            <div class="settings-card" id="detail-finds-section" style="display: none;">
+                <h3 data-i18n="hunts.finds">Finds</h3>
+                <div id="detail-finds-list"></div>
+            </div>
+
+            <div id="hunt-coverage-controls" style="display: none;"></div>
+
+            <div style="margin-top: var(--space-md);">
+                <button class="btn btn-sm btn-danger" id="btn-delete-hunt" data-i18n="hunts.delete">Delete</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Start Hunt Modal -->
+    <div class="modal-overlay" id="start-hunt-modal">
+        <div class="modal modal--sm">
+            <div class="modal-header">
+                <h2 data-i18n="hunts.startNew">Start New Hunt</h2>
+                <button class="modal-close" id="btn-start-modal-close">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: var(--space-lg);">
+                <div class="form-group">
+                    <label for="start-hunt-site" data-i18n="hunts.selectSite">Select a site (optional)</label>
+                    <select id="start-hunt-site" class="form-input">
+                        <option value="" data-i18n="hunts.noSite">No site</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-top: var(--space-md);">
+                    <label for="start-hunt-notes" data-i18n="hunts.notes">Notes</label>
+                    <textarea id="start-hunt-notes" class="form-input" rows="2"></textarea>
+                </div>
+                <div style="display: flex; gap: var(--space-sm); margin-top: var(--space-md);">
+                    <button class="btn btn-primary" id="btn-confirm-start" data-i18n="hunts.startNew">Start New Hunt</button>
+                    <button class="btn" id="btn-cancel-start">Cancel</button>
+                </div>
+                <span id="start-error-msg" class="text-muted" style="font-size: var(--font-size-sm); color: var(--color-status-red); display: block; margin-top: var(--space-sm);"></span>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/i18n.js"></script>
+    <script src="/js/offline-store.js"></script>
+    <script src="/js/sync-engine.js"></script>
+    <script src="/js/offline-ui.js"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/map.js"></script>
+    <script src="/js/hunts.js"></script>
+    <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js');}</script>
+</body>
+</html>

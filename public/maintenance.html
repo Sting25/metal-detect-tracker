@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Signal Bouncer - Upgrading</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #faf6f1 0%, #e8e2db 50%, #d9d0c7 100%);
+            color: #1a1a1a;
+            padding: 1.5rem;
+        }
+
+        .maintenance {
+            max-width: 540px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .maintenance__icon {
+            width: 88px;
+            height: 88px;
+            margin: 0 auto 2rem;
+            background: linear-gradient(135deg, #5c4033, #3e2a22);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(62, 42, 34, 0.2);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .maintenance__icon svg {
+            width: 44px;
+            height: 44px;
+            fill: none;
+            stroke: #faf6f1;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 8px 32px rgba(62, 42, 34, 0.2); }
+            50% { transform: scale(1.05); box-shadow: 0 12px 40px rgba(62, 42, 34, 0.3); }
+        }
+
+        .maintenance__card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 3rem 2.5rem;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e8e2db;
+        }
+
+        .maintenance__brand {
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #5c4033;
+            margin-bottom: 1rem;
+        }
+
+        .maintenance__title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #3e2a22;
+            line-height: 1.3;
+            margin-bottom: 1rem;
+        }
+
+        .maintenance__text {
+            font-size: 1.05rem;
+            color: #6b6b6b;
+            line-height: 1.65;
+            margin-bottom: 1.5rem;
+        }
+
+        .maintenance__divider {
+            width: 48px;
+            height: 3px;
+            background: linear-gradient(90deg, #5c4033, #8B7355);
+            border-radius: 2px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .maintenance__features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .maintenance__tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.4rem 0.85rem;
+            background: #faf6f1;
+            border: 1px solid #e8e2db;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            color: #5c4033;
+            font-weight: 500;
+        }
+
+        .maintenance__tag-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #2d5016;
+        }
+
+        .maintenance__status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 1.2rem;
+            background: #dcfce7;
+            border: 1px solid #bbf7d0;
+            border-radius: 24px;
+            font-size: 0.85rem;
+            color: #166534;
+            font-weight: 500;
+        }
+
+        .maintenance__status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .maintenance__footer {
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: #999999;
+        }
+
+        @media (max-width: 480px) {
+            .maintenance__card { padding: 2rem 1.5rem; }
+            .maintenance__title { font-size: 1.4rem; }
+            .maintenance__text { font-size: 0.95rem; }
+            .maintenance__icon { width: 72px; height: 72px; }
+            .maintenance__icon svg { width: 36px; height: 36px; }
+        }
+    </style>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#5c4033">
+</head>
+<body>
+    <div class="maintenance">
+        <div class="maintenance__icon">
+            <!-- Wrench/gear icon -->
+            <svg viewBox="0 0 24 24">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+            </svg>
+        </div>
+
+        <div class="maintenance__card">
+            <div class="maintenance__brand">Signal Bouncer</div>
+            <h1 class="maintenance__title">We're Upgrading</h1>
+            <p class="maintenance__text">
+                Signal Bouncer is getting a major infrastructure upgrade. We're moving to a faster, more reliable platform to support exciting new features.
+            </p>
+
+            <div class="maintenance__divider"></div>
+
+            <div class="maintenance__features">
+                <span class="maintenance__tag"><span class="maintenance__tag-dot"></span> Faster database</span>
+                <span class="maintenance__tag"><span class="maintenance__tag-dot"></span> Cloud storage</span>
+                <span class="maintenance__tag"><span class="maintenance__tag-dot"></span> Better performance</span>
+                <span class="maintenance__tag"><span class="maintenance__tag-dot"></span> New features coming</span>
+            </div>
+
+            <div class="maintenance__status">
+                <span class="maintenance__status-dot"></span>
+                Upgrade in progress
+            </div>
+
+            <p class="maintenance__footer">
+                Your data is safe. We'll be back shortly.
+            </p>
+        </div>
+    </div>
+    <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js');}</script>
+</body>
+</html>

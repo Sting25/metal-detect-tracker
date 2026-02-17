@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PK15CRVY76"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-PK15CRVY76');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login - Signal Bouncer</title>
+    <meta name="description" content="Sign in or create a free account to start tracking your metal detecting sites, logging finds, and managing landowner permissions.">
+    <link rel="canonical" href="https://signalbouncer.com/login.html">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#5c4033">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.umd.min.js"></script>
+</head>
+<body>
+    <main class="login-page">
+        <div class="login-card">
+            <div class="login-brand">
+                <span class="login-icon">&#9881;</span>
+                <span data-i18n="app.name">Signal Bouncer</span>
+            </div>
+
+            <!-- First-time setup (no users exist) -->
+            <div id="setup-section" style="display:none;">
+                <h2 class="login-heading" data-i18n="auth.createAdmin">Create Admin Account</h2>
+                <p class="text-muted" style="margin-bottom:1rem;font-size:0.9rem;" data-i18n="auth.createAdminDesc">First time setup. Create your admin account to get started.</p>
+                <form id="setup-form">
+                    <div class="form-group">
+                        <label for="setup-name" data-i18n="auth.label.displayName">Display Name</label>
+                        <input type="text" id="setup-name" class="form-control" placeholder="Your name" data-i18n-placeholder="auth.placeholder.name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="setup-email" data-i18n="auth.label.email">Email</label>
+                        <input type="email" id="setup-email" class="form-control" placeholder="you@example.com" data-i18n-placeholder="auth.placeholder.email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="setup-password" data-i18n="auth.label.password">Password</label>
+                        <input type="password" id="setup-password" class="form-control" placeholder="At least 12 characters" data-i18n-placeholder="auth.placeholder.password" required minlength="12">
+                        <small class="form-hint" data-i18n="auth.passwordHint">Must be at least 12 characters</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="setup-password2" data-i18n="auth.label.confirmPassword">Confirm Password</label>
+                        <input type="password" id="setup-password2" class="form-control" placeholder="Confirm password" data-i18n-placeholder="auth.placeholder.confirmPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" id="btn-setup" data-i18n="auth.createAdmin">Create Admin Account</button>
+                </form>
+            </div>
+
+            <!-- Login / Register tabs -->
+            <div id="auth-section" style="display:none;">
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-tab="login" data-i18n="auth.login">Login</button>
+                    <button class="auth-tab" data-tab="register" data-i18n="auth.register">Register</button>
+                </div>
+
+                <!-- Social / Passkey login options -->
+                <div class="auth-social" id="auth-social">
+                    <div id="google-signin-btn"></div>
+                    <button type="button" id="btn-passkey-login" class="btn btn-outline btn-block btn-passkey" style="display:none;">
+                        &#128273; <span data-i18n="auth.passkeyLogin">Sign in with Passkey</span>
+                    </button>
+                    <div class="auth-divider"><span data-i18n="auth.orDivider">or</span></div>
+                </div>
+
+                <!-- Google terms acceptance for new users -->
+                <div id="google-terms-section" style="display:none;">
+                    <h3 style="margin-bottom:0.5rem;" data-i18n="auth.google.completeReg">Complete Registration</h3>
+                    <p class="text-muted" style="font-size:0.9rem;margin-bottom:1rem;" id="google-welcome-msg"></p>
+                    <div class="form-group">
+                        <label class="terms-checkbox">
+                            <input type="checkbox" id="google-terms">
+                            <span data-i18n="auth.terms.label">I agree to the Terms of Use and Disclaimer</span>
+                        </label>
+                        <div class="terms-text">
+                            <p data-i18n="auth.terms.disclaimer">This app is currently in beta. Features may change or have bugs. The Legal Reference section is for informational purposes only and does not constitute legal advice. You are responsible for verifying all laws and regulations in your jurisdiction. Your data is stored on our servers and you may request account deletion at any time by contacting the admin.</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-block" id="btn-google-accept" data-i18n="auth.google.createAccount">Create Account</button>
+                    <div style="text-align:center;margin-top:0.75rem;">
+                        <a href="#" id="link-back-from-google" class="text-muted" style="font-size:0.85rem;" data-i18n="auth.backToLogin">&larr; Back to login</a>
+                    </div>
+                </div>
+
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-email" data-i18n="auth.label.email">Email</label>
+                        <input type="email" id="login-email" class="form-control" placeholder="you@example.com" data-i18n-placeholder="auth.placeholder.email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password" data-i18n="auth.label.password">Password</label>
+                        <input type="password" id="login-password" class="form-control" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" id="btn-login" data-i18n="auth.login">Login</button>
+                    <div style="text-align:center;margin-top:0.75rem;">
+                        <a href="/reset-password.html" class="text-muted" style="font-size:0.85rem;" data-i18n="auth.forgotPassword">Forgot password?</a>
+                    </div>
+                </form>
+
+                <form id="register-form" style="display:none;">
+                    <div class="form-group">
+                        <label for="reg-name"><span data-i18n="auth.label.displayName">Display Name</span> <span class="required-star">*</span></label>
+                        <input type="text" id="reg-name" class="form-control" placeholder="Your name" data-i18n-placeholder="auth.placeholder.name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-email"><span data-i18n="auth.label.email">Email</span> <span class="required-star">*</span></label>
+                        <input type="email" id="reg-email" class="form-control" placeholder="you@example.com" data-i18n-placeholder="auth.placeholder.email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-phone"><span data-i18n="auth.label.phone">Phone Number</span> <span class="text-muted" style="font-size:0.8rem;" data-i18n="auth.label.phoneOptional">(optional)</span></label>
+                        <input type="tel" id="reg-phone" class="form-control" placeholder="+1 (555) 123-4567" data-i18n-placeholder="auth.placeholder.phone">
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-country" data-i18n="auth.label.country">Country</label>
+                        <select id="reg-country" class="form-control">
+                            <option value="US" data-i18n="auth.country.US">United States</option>
+                            <option value="GB" data-i18n="auth.country.GB">United Kingdom</option>
+                            <option value="AU" data-i18n="auth.country.AU">Australia</option>
+                            <option value="CA" data-i18n="auth.country.CA">Canada</option>
+                            <option value="NZ" data-i18n="auth.country.NZ">New Zealand</option>
+                            <option value="OTHER" data-i18n="auth.country.OTHER">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-password"><span data-i18n="auth.label.password">Password</span> <span class="required-star">*</span></label>
+                        <input type="password" id="reg-password" class="form-control" placeholder="Create a strong password" data-i18n-placeholder="auth.placeholder.password" required minlength="12">
+                        <small class="form-hint" data-i18n="auth.passwordHint">At least 12 characters with uppercase, lowercase, and a number</small>
+                        <div id="password-strength" class="password-strength" style="display:none;">
+                            <div class="password-strength-bar"><div class="password-strength-fill"></div></div>
+                            <span class="password-strength-label"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-password2"><span data-i18n="auth.label.confirmPassword">Confirm Password</span> <span class="required-star">*</span></label>
+                        <input type="password" id="reg-password2" class="form-control" placeholder="Re-enter your password" data-i18n-placeholder="auth.placeholder.confirmPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="terms-checkbox">
+                            <input type="checkbox" id="reg-terms">
+                            <span data-i18n="auth.terms.label">I agree to the Terms of Use and Disclaimer</span>
+                        </label>
+                        <div class="terms-text">
+                            <p data-i18n="auth.terms.disclaimer">This app is currently in beta. Features may change or have bugs. The Legal Reference section is for informational purposes only and does not constitute legal advice. You are responsible for verifying all laws and regulations in your jurisdiction. Your data is stored on our servers and you may request account deletion at any time by contacting the admin.</p>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" id="btn-register" data-i18n="auth.register">Register</button>
+                </form>
+
+                <!-- Email Verification -->
+                <div id="verify-section" style="display:none;">
+                    <div style="text-align:center;margin-bottom:1rem;">
+                        <div style="font-size:2rem;margin-bottom:0.5rem;">&#9993;</div>
+                        <h3 style="margin-bottom:0.5rem;" data-i18n="auth.verifyEmail.title">Verify Your Email</h3>
+                        <p class="text-muted" style="font-size:0.9rem;" id="verify-sent-msg">We sent a 6-digit code to your email</p>
+                    </div>
+                    <form id="verify-form">
+                        <div class="form-group">
+                            <label for="verify-code" data-i18n="auth.verifyEmail.codeLabel">Verification Code</label>
+                            <input type="text" id="verify-code" class="form-control" placeholder="6-digit code" data-i18n-placeholder="auth.verifyEmail.codePlaceholder" required maxlength="6" style="font-family:monospace;letter-spacing:4px;text-align:center;font-size:1.3rem;">
+                        </div>
+                        <input type="hidden" id="verify-email">
+                        <button type="submit" class="btn btn-primary btn-block" id="btn-verify" data-i18n="auth.verifyEmail.submit">Verify Email</button>
+                    </form>
+                    <div style="text-align:center;margin-top:0.75rem;">
+                        <a href="#" id="link-resend-code" class="text-muted" style="font-size:0.85rem;" data-i18n="auth.verifyEmail.resend">Didn't get a code? Resend</a>
+                    </div>
+                    <div id="verify-resent" style="display:none;text-align:center;margin-top:0.5rem;color:var(--color-status-green);font-size:0.85rem;" data-i18n="auth.verifyEmail.resent">New code sent!</div>
+                </div>
+            </div>
+
+            <div id="auth-error" class="auth-error" style="display:none;"></div>
+
+            <div class="login-back-link">
+                <a href="/landing.html" data-i18n="auth.backToHome">&larr; Back to home</a>
+            </div>
+        </div>
+    </main>
+    <script src="/js/i18n.js"></script>
+    <script src="/js/login.js"></script>
+    <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js');}</script>
+</body>
+</html>

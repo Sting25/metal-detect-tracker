@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PK15CRVY76"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-PK15CRVY76');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Site Report - Signal Bouncer</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#5c4033">
+</head>
+<body>
+    <nav class="navbar no-print">
+        <a href="/landing.html" class="nav-brand"><img src="/icons/logo-nav.png" alt="" class="nav-brand-logo" width="28" height="28"><span class="nav-brand-full" data-i18n="app.name">Signal Bouncer</span><span class="nav-brand-short">Signal Bouncer</span></a>
+        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">&#9776;</button>
+        <div class="nav-links">
+            <a href="/index.html" data-i18n="nav.dashboard">Dashboard</a>
+            <a href="/sites.html" data-i18n="nav.sites">Sites</a>
+            <a href="/finds.html" data-i18n="nav.finds">Finds</a>
+            <a href="/hunts.html" data-i18n="nav.hunts">Hunts</a>
+            <a href="/permissions.html" data-i18n="nav.permissions">Permissions</a>
+            <a href="/legal.html" data-i18n="nav.legal">Legal Reference</a>
+        </div>
+    </nav>
+
+    <div class="print-toolbar no-print">
+        <button class="btn btn-primary" id="btn-print" onclick="window.print()" data-i18n="print.printReport">Print Report</button>
+        <button class="btn btn-secondary" onclick="if(window.opener||window.history.length<=1){window.close();setTimeout(function(){location.href='/sites.html'},100)}else{history.back()}" data-i18n="print.back">Back</button>
+    </div>
+
+    <main class="print-page" id="report-content">
+        <div class="print-header">
+            <h1 id="report-title" data-i18n="print.siteReport">Site Report</h1>
+            <p class="print-date" id="report-date"></p>
+        </div>
+
+        <!-- Site Overview -->
+        <section class="print-section" id="section-overview">
+            <h2 data-i18n="print.siteOverview">Site Overview</h2>
+            <div class="print-detail-grid">
+                <div class="print-detail-row">
+                    <span class="print-label" data-i18n="print.labelName">Name:</span>
+                    <span class="print-value" id="rpt-name">-</span>
+                </div>
+                <div class="print-detail-row">
+                    <span class="print-label" data-i18n="print.labelStatus">Status:</span>
+                    <span class="print-value" id="rpt-status">-</span>
+                </div>
+                <div class="print-detail-row">
+                    <span class="print-label" data-i18n="print.labelPriority">Priority:</span>
+                    <span class="print-value" id="rpt-priority">-</span>
+                </div>
+                <div class="print-detail-row">
+                    <span class="print-label" data-i18n="print.labelLandType">Land Type:</span>
+                    <span class="print-value" id="rpt-land-type">-</span>
+                </div>
+                <div class="print-detail-row">
+                    <span class="print-label" data-i18n="print.labelCoordinates">Coordinates:</span>
+                    <span class="print-value" id="rpt-coords">-</span>
+                </div>
+                <div class="print-detail-row">
+                    <span class="print-label" data-i18n="print.labelPermStatus">Permission Status:</span>
+                    <span class="print-value" id="rpt-perm-status">-</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Site Image -->
+        <section class="print-section" id="section-image" style="display:none;">
+            <h2 data-i18n="print.siteImage">Site Image</h2>
+            <img id="rpt-image" class="print-site-image" src="" alt="Site Image">
+        </section>
+
+        <!-- Map -->
+        <section class="print-section" id="section-map">
+            <h2 data-i18n="print.location">Location</h2>
+            <div id="rpt-map" class="print-map"></div>
+        </section>
+
+        <!-- Description & Notes -->
+        <section class="print-section" id="section-description">
+            <h2 data-i18n="print.description">Description</h2>
+            <p id="rpt-description">-</p>
+        </section>
+
+        <section class="print-section" id="section-notes" style="display:none;">
+            <h2 data-i18n="print.notes">Notes</h2>
+            <p id="rpt-notes">-</p>
+        </section>
+
+        <section class="print-section" id="section-legal" style="display:none;">
+            <h2 data-i18n="print.legalNotes">Legal Notes</h2>
+            <p id="rpt-legal-notes">-</p>
+        </section>
+
+        <!-- Contact Information -->
+        <section class="print-section" id="section-contact" style="display:none;">
+            <h2 data-i18n="print.contactInfo">Owner / Contact Information</h2>
+            <div class="print-detail-grid">
+                <div class="print-detail-row">
+                    <span class="print-label" data-i18n="print.labelContactName">Contact Name:</span>
+                    <span class="print-value" id="rpt-contact-name">-</span>
+                </div>
+                <div class="print-detail-row">
+                    <span class="print-label" data-i18n="print.labelPhone">Phone:</span>
+                    <span class="print-value" id="rpt-contact-phone">-</span>
+                </div>
+                <div class="print-detail-row">
+                    <span class="print-label" data-i18n="print.labelEmail">Email:</span>
+                    <span class="print-value" id="rpt-contact-email">-</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tags -->
+        <section class="print-section" id="section-tags" style="display:none;">
+            <h2 data-i18n="print.tags">Tags</h2>
+            <div id="rpt-tags" class="print-tags"></div>
+        </section>
+
+        <!-- Finds at this Site -->
+        <section class="print-section" id="section-finds">
+            <h2 data-i18n="print.findsAtSite">Finds at This Site</h2>
+            <div id="rpt-finds-list">
+                <p class="empty-text" data-i18n="print.noFinds">No finds recorded at this site.</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/i18n.js"></script>
+    <script src="/js/offline-store.js"></script>
+    <script src="/js/sync-engine.js"></script>
+    <script src="/js/offline-ui.js"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/print-site.js"></script>
+    <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js');}</script>
+</body>
+</html>

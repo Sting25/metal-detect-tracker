@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PK15CRVY76"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-PK15CRVY76');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Dashboard - Signal Bouncer</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#5c4033">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/landing.html" class="nav-brand"><img src="/icons/logo-nav.png" alt="" class="nav-brand-logo" width="28" height="28"><span class="nav-brand-full" data-i18n="app.name">Signal Bouncer</span><span class="nav-brand-short">Signal Bouncer</span></a>
+        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">&#9776;</button>
+        <div class="nav-links">
+            <a href="/index.html" class="active" data-i18n="nav.dashboard">Dashboard</a>
+            <a href="/sites.html" data-i18n="nav.sites">Sites</a>
+            <a href="/finds.html" data-i18n="nav.finds">Finds</a>
+            <a href="/hunts.html" data-i18n="nav.hunts">Hunts</a>
+            <a href="/permissions.html" data-i18n="nav.permissions">Permissions</a>
+            <a href="/legal.html" data-i18n="nav.legal">Legal Reference</a>
+        </div>
+    </nav>
+
+    <main class="dashboard-page">
+        <h1 class="page-title" data-i18n="dashboard.title">Dashboard</h1>
+
+        <div class="stats-row">
+            <a href="/sites.html" class="stat-card stat-card-link">
+                <div class="stat-icon">&#128205;</div>
+                <div class="stat-value" id="stat-total-sites">--</div>
+                <div class="stat-label" data-i18n="dashboard.totalSites">Total Sites</div>
+            </a>
+            <a href="/permissions.html" class="stat-card stat-card-link">
+                <div class="stat-icon">&#9989;</div>
+                <div class="stat-value" id="stat-permitted-sites">--</div>
+                <div class="stat-label" data-i18n="dashboard.sitesWithPermission">Sites with Permission</div>
+            </a>
+            <a href="/finds.html" class="stat-card stat-card-link">
+                <div class="stat-icon">&#129689;</div>
+                <div class="stat-value" id="stat-total-finds">--</div>
+                <div class="stat-label" data-i18n="dashboard.totalFinds">Total Finds</div>
+            </a>
+            <a href="/finds.html" class="stat-card stat-card-link">
+                <div class="stat-icon">&#128176;</div>
+                <div class="stat-value" id="stat-estimated-value">--</div>
+                <div class="stat-label" data-i18n="dashboard.estimatedValue">Estimated Value</div>
+            </a>
+        </div>
+
+        <!-- Upcoming Reminders Widget -->
+        <section class="reminders-widget" id="reminders-widget" style="display:none;">
+            <div class="reminders-widget-header">
+                <h2 class="section-title" data-i18n="reminders.upcoming">Upcoming Reminders</h2>
+                <a href="/permissions.html" class="reminders-view-all" data-i18n="permissions.title">Permissions</a>
+            </div>
+            <div id="reminders-list" class="reminders-list"></div>
+        </section>
+
+        <section class="dashboard-map-section">
+            <h2 class="section-title" data-i18n="dashboard.allSitesOverview">All Sites Overview</h2>
+            <div id="dashboard-map" class="dashboard-map"></div>
+            <div class="map-legend">
+                <h3 data-i18n="dashboard.siteTypes">Site Types</h3>
+                <div class="legend-items">
+                    <div class="legend-item">
+                        <span class="legend-icon">&#127968;</span>
+                        <span data-i18n="dashboard.siteType.homestead">Homestead</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-icon">&#128652;</span>
+                        <span data-i18n="dashboard.siteType.stagecoachStop">Stagecoach Stop</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-icon">&#127806;</span>
+                        <span data-i18n="dashboard.siteType.ranch">Ranch</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-icon">&#127754;</span>
+                        <span data-i18n="dashboard.siteType.creekSite">Creek Site</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-icon">&#127962;&#65039;</span>
+                        <span data-i18n="dashboard.siteType.ghostTown">Ghost Town</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-icon">&#129522;</span>
+                        <span data-i18n="dashboard.siteType.magnetFishing">Magnet Fishing</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-icon">&#128205;</span>
+                        <span data-i18n="dashboard.siteType.other">Other</span>
+                    </div>
+                </div>
+                <h3 style="margin-top: 10px;" data-i18n="dashboard.borderPermissionStatus">Border = Permission Status</h3>
+                <div class="legend-items">
+                    <div class="legend-item">
+                        <span class="legend-dot" style="background:#2ecc40;"></span>
+                        <span data-i18n="sites.permStatus.granted">Granted</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot" style="background:#ffdc00;"></span>
+                        <span data-i18n="sites.permStatus.requested">Requested</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot" style="background:#e74c3c;"></span>
+                        <span data-i18n="sites.permStatus.denied">Denied</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot" style="background:#3498db;"></span>
+                        <span data-i18n="sites.permStatus.notRequired">Not Required</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot" style="background:#95a5a6;"></span>
+                        <span data-i18n="sites.permStatus.notRequested">Not Requested</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="recent-activity-section">
+            <h2 class="section-title" data-i18n="dashboard.recentActivity">Recent Activity</h2>
+            <div id="recent-activity" class="recent-activity-list">
+                <p class="loading-text" data-i18n="dashboard.loadingActivity">Loading recent activity...</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/i18n.js"></script>
+    <script src="/js/offline-store.js"></script>
+    <script src="/js/sync-engine.js"></script>
+    <script src="/js/offline-ui.js"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/map.js"></script>
+    <script src="/js/dashboard.js"></script>
+    <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js');}</script>
+</body>
+</html>

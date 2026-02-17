@@ -1,0 +1,32 @@
+# Signal Bouncer
+# https://signalbouncer.com
+
+User-agent: *
+
+# Public pages
+Allow: /landing.html
+Allow: /legal.html
+Allow: /privacy.html
+Allow: /login.html
+
+# Block authenticated app pages
+Disallow: /index.html
+Disallow: /sites.html
+Disallow: /finds.html
+Disallow: /hunts.html
+Disallow: /permissions.html
+Disallow: /account.html
+Disallow: /settings.html
+Disallow: /admin.html
+Disallow: /reset-password.html
+Disallow: /print-site.html
+Disallow: /print-permission.html
+Disallow: /permission-approve.html
+
+# Block API and assets
+Disallow: /api/
+Disallow: /js/
+Disallow: /css/
+
+# Sitemap
+Sitemap: https://signalbouncer.com/sitemap.xml

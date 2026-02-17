@@ -1,0 +1,66 @@
+// PM2 ecosystem config — PostgreSQL + S3 version
+// Copy to ecosystem.config.js on the server and fill in real values.
+//   pm2 start ecosystem.config.js
+//   pm2 save
+//
+// To restart after deploy:
+//   pm2 restart metal-detect-tracker
+
+module.exports = {
+    apps: [
+        {
+            name: 'metal-detect-tracker',
+            script: 'server.js',
+            cwd: '/var/www/metal-detect-tracker',
+            env: {
+                NODE_ENV: 'production',
+                PORT: 3000,
+
+                // PostgreSQL connection
+                DATABASE_URL: 'postgresql://myapp:YOUR_PASSWORD@localhost:5432/metal_detect_tracker',
+
+                // JWT secret — REQUIRED (generate with: openssl rand -hex 32)
+                JWT_SECRET: 'CHANGE_ME_TO_A_RANDOM_STRING',
+
+                // S3-compatible storage (DigitalOcean Spaces, AWS S3, MinIO, etc.)
+                DO_SPACES_ENDPOINT: 'https://nyc3.digitaloceanspaces.com',
+                DO_SPACES_BUCKET: 'your-bucket-name',
+                DO_SPACES_KEY: 'YOUR_ACCESS_KEY',
+                DO_SPACES_SECRET: 'YOUR_SECRET_KEY',
+                DO_SPACES_REGION: 'nyc3',
+
+                // Google OAuth (optional — enables "Sign in with Google")
+                GOOGLE_CLIENT_ID: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
+
+                // WebAuthn passkeys (optional — enables passwordless login)
+                WEBAUTHN_RP_NAME: 'Metal Detect Tracker',
+                WEBAUTHN_RP_ID: 'yourdomain.com',
+                WEBAUTHN_ORIGIN: 'https://yourdomain.com',
+
+                // SendGrid email (optional — enables verification, password reset, notifications)
+                SENDGRID_API_KEY: 'SG.your_api_key_here',
+                SENDGRID_FROM_EMAIL: 'noreply@yourdomain.com',
+                SENDGRID_FROM_NAME: 'Metal Detect Tracker',
+
+                // Email verification — set to 'true' to require email verification on registration
+                EMAIL_VERIFICATION_ENABLED: 'true',
+
+                // Twilio SMS (optional — enables phone-based password reset)
+                TWILIO_ACCOUNT_SID: 'ACxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+                TWILIO_AUTH_TOKEN: 'your_auth_token_here',
+                TWILIO_VERIFY_SID: 'VAxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+
+                // Base URL for generated links (permission letters, emails)
+                BASE_URL: 'https://yourdomain.com',
+
+                // Admin bootstrap — set to 'false' after initial admin setup
+                ALLOW_SETUP: 'false',
+            },
+            error_file: '/var/www/metal-detect-tracker/logs/pm2-error.log',
+            out_file: '/var/www/metal-detect-tracker/logs/pm2-out.log',
+            merge_logs: true,
+            max_restarts: 10,
+            restart_delay: 1000
+        }
+    ]
+};

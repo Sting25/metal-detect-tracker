@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Permission Request - Signal Bouncer</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/signature_pad@4.2.0/dist/signature_pad.umd.min.js"></script>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#5c4033">
+</head>
+<body class="approval-page-body">
+    <nav class="navbar approval-navbar">
+        <a href="/landing.html" class="nav-brand">
+            <img src="/icons/logo-nav.png" alt="" class="nav-brand-logo" width="28" height="28">
+            <span class="nav-brand-full">Signal Bouncer</span>
+        </a>
+    </nav>
+
+    <main class="approval-page">
+        <!-- Loading State -->
+        <div id="loading-state" class="approval-state">
+            <div class="approval-card">
+                <p class="loading-text">Loading permission details...</p>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="approval-state" style="display:none;">
+            <div class="approval-card approval-card-error">
+                <div class="approval-icon">&#x26A0;</div>
+                <h2 id="error-title">Error</h2>
+                <p id="error-message">This permission link is no longer valid.</p>
+            </div>
+        </div>
+
+        <!-- Already Actioned State -->
+        <div id="done-state" class="approval-state" style="display:none;">
+            <div class="approval-card approval-card-done">
+                <div class="approval-icon" id="done-icon">&#x2705;</div>
+                <h2 id="done-title">Thank You</h2>
+                <p id="done-message">Your response has been recorded.</p>
+            </div>
+        </div>
+
+        <!-- Main Approval Form -->
+        <div id="approval-form-state" class="approval-state" style="display:none;">
+            <div class="approval-card">
+                <h1 class="approval-title">Permission Request</h1>
+                <p class="approval-subtitle">
+                    <strong id="requester-name"></strong> is requesting permission to metal detect on your property.
+                </p>
+
+                <!-- Permission Details -->
+                <div class="approval-details">
+                    <div class="approval-detail-row">
+                        <span class="approval-detail-label">Landowner / Agency:</span>
+                        <span class="approval-detail-value" id="detail-agency"></span>
+                    </div>
+                    <div class="approval-detail-row" id="detail-site-row" style="display:none;">
+                        <span class="approval-detail-label">Site:</span>
+                        <span class="approval-detail-value" id="detail-site"></span>
+                    </div>
+                    <div class="approval-detail-row" id="detail-desc-row" style="display:none;">
+                        <span class="approval-detail-label">Description:</span>
+                        <span class="approval-detail-value" id="detail-description"></span>
+                    </div>
+                    <div class="approval-detail-row" id="detail-notes-row" style="display:none;">
+                        <span class="approval-detail-label">Notes:</span>
+                        <span class="approval-detail-value" id="detail-notes"></span>
+                    </div>
+                </div>
+
+                <!-- Map (if coordinates available) -->
+                <div id="approval-map-container" style="display:none;">
+                    <div id="approval-map" style="height:200px; border-radius:8px;"></div>
+                </div>
+
+                <!-- Conditions (if set by requester) -->
+                <div id="conditions-section" style="display:none;">
+                    <h3>Conditions & Commitments</h3>
+                    <p id="conditions-text" class="conditions-text"></p>
+                </div>
+
+                <!-- Signature Section -->
+                <div class="signature-section">
+                    <h3>Your Response</h3>
+
+                    <div class="form-group">
+                        <label for="signed-name">Your Full Name *</label>
+                        <input type="text" id="signed-name" class="form-control" placeholder="Type your full legal name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Signature (optional)</label>
+                        <div class="signature-canvas-wrapper">
+                            <canvas id="signature-canvas" class="signature-canvas" width="400" height="150"></canvas>
+                            <button type="button" id="btn-clear-signature" class="btn btn-sm btn-outline">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="landowner-conditions">Additional Conditions (optional)</label>
+                        <textarea id="landowner-conditions" class="form-control" rows="3" placeholder="Any conditions or restrictions you'd like to add..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="approval-actions">
+                    <button type="button" id="btn-approve" class="btn btn-success btn-lg">Approve Permission</button>
+                    <button type="button" id="btn-deny" class="btn btn-danger btn-lg">Deny Request</button>
+                </div>
+
+                <!-- Deny Reason (shown when deny is clicked) -->
+                <div id="deny-section" style="display:none;">
+                    <div class="form-group">
+                        <label for="deny-reason">Reason for Denial (optional)</label>
+                        <textarea id="deny-reason" class="form-control" rows="2" placeholder="Optionally explain why..."></textarea>
+                    </div>
+                    <div class="approval-actions">
+                        <button type="button" id="btn-confirm-deny" class="btn btn-danger">Confirm Denial</button>
+                        <button type="button" id="btn-cancel-deny" class="btn btn-secondary">Cancel</button>
+                    </div>
+                </div>
+
+                <p class="approval-footer-text">
+                    Powered by <a href="https://signalbouncer.com" target="_blank">Signal Bouncer</a>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/permission-approve.js"></script>
+</body>
+</html>

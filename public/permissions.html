@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PK15CRVY76"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-PK15CRVY76');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Permissions - Signal Bouncer</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#5c4033">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/landing.html" class="nav-brand"><img src="/icons/logo-nav.png" alt="" class="nav-brand-logo" width="28" height="28"><span class="nav-brand-full" data-i18n="app.name">Signal Bouncer</span><span class="nav-brand-short">Signal Bouncer</span></a>
+        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">&#9776;</button>
+        <div class="nav-links">
+            <a href="/index.html" data-i18n="nav.dashboard">Dashboard</a>
+            <a href="/sites.html" data-i18n="nav.sites">Sites</a>
+            <a href="/finds.html" data-i18n="nav.finds">Finds</a>
+            <a href="/hunts.html" data-i18n="nav.hunts">Hunts</a>
+            <a href="/permissions.html" class="active" data-i18n="nav.permissions">Permissions</a>
+            <a href="/legal.html" data-i18n="nav.legal">Legal Reference</a>
+        </div>
+    </nav>
+
+    <main class="permissions-page">
+        <div class="page-header">
+            <h1 class="page-title" data-i18n="permissions.title">Permissions</h1>
+            <button class="btn btn-primary" id="btn-add-permission" data-i18n="permissions.addNew">+ New Permission Request</button>
+        </div>
+
+        <!-- Status Filter Tabs -->
+        <div class="filter-tabs" id="filter-tabs">
+            <button class="filter-tab active" data-filter="all" data-i18n="permissions.filter.all">All</button>
+            <button class="filter-tab" data-filter="pending" data-i18n="permissions.status.pending">Pending</button>
+            <button class="filter-tab" data-filter="approved" data-i18n="permissions.status.approved">Approved</button>
+            <button class="filter-tab" data-filter="denied" data-i18n="permissions.status.denied">Denied</button>
+            <button class="filter-tab" data-filter="expired" data-i18n="permissions.status.expired">Expired</button>
+        </div>
+
+        <!-- Permissions List -->
+        <div id="permissions-list" class="permissions-card-list">
+            <p class="loading-text" data-i18n="permissions.loading">Loading permissions...</p>
+        </div>
+    </main>
+
+    <!-- Add/Edit Permission Modal -->
+    <div class="modal-overlay" id="perm-modal-overlay">
+        <div class="modal" id="perm-modal">
+            <div class="modal-header">
+                <h2 id="perm-modal-title" data-i18n="permissions.modal.addTitle">New Permission Request</h2>
+                <button class="modal-close" id="btn-perm-modal-close">&times;</button>
+            </div>
+            <form id="perm-form" class="modal-body">
+                <input type="hidden" id="perm-id" name="id">
+
+                <div class="form-group">
+                    <label for="perm-site" data-i18n="permissions.label.linkedSite">Linked Site</label>
+                    <select id="perm-site" name="site_id" class="form-control">
+                        <option value="" data-i18n="permissions.label.noSite">None (general permission)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="perm-land-type" data-i18n="permissions.label.landType">Land Type</label>
+                    <select id="perm-land-type" name="land_type" class="form-control">
+                        <option value="" data-i18n="common.select">Select...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="perm-agency" data-i18n="permissions.label.agency">Agency or Owner *</label>
+                    <input type="text" id="perm-agency" name="agency_owner" required class="form-control" placeholder="Name of agency or landowner" data-i18n-placeholder="permissions.placeholder.agency">
+                </div>
+
+                <fieldset class="form-fieldset">
+                    <legend data-i18n="permissions.label.contactInfo">Contact Information</legend>
+                    <div class="form-group">
+                        <label for="perm-contact-name" data-i18n="permissions.label.contactName">Contact Name</label>
+                        <input type="text" id="perm-contact-name" name="contact_name" class="form-control" placeholder="Contact person" data-i18n-placeholder="permissions.placeholder.contactName">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="perm-contact-phone" data-i18n="permissions.label.phone">Phone</label>
+                            <input type="tel" id="perm-contact-phone" name="contact_phone" class="form-control" placeholder="(555) 555-5555" data-i18n-placeholder="permissions.placeholder.phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="perm-contact-email" data-i18n="permissions.label.email">Email</label>
+                            <input type="email" id="perm-contact-email" name="contact_email" class="form-control" placeholder="email@example.com" data-i18n-placeholder="permissions.placeholder.email">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="perm-contact-address" data-i18n="permissions.label.address">Address</label>
+                        <input type="text" id="perm-contact-address" name="contact_address" class="form-control" placeholder="Mailing address" data-i18n-placeholder="permissions.placeholder.address">
+                    </div>
+                </fieldset>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="perm-date-requested" data-i18n="permissions.label.dateRequested">Date Requested</label>
+                        <input type="date" id="perm-date-requested" name="date_requested" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="perm-status" data-i18n="permissions.label.status">Status</label>
+                        <select id="perm-status" name="status" class="form-control">
+                            <option value="pending" data-i18n="permissions.status.pending">Pending</option>
+                            <option value="approved" data-i18n="permissions.status.approved">Approved</option>
+                            <option value="denied" data-i18n="permissions.status.denied">Denied</option>
+                            <option value="expired" data-i18n="permissions.status.expired">Expired</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="perm-date-granted" data-i18n="permissions.label.dateGranted">Date Granted</label>
+                        <input type="date" id="perm-date-granted" name="date_granted" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="perm-expiration" data-i18n="permissions.label.expiration">Expiration Date</label>
+                        <input type="date" id="perm-expiration" name="expiration_date" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="perm-document" data-i18n="permissions.label.document">Document (PDF or Image)</label>
+                    <div class="upload-area" id="perm-upload-area">
+                        <div class="upload-placeholder" id="perm-upload-placeholder">
+                            <span class="upload-icon">&#128196;</span>
+                            <p data-i18n="permissions.placeholder.docUpload">Drag &amp; drop a document or click to browse</p>
+                        </div>
+                        <div id="perm-doc-preview" class="doc-preview" style="display:none;">
+                            <span class="doc-icon">&#128196;</span>
+                            <span id="perm-doc-name" class="doc-name"></span>
+                        </div>
+                        <input type="file" id="perm-document" name="document" accept=".pdf,image/*" class="upload-input">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="perm-notes" data-i18n="permissions.label.notes">Notes</label>
+                    <textarea id="perm-notes" name="notes" class="form-control" rows="3" placeholder="Additional notes about this permission..." data-i18n-placeholder="permissions.placeholder.notes"></textarea>
+                </div>
+
+                <!-- Contact Log Timeline (visible in edit mode only) -->
+                <div id="contact-log-section" class="contact-log-section" style="display:none;">
+                    <div class="contact-log-header">
+                        <h3 data-i18n="permissions.contacts.title">Contact Log</h3>
+                        <button type="button" class="btn btn-sm btn-secondary" id="btn-add-contact" data-i18n="permissions.contacts.add">Log Contact</button>
+                    </div>
+
+                    <!-- Inline add contact form (hidden by default) -->
+                    <div id="contact-form" class="contact-form" style="display:none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="contact-type" data-i18n="permissions.contacts.type">Contact Type</label>
+                                <select id="contact-type" class="form-control form-control-sm">
+                                    <option value="phone_call" data-i18n="contact_type.phone_call">Phone Call</option>
+                                    <option value="email" data-i18n="contact_type.email">Email</option>
+                                    <option value="in_person" data-i18n="contact_type.in_person">In Person</option>
+                                    <option value="letter_sent" data-i18n="contact_type.letter_sent">Letter Sent</option>
+                                    <option value="letter_received" data-i18n="contact_type.letter_received">Letter Received</option>
+                                    <option value="other" data-i18n="contact_type.other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-outcome" data-i18n="permissions.contacts.outcome">Outcome</label>
+                                <select id="contact-outcome" class="form-control form-control-sm">
+                                    <option value="">--</option>
+                                    <option value="positive" data-i18n="outcome.positive">Positive</option>
+                                    <option value="neutral" data-i18n="outcome.neutral">Neutral</option>
+                                    <option value="negative" data-i18n="outcome.negative">Negative</option>
+                                    <option value="no_response" data-i18n="outcome.no_response">No Response</option>
+                                    <option value="follow_up_needed" data-i18n="outcome.follow_up_needed">Follow-up Needed</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="contact-date" data-i18n="permissions.contacts.date">Date</label>
+                                <input type="date" id="contact-date" class="form-control form-control-sm">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-notes" data-i18n="permissions.contacts.notes">Notes</label>
+                            <textarea id="contact-notes" class="form-control form-control-sm" rows="2"></textarea>
+                        </div>
+                        <div class="contact-form-actions">
+                            <button type="button" class="btn btn-sm btn-secondary" id="btn-cancel-contact" data-i18n="permissions.modal.cancel">Cancel</button>
+                            <button type="button" class="btn btn-sm btn-primary" id="btn-save-contact" data-i18n="permissions.modal.save">Save</button>
+                        </div>
+                    </div>
+
+                    <div id="contact-timeline" class="contact-timeline">
+                        <p class="contact-empty" data-i18n="permissions.contacts.empty">No contacts logged yet.</p>
+                    </div>
+                </div>
+
+                <!-- Permission Link / Approval Section -->
+                <div id="link-section" class="link-section" style="display:none;">
+                    <div class="link-section-header">
+                        <h4 data-i18n="permissions.link.share">Share Approval Link</h4>
+                        <button type="button" class="btn btn-sm btn-primary" id="btn-create-link" data-i18n="permissions.link.create">Create Link</button>
+                    </div>
+                    <div id="link-result" class="link-result" style="display:none;">
+                        <div class="link-url-row">
+                            <input type="text" id="link-url" class="form-control form-control-sm link-url-input" readonly>
+                            <button type="button" class="btn btn-sm btn-outline" id="btn-copy-link" data-i18n="permissions.link.copyUrl">Copy</button>
+                        </div>
+                        <div class="link-qr-display" id="link-qr-display">
+                            <img id="link-qr-image" src="" alt="QR Code" class="qr-code-img">
+                        </div>
+                        <p class="link-expires-text" id="link-expires-text"></p>
+                    </div>
+                    <div id="link-history" class="link-history">
+                        <p class="link-empty" data-i18n="permissions.link.empty">No links created yet.</p>
+                    </div>
+                </div>
+
+                <!-- Letter Generation Section -->
+                <div id="letter-section" class="letter-section" style="display:none;">
+                    <div class="letter-section-header">
+                        <h4 data-i18n="permissions.letter.generate">Generate Letter</h4>
+                        <button type="button" class="btn btn-sm btn-primary" id="btn-generate-letter" data-i18n="permissions.letter.generate">Generate Letter</button>
+                    </div>
+                    <div id="letter-status" class="letter-status" style="display:none;"></div>
+                    <div id="letter-history" class="letter-history">
+                        <p class="letter-empty" data-i18n="permissions.letter.empty">No letters generated yet.</p>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="btn-delete-perm" style="display:none;" data-i18n="permissions.modal.delete">Delete</button>
+                    <div class="modal-footer-right">
+                        <button type="button" class="btn btn-secondary" id="btn-cancel-perm" data-i18n="permissions.modal.cancel">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="btn-save-perm" data-i18n="permissions.modal.save">Save Permission</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/i18n.js"></script>
+    <script src="/js/offline-store.js"></script>
+    <script src="/js/sync-engine.js"></script>
+    <script src="/js/offline-ui.js"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/map.js"></script>
+    <script src="/js/permissions.js"></script>
+    <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js');}</script>
+</body>
+</html>
