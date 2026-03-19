@@ -3,7 +3,24 @@
     "allow": [
       "Bash(git fetch:*)",
       "Bash(git checkout:*)",
-      "Bash(gh pr list:*)"
+      "Bash(gh pr list:*)",
+      "Bash(npm install:*)",
+      "Read(//Users/brain/**)",
+      "Bash(ping:*)",
+      "Bash(arp:*)",
+      "Bash(ssh:*)",
+      "Bash(node:*)",
+      "Bash(curl:*)",
+      "Bash(kill %2)",
+      "Bash(kill %1)",
+      "Bash(ls /Users/brain/metal-detect-tracker/public/landing*)",
+      "Bash(ls /Users/brain/metal-detect-tracker/public/index*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git config:*)",
+      "Bash(scp:*)",
+      "Bash(gh repo:*)"
     ]
   }
 }
