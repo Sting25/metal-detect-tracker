@@ -3,14 +3,14 @@
  * API requests pass through (handled by authedFetch in the app layer).
  */
 
-var CACHE_VERSION = 'v27';
+var CACHE_VERSION = 'v28';
 var SHELL_CACHE = 'shell-' + CACHE_VERSION;
 var CDN_CACHE = 'cdn-' + CACHE_VERSION;
 var TILE_CACHE = 'tiles';
 var TILE_LIMIT = 500;
 
 var SHELL_FILES = [
-    '/', '/index.html', '/sites.html', '/finds.html', '/hunts.html',
+    '/index.html', '/sites.html', '/finds.html', '/hunts.html',
     '/permissions.html', '/legal.html', '/account.html', '/settings.html',
     '/admin.html', '/login.html', '/landing.html', '/reset-password.html', '/privacy.html',
     '/print-site.html', '/print-permission.html', '/permission-approve.html', '/maintenance.html',
