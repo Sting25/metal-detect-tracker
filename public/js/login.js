@@ -77,9 +77,9 @@
             countrySelect.value = detected;
         }
 
-        // If already logged in, redirect
+        // If already logged in, redirect (unless user explicitly wants to register)
         var token = localStorage.getItem(TOKEN_KEY);
-        if (token) {
+        if (token && window.location.hash !== '#register') {
             try {
                 var res = await fetch('/api/auth/me', {
                     headers: { 'Authorization': 'Bearer ' + token }
