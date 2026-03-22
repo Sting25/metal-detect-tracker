@@ -348,31 +348,12 @@
                 return;
             }
 
-            // For now, use the reset-password endpoint with the current password
-            // We could add a dedicated change-password endpoint later
             var currentPw = document.getElementById('current-password').value;
 
             var btn = document.getElementById('btn-save-password');
             btn.disabled = true;
 
             try {
-                // Verify current password by attempting login (if has password)
-                if (accountData.has_password) {
-                    var loginRes = await fetch('/api/auth/login', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email: accountData.email, password: currentPw }),
-                    });
-                    if (!loginRes.ok) {
-                        showError(_t('account.wrongPassword') || 'Current password is incorrect');
-                        btn.disabled = false;
-                        return;
-                    }
-                }
-
-                // Use reset-password with email+code flow won't work here.
-                // Instead, we need an authenticated change-password endpoint.
-                // For now, use an authed fetch to a simple endpoint:
                 var res = await Auth.authedFetch('/api/auth/change-password', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
