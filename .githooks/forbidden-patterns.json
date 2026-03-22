@@ -1,0 +1,86 @@
+[
+  {
+    "id": "no-raw-fetch-in-frontend",
+    "pattern": "[^a-zA-Z.]fetch\\(",
+    "files": "public/js/.*\\.js$",
+    "exclude": "public/js/(auth|landing|config|legal|login-social|sw)\\.js$",
+    "message": "Use Auth.authedFetch() instead of raw fetch(). See CLAUDE.md Code Patterns."
+  },
+  {
+    "id": "no-inline-secrets",
+    "pattern": "(API_KEY|SECRET|PASSWORD|TOKEN)\\s*[=:]\\s*['\"][^'\"]+['\"]",
+    "files": "public/.*\\.(js|html)$",
+    "exclude": "",
+    "message": "Never put secrets in client code. Use environment variables on the server."
+  },
+  {
+    "id": "no-raw-error-in-response",
+    "pattern": "res\\.json\\(.*err\\.message",
+    "files": "routes/.*\\.js$",
+    "exclude": "",
+    "message": "Never expose raw error messages in API responses. Use a generic user-friendly message."
+  },
+  {
+    "id": "no-bare-catch",
+    "pattern": "catch\\s*\\([^)]*\\)\\s*\\{\\s*\\}",
+    "files": ".*\\.js$",
+    "exclude": "",
+    "message": "Empty catch blocks silently swallow errors. Log or handle the error."
+  },
+  {
+    "id": "no-var",
+    "pattern": "\\bvar\\s+",
+    "files": "(public/js|routes|middleware|services)/.*\\.js$",
+    "exclude": "",
+    "message": "Use const or let instead of var."
+  },
+  {
+    "id": "no-console-log-in-routes",
+    "pattern": "console\\.log\\(",
+    "files": "routes/.*\\.js$",
+    "exclude": "",
+    "message": "Use console.error() for errors in routes. Remove console.log() before committing."
+  },
+  {
+    "id": "no-innerhtml-unsanitized",
+    "pattern": "\\.innerHTML\\s*=.*\\$\\{",
+    "files": "public/js/.*\\.js$",
+    "exclude": "",
+    "message": "Never set innerHTML with interpolated values — XSS risk. Use textContent or sanitize first."
+  },
+  {
+    "id": "no-eval",
+    "pattern": "\\beval\\(",
+    "files": ".*\\.js$",
+    "exclude": "",
+    "message": "eval() is a security risk. Find an alternative approach."
+  },
+  {
+    "id": "no-sync-fs-in-routes",
+    "pattern": "fs\\.(readFileSync|writeFileSync|unlinkSync|mkdirSync)",
+    "files": "routes/.*\\.js$",
+    "exclude": "",
+    "message": "Synchronous fs calls block the event loop. Use async fs methods (fs.promises) in route handlers."
+  },
+  {
+    "id": "no-sql-interpolation",
+    "pattern": "query\\(`[^`]*\\$\\{",
+    "files": "routes/.*\\.js$",
+    "exclude": "",
+    "message": "Never interpolate values into SQL strings — SQL injection risk. Use parameterized queries ($1, $2, etc.)."
+  },
+  {
+    "id": "no-global-middleware-skip",
+    "pattern": "app\\.use.*verifyToken",
+    "files": "server\\.js$",
+    "exclude": "",
+    "message": "Auth middleware is applied per-route, not globally on server.js. See CLAUDE.md API Route Structure."
+  },
+  {
+    "id": "no-drop-table",
+    "pattern": "DROP\\s+(TABLE|COLUMN)",
+    "files": "(database|migrations?)\\.js$",
+    "exclude": "",
+    "message": "Migrations are additive. Never drop tables or columns. See CLAUDE.md Database rules."
+  }
+]
