@@ -379,7 +379,7 @@ describe('PUT /api/auth/passkeys/:id — edge cases', () => {
             .send({ display_name: '' });
 
         expect(res.status).toBe(400);
-        expect(res.body.error).toMatch(/display name/i);
+        expect(res.body.error).toMatch(/display_name/i);
     });
 
     it('rejects whitespace-only display_name', async () => {
@@ -392,7 +392,7 @@ describe('PUT /api/auth/passkeys/:id — edge cases', () => {
             .send({ display_name: '   ' });
 
         expect(res.status).toBe(400);
-        expect(res.body.error).toMatch(/display name/i);
+        expect(res.body.error).toMatch(/display_name/i);
     });
 
     it('returns 404 for nonexistent passkey id', async () => {

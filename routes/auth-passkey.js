@@ -7,6 +7,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const db = require('../database');
 const { verifyToken, denyDemoUser, JWT_SECRET } = require('../middleware/auth');
+const { validate, schemas } = require('../middleware/validate');
 const {
     generateRegistrationOptions,
     verifyRegistrationResponse,
@@ -65,7 +66,7 @@ router.post('/passkey/register-options', verifyToken, denyDemoUser, async (req, 
 // -------------------------------------------------------------------------
 // POST /api/auth/passkey/register-verify — Complete passkey registration
 // -------------------------------------------------------------------------
-router.post('/passkey/register-verify', verifyToken, denyDemoUser, async (req, res) => {
+router.post('/passkey/register-verify', verifyToken, denyDemoUser, validate(schemas.passkeyRegisterVerify), async (req, res) => {
     try {
         const { credential, display_name } = req.body;
         if (!credential) {
@@ -159,7 +160,7 @@ router.post('/passkey/login-options', async (req, res) => {
 // -------------------------------------------------------------------------
 // POST /api/auth/passkey/login-verify — Complete passkey authentication
 // -------------------------------------------------------------------------
-router.post('/passkey/login-verify', async (req, res) => {
+router.post('/passkey/login-verify', validate(schemas.passkeyLoginVerify), async (req, res) => {
     try {
         const { credential, challenge_id } = req.body;
         if (!credential) {
@@ -262,7 +263,7 @@ router.get('/passkeys', verifyToken, async (req, res) => {
     }
 });
 
-router.put('/passkeys/:id', verifyToken, denyDemoUser, async (req, res) => {
+router.put('/passkeys/:id', verifyToken, denyDemoUser, validate(schemas.renamePasskey), async (req, res) => {
     try {
         const { display_name } = req.body;
         if (!display_name || !display_name.trim()) {

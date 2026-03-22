@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database');
 const { verifyToken } = require('../middleware/auth');
+const { validate, schemas } = require('../middleware/validate');
 
 /**
  * GET /api/letter-preferences
@@ -51,7 +52,7 @@ router.get('/', verifyToken, async (req, res) => {
  * PUT /api/letter-preferences
  * Upsert the current user's letter preferences.
  */
-router.put('/', verifyToken, async (req, res) => {
+router.put('/', verifyToken, validate(schemas.letterPreferences), async (req, res) => {
     try {
         const {
             full_name, address, phone, email,

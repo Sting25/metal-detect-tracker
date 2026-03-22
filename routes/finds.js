@@ -583,16 +583,13 @@ router.delete('/:id/photos/:photoId', denyDemoUser, async (req, res) => {
 // ---------------------------------------------------------------------------
 // PUT /api/finds/:id/photos/reorder -- reorder photos
 // ---------------------------------------------------------------------------
-router.put('/:id/photos/reorder', denyDemoUser, async (req, res) => {
+router.put('/:id/photos/reorder', denyDemoUser, validate(schemas.reorderPhotos), async (req, res) => {
   try {
     const find = await db.queryOne('SELECT * FROM finds WHERE id = $1', [req.params.id]);
     if (!find) return res.status(404).json({ success: false, error: 'Find not found' });
     if (!canEditFind(req.user, find)) return res.status(403).json({ success: false, error: 'Access denied' });
 
     const photoIds = req.body.photo_ids;
-    if (!Array.isArray(photoIds) || photoIds.length === 0) {
-      return res.status(400).json({ success: false, error: 'photo_ids array required' });
-    }
 
     // Verify all photo_ids belong to this find
     const existingPhotos = await db.query(

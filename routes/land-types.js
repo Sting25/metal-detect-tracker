@@ -6,6 +6,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database');
 const { verifyToken, denyDemoUser } = require('../middleware/auth');
+const { validate, schemas } = require('../middleware/validate');
 
 /**
  * GET /api/land-types?country=US
@@ -35,13 +36,9 @@ router.get('/', verifyToken, async (req, res) => {
  * POST /api/land-types
  * Create a custom land type for the authenticated user.
  */
-router.post('/', verifyToken, denyDemoUser, async (req, res) => {
+router.post('/', verifyToken, denyDemoUser, validate(schemas.createLandType), async (req, res) => {
     try {
         const { code, label, country_code, description } = req.body;
-
-        if (!code || !label) {
-            return res.status(400).json({ success: false, error: 'Code and label are required' });
-        }
 
         // Sanitize code: lowercase, underscores only
         const cleanCode = code.toLowerCase().replace(/[^a-z0-9_]/g, '_');

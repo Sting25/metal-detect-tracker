@@ -37,7 +37,8 @@ router.get('/stats', async (req, res) => {
             data: { totalUsers, totalSites, totalFinds, activeInvites, pendingRequests, activeUsers },
         });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Admin stats error:', err);
+        res.status(500).json({ success: false, error: 'Failed to load statistics.' });
     }
 });
 
@@ -67,12 +68,9 @@ router.get('/users', async (req, res) => {
 // -------------------------------------------------------------------------
 // PUT /api/admin/users/:id/role — Change user role
 // -------------------------------------------------------------------------
-router.put('/users/:id/role', async (req, res) => {
+router.put('/users/:id/role', validate(schemas.adminUpdateRole), async (req, res) => {
     try {
         const { role } = req.body;
-        if (!['admin', 'user'].includes(role)) {
-            return res.status(400).json({ success: false, error: 'Invalid role' });
-        }
         const user = await db.queryOne('SELECT id, role FROM users WHERE id = $1', [req.params.id]);
         if (!user) {
             return res.status(404).json({ success: false, error: 'User not found' });
@@ -94,7 +92,8 @@ router.put('/users/:id/role', async (req, res) => {
 
         res.json({ success: true, data: updated });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Update user role error:', err);
+        res.status(500).json({ success: false, error: 'Failed to update user role.' });
     }
 });
 
@@ -124,7 +123,8 @@ router.put('/users/:id/disable', async (req, res) => {
 
         res.json({ success: true, data: { id: Number(req.params.id), is_disabled: newState } });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Toggle user disabled error:', err);
+        res.status(500).json({ success: false, error: 'Failed to update user status.' });
     }
 });
 
@@ -162,7 +162,8 @@ router.delete('/users/:id', async (req, res) => {
 
         res.json({ success: true, data: { id: Number(req.params.id) } });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Delete user error:', err);
+        res.status(500).json({ success: false, error: 'Failed to delete user.' });
     }
 });
 
@@ -182,14 +183,15 @@ router.get('/invite-codes', async (req, res) => {
         )).rows;
         res.json({ success: true, data: codes });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('List invite codes error:', err);
+        res.status(500).json({ success: false, error: 'Failed to load invite codes.' });
     }
 });
 
 // -------------------------------------------------------------------------
 // POST /api/admin/invite-codes — Generate a new invite code
 // -------------------------------------------------------------------------
-router.post('/invite-codes', async (req, res) => {
+router.post('/invite-codes', validate(schemas.adminCreateInviteCode), async (req, res) => {
     try {
         const code = crypto.randomBytes(4).toString('hex').toUpperCase();
         const expiresAt = req.body.expires_at || null;
@@ -212,7 +214,8 @@ router.post('/invite-codes', async (req, res) => {
 
         res.status(201).json({ success: true, data: newCode });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Create invite code error:', err);
+        res.status(500).json({ success: false, error: 'Failed to create invite code.' });
     }
 });
 
@@ -250,7 +253,8 @@ router.post('/users/:id/reset-password', async (req, res) => {
             },
         });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Admin reset password error:', err);
+        res.status(500).json({ success: false, error: 'Failed to reset password.' });
     }
 });
 
@@ -262,7 +266,8 @@ router.delete('/invite-codes/:id', async (req, res) => {
         await db.query('DELETE FROM invite_codes WHERE id = $1', [req.params.id]);
         res.json({ success: true, data: { id: Number(req.params.id) } });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Delete invite code error:', err);
+        res.status(500).json({ success: false, error: 'Failed to delete invite code.' });
     }
 });
 
@@ -278,24 +283,26 @@ router.get('/settings', async (req, res) => {
             data: { notify_on_register: notifyOnRegister, email_configured: emailConfigured },
         });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Load settings error:', err);
+        res.status(500).json({ success: false, error: 'Failed to load settings.' });
     }
 });
 
 // -------------------------------------------------------------------------
 // PUT /api/admin/settings — Update an admin setting
 // -------------------------------------------------------------------------
-router.put('/settings', async (req, res) => {
+router.put('/settings', validate(schemas.adminUpdateSetting), async (req, res) => {
     try {
         const { key, value } = req.body;
         const allowedKeys = ['notify_on_register'];
         if (!allowedKeys.includes(key)) {
             return res.status(400).json({ success: false, error: 'Invalid setting key' });
         }
-        await db.setSetting(key, String(value));
+        await db.setSetting(key, value);
         res.json({ success: true, data: { key, value: String(value) } });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Update settings error:', err);
+        res.status(500).json({ success: false, error: 'Failed to update settings.' });
     }
 });
 
@@ -312,7 +319,8 @@ router.get('/invite-requests', async (req, res) => {
         )).rows;
         res.json({ success: true, data: requests });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('List invite requests error:', err);
+        res.status(500).json({ success: false, error: 'Failed to load invite requests.' });
     }
 });
 
@@ -359,7 +367,8 @@ router.post('/invite-requests/:id/approve', async (req, res) => {
 
         res.json({ success: true, data: { code, request_id: request.id } });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Approve invite request error:', err);
+        res.status(500).json({ success: false, error: 'Failed to approve invite request.' });
     }
 });
 
@@ -391,7 +400,8 @@ router.post('/invite-requests/:id/deny', async (req, res) => {
 
         res.json({ success: true, data: { request_id: request.id } });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Deny invite request error:', err);
+        res.status(500).json({ success: false, error: 'Failed to deny invite request.' });
     }
 });
 
@@ -657,18 +667,9 @@ router.get('/legal/:id', async (req, res) => {
 // -------------------------------------------------------------------------
 // POST /api/admin/legal — Create a new legal section
 // -------------------------------------------------------------------------
-router.post('/legal', async (req, res) => {
+router.post('/legal', validate(schemas.adminCreateLegal), async (req, res) => {
     try {
         const { country_code, region_code, language, section_key, section_title, content_html, severity, sort_order, source_url } = req.body;
-
-        if (!country_code || !section_key || !section_title || !content_html) {
-            return res.status(400).json({ success: false, error: 'country_code, section_key, section_title, and content_html are required.' });
-        }
-
-        const validSeverities = ['ok', 'caution', 'warning', 'danger'];
-        if (severity && !validSeverities.includes(severity)) {
-            return res.status(400).json({ success: false, error: 'Invalid severity. Use: ok, caution, warning, danger.' });
-        }
 
         const result = await db.query(
             `INSERT INTO legal_content (country_code, region_code, language, section_key, section_title, content_html, severity, sort_order, source_url, last_verified)
@@ -699,7 +700,7 @@ router.post('/legal', async (req, res) => {
 // -------------------------------------------------------------------------
 // PUT /api/admin/legal/:id — Update a legal section (with auto-revision)
 // -------------------------------------------------------------------------
-router.put('/legal/:id', async (req, res) => {
+router.put('/legal/:id', validate(schemas.adminUpdateLegal), async (req, res) => {
     try {
         const existing = await db.queryOne('SELECT * FROM legal_content WHERE id = $1', [req.params.id]);
         if (!existing) {
@@ -707,11 +708,6 @@ router.put('/legal/:id', async (req, res) => {
         }
 
         const { section_title, content_html, severity, sort_order, source_url } = req.body;
-
-        const validSeverities = ['ok', 'caution', 'warning', 'danger', ''];
-        if (severity !== undefined && severity !== null && severity !== '' && !['ok', 'caution', 'warning', 'danger'].includes(severity)) {
-            return res.status(400).json({ success: false, error: 'Invalid severity.' });
-        }
 
         await db.query(
             `UPDATE legal_content SET
@@ -857,7 +853,8 @@ router.get('/audit/actions', async (req, res) => {
         )).rows;
         res.json({ success: true, data: rows.map(r => r.action) });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('List audit actions error:', err);
+        res.status(500).json({ success: false, error: 'Failed to load audit actions.' });
     }
 });
 
@@ -929,7 +926,8 @@ router.get('/audit', async (req, res) => {
             data: { events, total_count: totalCount, page, page_size: pageSize },
         });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('List audit events error:', err);
+        res.status(500).json({ success: false, error: 'Failed to load audit log.' });
     }
 });
 

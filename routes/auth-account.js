@@ -17,7 +17,7 @@ const emailService = require('../services/email');
 const NO_PASSWORD_SENTINEL = '__NO_PASSWORD__';
 
 // POST /api/auth/verify-email — Verify email with 6-digit code
-router.post('/verify-email', async (req, res) => {
+router.post('/verify-email', validate(schemas.verifyEmail), async (req, res) => {
     try {
         const { email, code } = req.body;
         if (!email || !code) {
@@ -62,7 +62,7 @@ router.post('/verify-email', async (req, res) => {
 });
 
 // POST /api/auth/resend-verification — Resend verification code
-router.post('/resend-verification', async (req, res) => {
+router.post('/resend-verification', validate(schemas.resendVerification), async (req, res) => {
     try {
         const { email } = req.body;
         if (!email) {
@@ -275,7 +275,7 @@ router.post('/reset-password', validate(schemas.resetPassword), async (req, res)
 });
 
 // POST /api/auth/request-invite — Request an invite code (no auth required)
-router.post('/request-invite', async (req, res) => {
+router.post('/request-invite', validate(schemas.requestInvite), async (req, res) => {
     try {
         const { name, email, message } = req.body;
         if (!name || !email) {
@@ -325,29 +325,82 @@ router.post('/request-invite', async (req, res) => {
     }
 });
 
+// POST /api/auth/send-set-password-code — Send a verification code to allow
+// OAuth/passkey-only users to create a password (requires auth)
+router.post('/send-set-password-code', verifyToken, denyDemoUser, async (req, res) => {
+    try {
+        const user = await db.queryOne('SELECT id, email, display_name, password_hash FROM users WHERE id = $1', [req.user.id]);
+        const hasPassword = user.password_hash && user.password_hash !== NO_PASSWORD_SENTINEL;
+
+        if (hasPassword) {
+            return res.status(400).json({ success: false, error: 'Account already has a password. Use change-password with your current password instead.' });
+        }
+
+        // Generate 6-digit code, valid for 15 minutes
+        const code = String(Math.floor(100000 + Math.random() * 900000));
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+
+        await db.query(
+            'UPDATE users SET reset_code = $1, reset_code_expires_at = $2 WHERE id = $3',
+            [code, expiresAt, user.id]
+        );
+
+        // Send email (fire-and-forget)
+        try {
+            if (emailService.isConfigured()) {
+                emailService.sendPasswordResetEmail(
+                    user.email,
+                    user.display_name || user.email,
+                    code
+                ).catch(function (err) {
+                    console.error('Failed to send set-password verification email:', err.message);
+                });
+            }
+        } catch (emailErr) {
+            console.error('Warning: set-password verification email failed:', emailErr.message);
+        }
+
+        res.json({ success: true, data: { message: 'Verification code sent to your email.' } });
+    } catch (err) {
+        console.error('Send set-password code error:', err);
+        res.status(500).json({ success: false, error: 'Failed to send verification code. Please try again.' });
+    }
+});
+
 // POST /api/auth/change-password — Change or set password (authenticated)
 router.post('/change-password', verifyToken, denyDemoUser, validate(schemas.changePassword), async (req, res) => {
     try {
-        const { current_password, new_password } = req.body;
+        const { current_password, new_password, verification_code } = req.body;
         if (!new_password || new_password.length < 12) {
             return res.status(400).json({ success: false, error: 'New password must be at least 12 characters' });
         }
 
-        const user = await db.queryOne('SELECT password_hash FROM users WHERE id = $1', [req.user.id]);
+        const user = await db.queryOne('SELECT password_hash, reset_code, reset_code_expires_at FROM users WHERE id = $1', [req.user.id]);
         const hasPassword = user.password_hash && user.password_hash !== NO_PASSWORD_SENTINEL;
 
-        // If user has a password, require current password
         if (hasPassword) {
+            // Existing password flow: require current password
             if (!current_password) {
                 return res.status(400).json({ success: false, error: 'Current password is required' });
             }
             if (!bcrypt.compareSync(current_password, user.password_hash)) {
                 return res.status(401).json({ success: false, error: 'Current password is incorrect' });
             }
+        } else {
+            // No password (OAuth/passkey-only): require email verification code
+            if (!verification_code) {
+                return res.status(400).json({ success: false, error: 'Verification code is required to set a password. Request one via /api/auth/send-set-password-code.' });
+            }
+            if (!user.reset_code || user.reset_code !== verification_code.trim()) {
+                return res.status(400).json({ success: false, error: 'Invalid or expired verification code' });
+            }
+            if (user.reset_code_expires_at && new Date(user.reset_code_expires_at) < new Date()) {
+                return res.status(400).json({ success: false, error: 'Verification code has expired. Please request a new one.' });
+            }
         }
 
         const hash = bcrypt.hashSync(new_password, 10);
-        await db.query('UPDATE users SET password_hash = $1 WHERE id = $2', [hash, req.user.id]);
+        await db.query('UPDATE users SET password_hash = $1, reset_code = NULL, reset_code_expires_at = NULL WHERE id = $2', [hash, req.user.id]);
 
         db.logAuditEvent({
             userId: req.user.id,
@@ -366,7 +419,7 @@ router.post('/change-password', verifyToken, denyDemoUser, validate(schemas.chan
 });
 
 // PUT /api/auth/preferences — Update user preferences
-router.put('/preferences', verifyToken, denyDemoUser, async (req, res) => {
+router.put('/preferences', verifyToken, denyDemoUser, validate(schemas.preferences), async (req, res) => {
     try {
         const { unit_preference, country_code, region, language_preference, store_exact_gps, export_obfuscation } = req.body;
 
@@ -455,7 +508,7 @@ router.get('/me', verifyToken, async (req, res) => {
 });
 
 // POST /api/auth/delete-account — Self-service account deletion (soft delete)
-router.post('/delete-account', verifyToken, denyDemoUser, async (req, res) => {
+router.post('/delete-account', verifyToken, denyDemoUser, validate(schemas.deleteAccount), async (req, res) => {
     try {
         const { confirmation } = req.body;
         if (confirmation !== 'DELETE') {

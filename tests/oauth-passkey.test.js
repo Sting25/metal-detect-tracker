@@ -326,13 +326,18 @@ describe('POST /api/auth/change-password', () => {
         expect(loginRes.status).toBe(200);
     });
 
-    it('sets password for Google-only user without current password', async () => {
+    it('sets password for Google-only user with verification code', async () => {
         const { token, user } = await createGoogleUser({ email: 'setpw@test.com' });
+
+        // Set up a verification code (as send-set-password-code would)
+        const code = '654321';
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+        await db.query('UPDATE users SET reset_code = $1, reset_code_expires_at = $2 WHERE id = $3', [code, expiresAt, user.id]);
 
         const res = await request()
             .post('/api/auth/change-password')
             .set('Authorization', `Bearer ${token}`)
-            .send({ new_password: 'Brandnew12345' });
+            .send({ new_password: 'Brandnew12345', verification_code: code });
 
         expect(res.status).toBe(200);
 
@@ -341,6 +346,18 @@ describe('POST /api/auth/change-password', () => {
             .post('/api/auth/login')
             .send({ email: 'setpw@test.com', password: 'Brandnew12345' });
         expect(loginRes.status).toBe(200);
+    });
+
+    it('rejects Google-only user setting password without verification code', async () => {
+        const { token } = await createGoogleUser({ email: 'noverify@test.com' });
+
+        const res = await request()
+            .post('/api/auth/change-password')
+            .set('Authorization', `Bearer ${token}`)
+            .send({ new_password: 'Brandnew12345' });
+
+        expect(res.status).toBe(400);
+        expect(res.body.error).toMatch(/verification code is required/i);
     });
 
     it('rejects wrong current password', async () => {

@@ -88,6 +88,73 @@ const resetPassword = z.object({
 const changePassword = z.object({
   current_password: z.string().optional(),
   new_password: strongPassword,
+  verification_code: z.string().optional(),
+}).passthrough();
+
+// ---------------------------------------------------------------------------
+// Auth-account schemas
+// ---------------------------------------------------------------------------
+
+const verifyEmail = z.object({
+  email: emailField,
+  code: z.string().trim().min(1),
+}).passthrough();
+
+const resendVerification = z.object({
+  email: emailField,
+}).passthrough();
+
+const requestInvite = z.object({
+  name: z.string().trim().min(1),
+  email: emailField,
+  message: optionalTrimmedString,
+}).passthrough();
+
+const deleteAccount = z.object({
+  confirmation: z.literal('DELETE', { errorMap: () => ({ message: 'You must send confirmation: "DELETE" to delete your account' }) }),
+}).passthrough();
+
+const preferences = z.object({
+  unit_preference: z.enum(['metric', 'imperial']).optional(),
+  country_code: z.string().nullable().optional(),
+  region: z.string().nullable().optional(),
+  language_preference: z.enum(['en', 'es', 'fr']).optional(),
+  store_exact_gps: z.boolean().optional(),
+  export_obfuscation: z.enum(['none', 'rounded_1km', 'rounded_10km', 'no_coords']).optional(),
+}).passthrough();
+
+// ---------------------------------------------------------------------------
+// Auth-passkey schemas
+// ---------------------------------------------------------------------------
+
+const passkeyRegisterVerify = z.object({
+  credential: z.object({}).passthrough(),
+  display_name: optionalTrimmedString,
+}).passthrough();
+
+const passkeyLoginVerify = z.object({
+  credential: z.object({}).passthrough(),
+  challenge_id: optionalCoerceNumber,
+}).passthrough();
+
+const renamePasskey = z.object({
+  display_name: z.string().trim().min(1),
+}).passthrough();
+
+// ---------------------------------------------------------------------------
+// Auth-social schemas
+// ---------------------------------------------------------------------------
+
+const googleAuth = z.object({
+  id_token: z.string().min(1),
+  terms_accepted: z.preprocess(
+    (v) => v === 'true' || v === true ? true : v,
+    z.boolean().optional()
+  ),
+}).passthrough();
+
+const googleLink = z.object({
+  id_token: z.string().min(1),
 }).passthrough();
 
 // ---------------------------------------------------------------------------
@@ -313,6 +380,88 @@ const uploadTrackpoints = z.object({
 }).passthrough();
 
 // ---------------------------------------------------------------------------
+// Admin schemas
+// ---------------------------------------------------------------------------
+
+const adminUpdateRole = z.object({
+  role: z.enum(['admin', 'user']),
+}).passthrough();
+
+const adminCreateInviteCode = z.object({
+  expires_at: optionalString,
+}).passthrough();
+
+const adminUpdateSetting = z.object({
+  key: z.string().min(1),
+  value: z.preprocess((v) => (v === undefined ? undefined : String(v)), z.string()),
+}).passthrough();
+
+const adminCreateLegal = z.object({
+  country_code: z.string().trim().min(1),
+  region_code: optionalTrimmedString,
+  language: optionalString,
+  section_key: z.string().trim().min(1),
+  section_title: z.string().trim().min(1),
+  content_html: z.string().min(1),
+  severity: z.enum(['ok', 'caution', 'warning', 'danger']).optional(),
+  sort_order: optionalCoerceNumber,
+  source_url: optionalString,
+}).passthrough();
+
+const adminUpdateLegal = z.object({
+  section_title: optionalTrimmedString,
+  content_html: optionalString,
+  severity: z.string().optional(),
+  sort_order: optionalCoerceNumber,
+  source_url: optionalString,
+}).passthrough();
+
+// ---------------------------------------------------------------------------
+// Site share schema
+// ---------------------------------------------------------------------------
+
+const shareSite = z.object({
+  email: emailField,
+  permission_level: z.enum(['view', 'edit']).optional(),
+}).passthrough();
+
+// ---------------------------------------------------------------------------
+// Find photo reorder schema
+// ---------------------------------------------------------------------------
+
+const reorderPhotos = z.object({
+  photo_ids: z.array(z.coerce.number()).min(1),
+}).passthrough();
+
+// ---------------------------------------------------------------------------
+// Land type schema
+// ---------------------------------------------------------------------------
+
+const createLandType = z.object({
+  code: z.string().trim().min(1),
+  label: z.string().trim().min(1),
+  country_code: optionalString,
+  description: optionalString,
+}).passthrough();
+
+// ---------------------------------------------------------------------------
+// Letter preferences schema
+// ---------------------------------------------------------------------------
+
+const letterPreferences = z.object({
+  full_name: z.string().nullable().optional(),
+  address: z.string().nullable().optional(),
+  phone: z.string().nullable().optional(),
+  email: z.string().nullable().optional(),
+  signature_name: z.string().nullable().optional(),
+  signature_title: z.string().nullable().optional(),
+  intro_text: z.string().nullable().optional(),
+  commitments_html: z.string().nullable().optional(),
+  closing_text: z.string().nullable().optional(),
+  insurance_text: z.string().nullable().optional(),
+}).passthrough();
+
+// ---------------------------------------------------------------------------
 // Exports
 // ---------------------------------------------------------------------------
 
@@ -324,12 +473,27 @@ const schemas = {
   forgotPassword,
   resetPassword,
   changePassword,
+  // Auth-account
+  verifyEmail,
+  resendVerification,
+  requestInvite,
+  deleteAccount,
+  preferences,
+  // Auth-passkey
+  passkeyRegisterVerify,
+  passkeyLoginVerify,
+  renamePasskey,
+  // Auth-social
+  googleAuth,
+  googleLink,
   // Sites
   createSite,
   updateSite,
+  shareSite,
   // Finds
   createFind,
   updateFind,
+  reorderPhotos,
   // Permissions
   createPermission,
   updatePermission,
@@ -355,6 +519,16 @@ const schemas = {
   startHunt,
   updateHunt,
   uploadTrackpoints,
+  // Admin
+  adminUpdateRole,
+  adminCreateInviteCode,
+  adminUpdateSetting,
+  adminCreateLegal,
+  adminUpdateLegal,
+  // Land types
+  createLandType,
+  // Letter preferences
+  letterPreferences,
 };
 
 module.exports = { validate, schemas };

@@ -7,6 +7,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const db = require('../database');
 const { verifyToken, denyDemoUser, JWT_SECRET } = require('../middleware/auth');
+const { validate, schemas } = require('../middleware/validate');
 const emailService = require('../services/email');
 const { OAuth2Client } = require('google-auth-library');
 
@@ -60,7 +61,7 @@ router.get('/config', (req, res) => {
 // -------------------------------------------------------------------------
 // POST /api/auth/google — Google OAuth sign-in / sign-up
 // -------------------------------------------------------------------------
-router.post('/google', async (req, res) => {
+router.post('/google', validate(schemas.googleAuth), async (req, res) => {
     try {
         if (!getGoogleClient()) {
             return res.status(503).json({ success: false, error: 'Google sign-in is not configured' });
@@ -188,7 +189,7 @@ router.post('/google', async (req, res) => {
 // -------------------------------------------------------------------------
 // POST /api/auth/google/link — Link Google account to current user
 // -------------------------------------------------------------------------
-router.post('/google/link', verifyToken, denyDemoUser, async (req, res) => {
+router.post('/google/link', verifyToken, denyDemoUser, validate(schemas.googleLink), async (req, res) => {
     try {
         if (!getGoogleClient()) {
             return res.status(503).json({ success: false, error: 'Google sign-in is not configured' });

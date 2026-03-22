@@ -147,7 +147,29 @@ describe('Auth Account Routes', () => {
             expect(res.body.error).toMatch(/current password is incorrect/i);
         });
 
-        it('allows OAuth-only user to set password without current_password', async () => {
+        it('allows OAuth-only user to set password with valid verification code', async () => {
+            const { user, token } = await createGoogleUser();
+
+            // Simulate a verification code being sent
+            const code = '123456';
+            const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+            await db.query('UPDATE users SET reset_code = $1, reset_code_expires_at = $2 WHERE id = $3', [code, expiresAt, user.id]);
+
+            const res = await request()
+                .post('/api/auth/change-password')
+                .set('Authorization', `Bearer ${token}`)
+                .send({ new_password: 'BrandNewPass123!', verification_code: code });
+
+            expect(res.status).toBe(200);
+            expect(res.body.success).toBe(true);
+            expect(res.body.data.message).toMatch(/password updated/i);
+
+            // Verify reset_code was cleared
+            const dbUser = await db.queryOne('SELECT reset_code FROM users WHERE id = $1', [user.id]);
+            expect(dbUser.reset_code).toBeNull();
+        });
+
+        it('rejects OAuth-only user setting password without verification code', async () => {
             const { token } = await createGoogleUser();
 
             const res = await request()
@@ -155,9 +177,41 @@ describe('Auth Account Routes', () => {
                 .set('Authorization', `Bearer ${token}`)
                 .send({ new_password: 'BrandNewPass123!' });
 
-            expect(res.status).toBe(200);
-            expect(res.body.success).toBe(true);
-            expect(res.body.data.message).toMatch(/password updated/i);
+            expect(res.status).toBe(400);
+            expect(res.body.success).toBe(false);
+            expect(res.body.error).toMatch(/verification code is required/i);
+        });
+
+        it('rejects OAuth-only user with wrong verification code', async () => {
+            const { user, token } = await createGoogleUser();
+            const code = '123456';
+            const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+            await db.query('UPDATE users SET reset_code = $1, reset_code_expires_at = $2 WHERE id = $3', [code, expiresAt, user.id]);
+
+            const res = await request()
+                .post('/api/auth/change-password')
+                .set('Authorization', `Bearer ${token}`)
+                .send({ new_password: 'BrandNewPass123!', verification_code: '999999' });
+
+            expect(res.status).toBe(400);
+            expect(res.body.success).toBe(false);
+            expect(res.body.error).toMatch(/invalid or expired/i);
+        });
+
+        it('rejects OAuth-only user with expired verification code', async () => {
+            const { user, token } = await createGoogleUser();
+            const code = '123456';
+            const expiredAt = new Date(Date.now() - 60 * 1000).toISOString(); // expired 1 min ago
+            await db.query('UPDATE users SET reset_code = $1, reset_code_expires_at = $2 WHERE id = $3', [code, expiredAt, user.id]);
+
+            const res = await request()
+                .post('/api/auth/change-password')
+                .set('Authorization', `Bearer ${token}`)
+                .send({ new_password: 'BrandNewPass123!', verification_code: code });
+
+            expect(res.status).toBe(400);
+            expect(res.body.success).toBe(false);
+            expect(res.body.error).toMatch(/expired/i);
         });
 
         it('rejects short new password', async () => {
@@ -175,6 +229,46 @@ describe('Auth Account Routes', () => {
             const res = await request()
                 .post('/api/auth/change-password')
                 .send({ current_password: 'OldPassword123!', new_password: 'NewPassword456!' });
+
+            expect(res.status).toBe(401);
+        });
+    });
+
+    // --- POST /api/auth/send-set-password-code ---
+    describe('POST /api/auth/send-set-password-code', () => {
+        it('sends verification code for OAuth-only user', async () => {
+            const { user, token } = await createGoogleUser();
+
+            const res = await request()
+                .post('/api/auth/send-set-password-code')
+                .set('Authorization', `Bearer ${token}`);
+
+            expect(res.status).toBe(200);
+            expect(res.body.success).toBe(true);
+            expect(res.body.data.message).toMatch(/verification code sent/i);
+
+            // Verify code was stored
+            const dbUser = await db.queryOne('SELECT reset_code, reset_code_expires_at FROM users WHERE id = $1', [user.id]);
+            expect(dbUser.reset_code).toBeTruthy();
+            expect(dbUser.reset_code).toHaveLength(6);
+            expect(dbUser.reset_code_expires_at).toBeTruthy();
+        });
+
+        it('rejects if user already has a password', async () => {
+            const { token } = await createUser({ password: 'ExistingPass123!' });
+
+            const res = await request()
+                .post('/api/auth/send-set-password-code')
+                .set('Authorization', `Bearer ${token}`);
+
+            expect(res.status).toBe(400);
+            expect(res.body.success).toBe(false);
+            expect(res.body.error).toMatch(/already has a password/i);
+        });
+
+        it('requires authentication', async () => {
+            const res = await request()
+                .post('/api/auth/send-set-password-code');
 
             expect(res.status).toBe(401);
         });
@@ -542,7 +636,8 @@ describe('POST /api/auth/request-invite', () => {
             .send({ email: 'noname@example.com' });
 
         expect(res.status).toBe(400);
-        expect(res.body.error).toMatch(/name.*email.*required/i);
+        expect(res.body.success).toBe(false);
+        expect(res.body.error).toBeTruthy();
     });
 
     it('returns 400 when email is missing', async () => {
@@ -551,7 +646,8 @@ describe('POST /api/auth/request-invite', () => {
             .send({ name: 'No Email' });
 
         expect(res.status).toBe(400);
-        expect(res.body.error).toMatch(/name.*email.*required/i);
+        expect(res.body.success).toBe(false);
+        expect(res.body.error).toBeTruthy();
     });
 
     it('normalizes email to lowercase', async () => {

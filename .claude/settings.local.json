@@ -50,7 +50,25 @@
       "Bash(rsync -avz --delete --exclude=node_modules --exclude=.env --exclude=.git --exclude=uploads /Users/brain/metal-detect-tracker/ root@167.172.28.28:/var/www/signalbouncer/)",
       "Bash(python3 -m json.tool)",
       "Bash(rsync:*)",
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "Bash(ls -la /Users/brain/metal-detect-tracker/tests/*.test.js)",
+      "Bash(ls /Users/brain/metal-detect-tracker/routes/*.js)",
+      "Bash(xargs -I {} basename {})",
+      "Bash(while read:*)",
+      "Bash(do echo:*)",
+      "Read(//Users/brain/metal-detect-tracker/**)",
+      "Bash(done)",
+      "Bash(ls -lh /Users/brain/metal-detect-tracker/public/js/*.js)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Read(//tmp/**)",
+      "Bash(wc -l /Users/brain/metal-detect-tracker/tests/*.test.js)",
+      "Bash(wc:*)",
+      "Bash(cp .claude/worktrees/agent-a18ff2e0/tests/auth-passkey.test.js tests/auth-passkey.test.js)",
+      "Bash(cp .claude/worktrees/agent-a0024cce/tests/auth-social.test.js tests/auth-social.test.js)",
+      "Bash(grep -rn \"<script>\" public/*.html)",
+      "Bash(grep -n \"<script\\\\s\" public/*.html)",
+      "Bash(grep -rn \"\\\\+ \"\".*SELECT\\\\|\\\\+ ''''.*SELECT\\\\|db\\\\.query.*\\\\+\\\\|db\\\\.one.*\\\\+\" routes/*.js middleware/*.js services/*.js database.js)"
     ]
   }
 }

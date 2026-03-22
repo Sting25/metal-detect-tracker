@@ -491,7 +491,7 @@ router.delete('/:id', denyDemoUser, async (req, res) => {
 // ---------------------------------------------------------------------------
 // POST /api/sites/:id/share -- share a site with another user by email
 // ---------------------------------------------------------------------------
-router.post('/:id/share', denyDemoUser, async (req, res) => {
+router.post('/:id/share', denyDemoUser, validate(schemas.shareSite), async (req, res) => {
   try {
     const site = await db.queryOne('SELECT * FROM sites WHERE id = $1', [req.params.id]);
     if (!site) {
@@ -504,9 +504,6 @@ router.post('/:id/share', denyDemoUser, async (req, res) => {
     }
 
     const { email, permission_level } = req.body;
-    if (!email) {
-      return res.status(400).json({ success: false, error: 'Email is required' });
-    }
 
     const targetUser = await db.queryOne(
       'SELECT id, email, display_name FROM users WHERE email = $1',
