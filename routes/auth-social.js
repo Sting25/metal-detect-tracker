@@ -28,9 +28,6 @@ function getGoogleClientId() {
     return process.env.GOOGLE_CLIENT_ID || null;
 }
 
-// WebAuthn config — used by /config endpoint for feature detection
-const WEBAUTHN_RP_ID = process.env.WEBAUTHN_RP_ID || '';
-
 /**
  * Verify a Google ID token. Extracted for testability — tests can override
  * router._verifyGoogleIdToken to avoid needing to mock the google-auth-library module.
@@ -55,7 +52,7 @@ router.get('/config', (req, res) => {
         success: true,
         data: {
             google_client_id: getGoogleClientId(),
-            webauthn_enabled: !!WEBAUTHN_RP_ID,
+            webauthn_enabled: !!process.env.WEBAUTHN_RP_ID,
         },
     });
 });
