@@ -83,6 +83,17 @@ router.post('/google', async (req, res) => {
         const googleEmail = (payload.email || '').toLowerCase().trim();
         const googleName = payload.name || googleEmail.split('@')[0];
 
+        // Detect country from Google locale (e.g. "en-GB" → "GB", "en-AU" → "AU")
+        const supportedCountries = ['US', 'GB', 'AU', 'CA', 'NZ'];
+        let detectedCountry = 'US';
+        if (payload.locale) {
+            const parts = payload.locale.split(/[-_]/);
+            const candidate = (parts[1] || '').toUpperCase();
+            if (supportedCountries.includes(candidate)) {
+                detectedCountry = candidate;
+            }
+        }
+
         // 1. Check if user exists with this google_id
         let user = await db.queryOne('SELECT * FROM users WHERE google_id = $1', [googleId]);
         if (user) {
@@ -127,14 +138,14 @@ router.post('/google', async (req, res) => {
         const termsAcceptedAt = new Date().toISOString();
         const result = await db.query(
             'INSERT INTO users (email, password_hash, display_name, role, email_verified, google_id, terms_accepted_at, country_code) VALUES ($1, $2, $3, $4, true, $5, $6, $7) RETURNING id',
-            [googleEmail, NO_PASSWORD_SENTINEL, googleName, 'user', googleId, termsAcceptedAt, 'US']
+            [googleEmail, NO_PASSWORD_SENTINEL, googleName, 'user', googleId, termsAcceptedAt, detectedCountry]
         );
 
         const newUserId = result.rows[0].id;
 
         // Seed sites
         try {
-            await db.insertSeedSites(newUserId, 'US');
+            await db.insertSeedSites(newUserId, detectedCountry);
         } catch (seedErr) {
             console.error('Warning: failed to insert seed sites for Google user:', seedErr.message);
         }
