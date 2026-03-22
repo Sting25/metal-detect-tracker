@@ -17,13 +17,13 @@ router.use(verifyToken);
 // ---------------------------------------------------------------------------
 router.get('/', async (req, res) => {
   try {
-    var completed = req.query.completed;
-    var limit = parseInt(req.query.limit, 10) || 50;
-    var sort = req.query.sort === 'due_date' ? 'due_date' : 'created_at';
+    const completed = req.query.completed;
+    const limit = parseInt(req.query.limit, 10) || 50;
+    const sort = req.query.sort === 'due_date' ? 'due_date' : 'created_at';
 
-    var sql = 'SELECT r.*, p.agency_or_owner AS permission_name FROM reminders r LEFT JOIN permissions p ON r.permission_id = p.id WHERE r.user_id = $1';
-    var params = [req.user.id];
-    var idx = 2;
+    let sql = 'SELECT r.*, p.agency_or_owner AS permission_name FROM reminders r LEFT JOIN permissions p ON r.permission_id = p.id WHERE r.user_id = $1';
+    const params = [req.user.id];
+    const idx = 2;
 
     if (completed === 'true') {
       sql += ' AND r.is_completed = true';
@@ -34,7 +34,7 @@ router.get('/', async (req, res) => {
     sql += ' ORDER BY r.' + sort + ' ASC, r.id ASC LIMIT $' + idx;
     params.push(limit);
 
-    var result = await db.query(sql, params);
+    const result = await db.query(sql, params);
     res.json({ success: true, data: result.rows, count: result.rows.length });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -46,11 +46,11 @@ router.get('/', async (req, res) => {
 // ---------------------------------------------------------------------------
 router.post('/', denyDemoUser, validate(schemas.createReminder), async (req, res) => {
   try {
-    var { permission_id, reminder_type, title, due_date, notes } = req.body;
+    const { permission_id, reminder_type, title, due_date, notes } = req.body;
 
     // If permission_id given, verify ownership
     if (permission_id) {
-      var perm = await db.queryOne('SELECT * FROM permissions WHERE id = $1', [permission_id]);
+      const perm = await db.queryOne('SELECT * FROM permissions WHERE id = $1', [permission_id]);
       if (!perm) {
         return res.status(404).json({ success: false, error: 'Permission not found' });
       }
@@ -59,12 +59,12 @@ router.post('/', denyDemoUser, validate(schemas.createReminder), async (req, res
       }
     }
 
-    var result = await db.query(
+    const result = await db.query(
       'INSERT INTO reminders (user_id, permission_id, reminder_type, title, due_date, notes) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
       [req.user.id, permission_id || null, reminder_type, title, due_date, notes || null]
     );
 
-    var reminder = await db.queryOne(
+    const reminder = await db.queryOne(
       'SELECT r.*, p.agency_or_owner AS permission_name FROM reminders r LEFT JOIN permissions p ON r.permission_id = p.id WHERE r.id = $1',
       [result.rows[0].id]
     );
@@ -89,7 +89,7 @@ router.post('/', denyDemoUser, validate(schemas.createReminder), async (req, res
 // ---------------------------------------------------------------------------
 router.put('/:id', denyDemoUser, validate(schemas.updateReminder), async (req, res) => {
   try {
-    var existing = await db.queryOne('SELECT * FROM reminders WHERE id = $1', [req.params.id]);
+    const existing = await db.queryOne('SELECT * FROM reminders WHERE id = $1', [req.params.id]);
     if (!existing) {
       return res.status(404).json({ success: false, error: 'Reminder not found' });
     }
@@ -97,7 +97,7 @@ router.put('/:id', denyDemoUser, validate(schemas.updateReminder), async (req, r
       return res.status(403).json({ success: false, error: 'Access denied' });
     }
 
-    var { permission_id, reminder_type, title, due_date, notes } = req.body;
+    const { permission_id, reminder_type, title, due_date, notes } = req.body;
 
     await db.query(
       `UPDATE reminders SET
@@ -117,7 +117,7 @@ router.put('/:id', denyDemoUser, validate(schemas.updateReminder), async (req, r
       ]
     );
 
-    var updated = await db.queryOne(
+    const updated = await db.queryOne(
       'SELECT r.*, p.agency_or_owner AS permission_name FROM reminders r LEFT JOIN permissions p ON r.permission_id = p.id WHERE r.id = $1',
       [req.params.id]
     );
@@ -142,7 +142,7 @@ router.put('/:id', denyDemoUser, validate(schemas.updateReminder), async (req, r
 // ---------------------------------------------------------------------------
 router.patch('/:id/complete', denyDemoUser, validate(schemas.completeReminder), async (req, res) => {
   try {
-    var existing = await db.queryOne('SELECT * FROM reminders WHERE id = $1', [req.params.id]);
+    const existing = await db.queryOne('SELECT * FROM reminders WHERE id = $1', [req.params.id]);
     if (!existing) {
       return res.status(404).json({ success: false, error: 'Reminder not found' });
     }
@@ -150,15 +150,15 @@ router.patch('/:id/complete', denyDemoUser, validate(schemas.completeReminder), 
       return res.status(403).json({ success: false, error: 'Access denied' });
     }
 
-    var isCompleted = req.body.is_completed;
-    var completedAt = isCompleted ? new Date().toISOString() : null;
+    const isCompleted = req.body.is_completed;
+    const completedAt = isCompleted ? new Date().toISOString() : null;
 
     await db.query(
       'UPDATE reminders SET is_completed = $1, completed_at = $2 WHERE id = $3',
       [isCompleted, completedAt, req.params.id]
     );
 
-    var updated = await db.queryOne(
+    const updated = await db.queryOne(
       'SELECT r.*, p.agency_or_owner AS permission_name FROM reminders r LEFT JOIN permissions p ON r.permission_id = p.id WHERE r.id = $1',
       [req.params.id]
     );
@@ -183,7 +183,7 @@ router.patch('/:id/complete', denyDemoUser, validate(schemas.completeReminder), 
 // ---------------------------------------------------------------------------
 router.delete('/:id', denyDemoUser, async (req, res) => {
   try {
-    var existing = await db.queryOne('SELECT * FROM reminders WHERE id = $1', [req.params.id]);
+    const existing = await db.queryOne('SELECT * FROM reminders WHERE id = $1', [req.params.id]);
     if (!existing) {
       return res.status(404).json({ success: false, error: 'Reminder not found' });
     }

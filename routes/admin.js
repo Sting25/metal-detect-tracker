@@ -109,7 +109,7 @@ router.put('/users/:id/disable', async (req, res) => {
         if (!user) {
             return res.status(404).json({ success: false, error: 'User not found' });
         }
-        var newState = !user.is_disabled;
+        const newState = !user.is_disabled;
         await db.query('UPDATE users SET is_disabled = $1 WHERE id = $2', [newState, req.params.id]);
 
         db.logAuditEvent({
@@ -140,12 +140,12 @@ router.delete('/users/:id', async (req, res) => {
             return res.status(404).json({ success: false, error: 'User not found' });
         }
         // Use hardDeleteUser to handle all FK constraints and collect S3 keys
-        var s3Keys = await db.hardDeleteUser(Number(req.params.id));
+        const s3Keys = await db.hardDeleteUser(Number(req.params.id));
 
         // Clean up S3 files in background (non-blocking)
         if (s3Keys && s3Keys.length > 0) {
-            var s3 = require('../services/s3');
-            for (var si = 0; si < s3Keys.length; si++) {
+            const s3 = require('../services/s3');
+            for (let si = 0; si < s3Keys.length; si++) {
                 try { await s3.deleteFromS3(s3Keys[si]); } catch (e) { /* ignore S3 cleanup errors */ }
             }
         }
@@ -570,8 +570,8 @@ router.post('/legal/suggestions/:id/apply', validate(schemas.applyLegalSuggestio
                 return res.status(404).json({ success: false, error: 'Linked legal content not found.' });
             }
 
-            var newTitle = section_title || existing.section_title;
-            var newSeverity = severity || existing.severity;
+            const newTitle = section_title || existing.section_title;
+            const newSeverity = severity || existing.severity;
 
             await db.query(
                 `UPDATE legal_content SET
@@ -581,7 +581,7 @@ router.post('/legal/suggestions/:id/apply', validate(schemas.applyLegalSuggestio
             );
 
             // Create revision
-            var revNum = (await db.queryOne(
+            const revNum = (await db.queryOne(
                 'SELECT COALESCE(MAX(revision_number), 0) + 1 AS next_num FROM legal_revisions WHERE legal_content_id = $1',
                 [contentId]
             )).next_num;
@@ -599,8 +599,8 @@ router.post('/legal/suggestions/:id/apply', validate(schemas.applyLegalSuggestio
             );
         } else {
             // Create new legal content section
-            var sectionKey = 'suggestion_' + suggestion.id + '_' + Date.now();
-            var result = await db.query(
+            const sectionKey = 'suggestion_' + suggestion.id + '_' + Date.now();
+            const result = await db.query(
                 `INSERT INTO legal_content (country_code, region_code, language, section_key, section_title, content_html, severity, last_verified)
                  VALUES ($1, $2, 'en', $3, $4, $5, $6, CURRENT_DATE) RETURNING id`,
                 [
@@ -732,16 +732,16 @@ router.put('/legal/:id', async (req, res) => {
         );
 
         // Auto-create revision if title, content, or severity changed
-        var newTitle = section_title || existing.section_title;
-        var newContent = content_html || existing.content_html;
-        var newSeverity = (severity === '') ? null : (severity !== undefined ? severity : existing.severity);
+        const newTitle = section_title || existing.section_title;
+        const newContent = content_html || existing.content_html;
+        const newSeverity = (severity === '') ? null : (severity !== undefined ? severity : existing.severity);
 
-        var titleChanged = newTitle !== existing.section_title;
-        var contentChanged = newContent !== existing.content_html;
-        var severityChanged = (newSeverity || null) !== (existing.severity || null);
+        const titleChanged = newTitle !== existing.section_title;
+        const contentChanged = newContent !== existing.content_html;
+        const severityChanged = (newSeverity || null) !== (existing.severity || null);
 
         if (titleChanged || contentChanged || severityChanged) {
-            var revNum = (await db.queryOne(
+            const revNum = (await db.queryOne(
                 'SELECT COALESCE(MAX(revision_number), 0) + 1 AS next_num FROM legal_revisions WHERE legal_content_id = $1',
                 [req.params.id]
             )).next_num;

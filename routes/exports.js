@@ -1,8 +1,8 @@
-var express = require('express');
-var router = express.Router();
-var { verifyToken, denyDemoUser } = require('../middleware/auth');
-var { buildExportZip } = require('../services/export');
-var db = require('../database');
+const express = require('express');
+const router = express.Router();
+const { verifyToken, denyDemoUser } = require('../middleware/auth');
+const { buildExportZip } = require('../services/export');
+const db = require('../database');
 
 // All routes require authentication
 router.use(verifyToken);
