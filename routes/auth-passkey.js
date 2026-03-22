@@ -91,7 +91,8 @@ router.post('/passkey/register-verify', verifyToken, denyDemoUser, async (req, r
                 expectedRPID: WEBAUTHN_RP_ID,
             });
         } catch (verifyErr) {
-            return res.status(400).json({ success: false, error: 'Passkey verification failed: ' + verifyErr.message });
+            console.error('Passkey registration verification error:', verifyErr.message);
+            return res.status(400).json({ success: false, error: 'Passkey verification failed. Please try again.' });
         }
 
         if (!verification.verified || !verification.registrationInfo) {
@@ -203,7 +204,8 @@ router.post('/passkey/login-verify', async (req, res) => {
                 },
             });
         } catch (verifyErr) {
-            return res.status(401).json({ success: false, error: 'Passkey verification failed: ' + verifyErr.message });
+            console.error('Passkey login verification error:', verifyErr.message);
+            return res.status(401).json({ success: false, error: 'Passkey verification failed. Please try again.' });
         }
 
         if (!verification.verified) {
