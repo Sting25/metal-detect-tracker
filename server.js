@@ -27,6 +27,7 @@ app.use(helmet({
             workerSrc: ["'self'"],
         },
     },
+    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
 }));
 
 // ---------------------------------------------------------------------------
