@@ -62,18 +62,18 @@ function canEditPerm(user, perm) {
 async function autoExpirationReminder(userId, permId, expirationDate, agencyOrOwner) {
   if (!expirationDate) return;
   try {
-    var expDate = new Date(expirationDate);
-    var now = new Date();
-    var daysUntil = Math.ceil((expDate - now) / (1000 * 60 * 60 * 24));
+    const expDate = new Date(expirationDate);
+    const now = new Date();
+    const daysUntil = Math.ceil((expDate - now) / (1000 * 60 * 60 * 24));
     if (daysUntil <= 30) return; // Too soon or already past, no reminder needed
 
-    var dueDate = new Date(expDate);
+    const dueDate = new Date(expDate);
     dueDate.setDate(dueDate.getDate() - 30);
-    var dueDateStr = dueDate.toISOString().split('T')[0];
-    var title = 'Permission expiring: ' + (agencyOrOwner || 'Unknown');
+    const dueDateStr = dueDate.toISOString().split('T')[0];
+    const title = 'Permission expiring: ' + (agencyOrOwner || 'Unknown');
 
     // Check for existing expiration reminder for this permission
-    var existing = await db.queryOne(
+    const existing = await db.queryOne(
       "SELECT id FROM reminders WHERE permission_id = $1 AND reminder_type = 'expiration' AND user_id = $2",
       [permId, userId]
     );
@@ -629,30 +629,30 @@ router.post('/:id/letter', denyDemoUser, async (req, res) => {
     }
 
     // Fetch linked site (optional)
-    var site = null;
+    let site = null;
     if (perm.site_id) {
       site = await db.queryOne('SELECT * FROM sites WHERE id = $1', [perm.site_id]);
     }
 
     // Generate the PDF
-    var pdfBuffer = await pdfService.generatePermissionLetter(letterPrefs, perm, site);
+    const pdfBuffer = await pdfService.generatePermissionLetter(letterPrefs, perm, site);
 
     // Upload to S3
-    var timestamp = Date.now();
-    var filename = 'permission-letter-' + perm.id + '-' + timestamp + '.pdf';
-    var s3Path = 'letters/' + perm.id + '/' + filename;
+    const timestamp = Date.now();
+    const filename = 'permission-letter-' + perm.id + '-' + timestamp + '.pdf';
+    const s3Path = 'letters/' + perm.id + '/' + filename;
     await s3.uploadToS3(pdfBuffer, s3Path, 'application/pdf');
 
     // Store record
-    var result = await db.query(
+    const result = await db.query(
       'INSERT INTO generated_letters (permission_id, user_id, s3_path, filename) VALUES ($1, $2, $3, $4) RETURNING id',
       [perm.id, req.user.id, s3Path, filename]
     );
 
-    var letter = await db.queryOne('SELECT * FROM generated_letters WHERE id = $1', [result.rows[0].id]);
+    const letter = await db.queryOne('SELECT * FROM generated_letters WHERE id = $1', [result.rows[0].id]);
 
     // Generate a presigned URL for immediate download
-    var downloadUrl = await s3.getPresignedUrl(s3Path, 900);
+    const downloadUrl = await s3.getPresignedUrl(s3Path, 900);
 
     db.logAuditEvent({
       userId: req.user.id,
@@ -692,16 +692,16 @@ router.get('/:id/letters', async (req, res) => {
       return res.status(403).json({ success: false, error: 'Access denied' });
     }
 
-    var result = await db.query(
+    const result = await db.query(
       'SELECT * FROM generated_letters WHERE permission_id = $1 ORDER BY created_at DESC',
       [req.params.id]
     );
 
     // Generate presigned URLs for each letter
-    var letters = [];
-    for (var i = 0; i < result.rows.length; i++) {
-      var row = result.rows[i];
-      var downloadUrl = await s3.getPresignedUrl(row.s3_path, 900);
+    const letters = [];
+    for (let i = 0; i < result.rows.length; i++) {
+      const row = result.rows[i];
+      const downloadUrl = await s3.getPresignedUrl(row.s3_path, 900);
       letters.push({
         id: row.id,
         permission_id: row.permission_id,
@@ -738,24 +738,24 @@ router.post('/:id/link', denyDemoUser, validate(schemas.createPermissionLink), a
       return res.status(403).json({ success: false, error: 'Access denied' });
     }
 
-    var expiresInDays = req.body.expires_in_days || 30;
-    var expiresAt = new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000);
-    var token = crypto.randomBytes(32).toString('hex');
+    const expiresInDays = req.body.expires_in_days || 30;
+    const expiresAt = new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000);
+    const token = crypto.randomBytes(32).toString('hex');
 
-    var result = await db.query(
+    const result = await db.query(
       `INSERT INTO permission_links (permission_id, token, status, expires_at, conditions_text)
        VALUES ($1, $2, 'active', $3, $4) RETURNING id`,
       [perm.id, token, expiresAt, req.body.conditions_text || null]
     );
 
-    var link = await db.queryOne('SELECT * FROM permission_links WHERE id = $1', [result.rows[0].id]);
+    const link = await db.queryOne('SELECT * FROM permission_links WHERE id = $1', [result.rows[0].id]);
 
     // Build the public approval URL
-    var baseUrl = process.env.BASE_URL || 'http://localhost:3000';
-    var approvalUrl = baseUrl + '/permission-approve.html?token=' + token;
+    const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+    const approvalUrl = baseUrl + '/permission-approve.html?token=' + token;
 
     // Generate QR code as data URI
-    var qrCode = await QRCode.toDataURL(approvalUrl);
+    const qrCode = await QRCode.toDataURL(approvalUrl);
 
     db.logAuditEvent({
       userId: req.user.id,
@@ -797,7 +797,7 @@ router.get('/:id/links', async (req, res) => {
       return res.status(403).json({ success: false, error: 'Access denied' });
     }
 
-    var result = await db.query(
+    const result = await db.query(
       'SELECT id, permission_id, token, status, expires_at, created_at, signed_name, approved_at, denied_at FROM permission_links WHERE permission_id = $1 ORDER BY created_at DESC',
       [req.params.id]
     );
@@ -821,7 +821,7 @@ router.delete('/:id/links/:lid', denyDemoUser, async (req, res) => {
       return res.status(403).json({ success: false, error: 'Access denied' });
     }
 
-    var link = await db.queryOne(
+    const link = await db.queryOne(
       'SELECT * FROM permission_links WHERE id = $1 AND permission_id = $2',
       [req.params.lid, req.params.id]
     );
