@@ -51,6 +51,7 @@
                 client_id: clientId,
                 callback: function (response) { handleGoogleCredentialResponse(response, LP); },
                 auto_select: false,
+                use_fedcm_for_prompt: false,
             });
             google.accounts.id.renderButton(
                 document.getElementById('google-signin-btn'),

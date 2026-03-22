@@ -111,9 +111,31 @@ router.post('/google', validate(schemas.googleAuth), async (req, res) => {
             });
         }
 
-        // 2. Check if user exists with same email — require explicit linking
+        // 2. Check if user exists with same email — auto-link if Google has verified the email
         user = await db.queryOne('SELECT * FROM users WHERE email = $1', [googleEmail]);
         if (user) {
+            if (user.is_disabled) {
+                return res.status(403).json({ success: false, error: 'Account disabled. Contact an administrator.', isDisabled: true });
+            }
+            if (payload.email_verified) {
+                await db.query('UPDATE users SET google_id = $1 WHERE id = $2', [googleId, user.id]);
+                db.logAuditEvent({
+                    userId: user.id,
+                    action: 'user.google_link',
+                    entityType: 'user',
+                    entityId: user.id,
+                    details: { method: 'auto_link' },
+                    ipAddress: req.ip,
+                });
+                const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
+                return res.json({
+                    success: true,
+                    data: {
+                        user: { id: user.id, email: user.email, display_name: user.display_name, role: user.role, country_code: user.country_code, unit_preference: user.unit_preference, language_preference: user.language_preference },
+                        token,
+                    },
+                });
+            }
             return res.json({
                 success: true,
                 data: {
