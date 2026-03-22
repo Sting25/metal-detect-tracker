@@ -1,6 +1,19 @@
 const { request, createUser, createAdmin, createSite, createFind, createPermission, shareSite, createDemoUser } = require('./helpers');
 const db = require('../database');
 
+/**
+ * Poll for an audit event that may be inserted asynchronously (fire-and-forget).
+ * Retries up to 10 times with 20ms intervals before giving up.
+ */
+async function waitForAuditEvent(sql, params, maxAttempts = 10) {
+    for (let i = 0; i < maxAttempts; i++) {
+        const row = await db.queryOne(sql, params);
+        if (row) return row;
+        await new Promise(r => setTimeout(r, 20));
+    }
+    return null;
+}
+
 describe('Audit Log', () => {
 
     // --- Unit: db.logAuditEvent() ---
@@ -122,7 +135,7 @@ describe('Audit Log', () => {
                 .set('Authorization', `Bearer ${token}`)
                 .expect(200);
 
-            const event = await db.queryOne(
+            const event = await waitForAuditEvent(
                 'SELECT * FROM audit_events WHERE action = $1 AND entity_id = $2',
                 ['site_delete', site.id]
             );
@@ -146,7 +159,7 @@ describe('Audit Log', () => {
                 .set('Authorization', `Bearer ${token}`)
                 .expect(200);
 
-            const event = await db.queryOne(
+            const event = await waitForAuditEvent(
                 'SELECT * FROM audit_events WHERE action = $1 AND entity_id = $2',
                 ['find_delete', find.id]
             );
@@ -172,7 +185,7 @@ describe('Audit Log', () => {
                 .set('Authorization', `Bearer ${token}`)
                 .expect(200);
 
-            const event = await db.queryOne(
+            const event = await waitForAuditEvent(
                 'SELECT * FROM audit_events WHERE action = $1 AND entity_id = $2',
                 ['permission_delete', perm.id]
             );
@@ -197,7 +210,7 @@ describe('Audit Log', () => {
                 .send({ email: otherUser.email, permission_level: 'view' })
                 .expect(201);
 
-            const event = await db.queryOne(
+            const event = await waitForAuditEvent(
                 'SELECT * FROM audit_events WHERE action = $1 AND entity_id = $2',
                 ['share_create', site.id]
             );
@@ -223,7 +236,7 @@ describe('Audit Log', () => {
                 .send({ email: otherUser.email, permission_level: 'edit' })
                 .expect(201);
 
-            const event = await db.queryOne(
+            const event = await waitForAuditEvent(
                 'SELECT * FROM audit_events WHERE action = $1 AND entity_id = $2',
                 ['share_update', site.id]
             );
@@ -245,7 +258,7 @@ describe('Audit Log', () => {
                 .set('Authorization', `Bearer ${token}`)
                 .expect(200);
 
-            const event = await db.queryOne(
+            const event = await waitForAuditEvent(
                 'SELECT * FROM audit_events WHERE action = $1 AND entity_id = $2',
                 ['share_remove', site.id]
             );
@@ -418,7 +431,7 @@ describe('Audit Log', () => {
 
             expect(res.status).toBe(201);
 
-            const event = await db.queryOne(
+            const event = await waitForAuditEvent(
                 "SELECT * FROM audit_events WHERE action = 'user.register' AND user_id = $1",
                 [res.body.data.user.id]
             );
@@ -434,7 +447,7 @@ describe('Audit Log', () => {
                 .post('/api/auth/login')
                 .send({ email: user.email, password });
 
-            const event = await db.queryOne(
+            const event = await waitForAuditEvent(
                 "SELECT * FROM audit_events WHERE action = 'user.login' AND user_id = $1",
                 [user.id]
             );
@@ -452,7 +465,7 @@ describe('Audit Log', () => {
 
             expect(res.status).toBe(201);
 
-            const event = await db.queryOne(
+            const event = await waitForAuditEvent(
                 "SELECT * FROM audit_events WHERE action = 'site.create' AND user_id = $1",
                 [user.id]
             );
@@ -472,7 +485,7 @@ describe('Audit Log', () => {
 
             expect(res.status).toBe(201);
 
-            const event = await db.queryOne(
+            const event = await waitForAuditEvent(
                 "SELECT * FROM audit_events WHERE action = 'find.create' AND user_id = $1",
                 [user.id]
             );
@@ -492,7 +505,7 @@ describe('Audit Log', () => {
 
             expect(res.status).toBe(201);
 
-            const event = await db.queryOne(
+            const event = await waitForAuditEvent(
                 "SELECT * FROM audit_events WHERE action = 'permission.create' AND user_id = $1",
                 [user.id]
             );
@@ -510,7 +523,7 @@ describe('Audit Log', () => {
                 .set('Authorization', `Bearer ${admin.token}`)
                 .send({ role: 'admin' });
 
-            const event = await db.queryOne(
+            const event = await waitForAuditEvent(
                 "SELECT * FROM audit_events WHERE action = 'admin.user_role_change' AND entity_id = $1",
                 [user.id]
             );
