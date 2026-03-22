@@ -266,6 +266,19 @@
     };
 
     /* ------------------------------------------------------------------ */
+    /*  Nav toggle: show authed vs public nav based on token               */
+    /* ------------------------------------------------------------------ */
+    function initNavToggle() {
+        if (localStorage.getItem('mdt_token')) {
+            var authed = document.getElementById('nav-authed');
+            var pub = document.getElementById('nav-public');
+            if (authed) authed.style.display = '';
+            if (pub) pub.style.display = 'none';
+        }
+    }
+    initNavToggle();
+
+    /* ------------------------------------------------------------------ */
     /*  Init                                                               */
     /* ------------------------------------------------------------------ */
     function initLegal() {
