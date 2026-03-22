@@ -1,0 +1,22 @@
+#!/bin/bash
+# Enforce that tests pass before allowing a push to the remote repository.
+
+echo "Running pre-push checks..."
+ERRORS=0
+
+echo ""
+echo "--- Running Tests (Vitest) ---"
+npx vitest run
+if [ $? -ne 0 ]; then
+  echo "ERROR: Tests failed. Please fix before pushing."
+  ERRORS=1
+fi
+
+if [ $ERRORS -ne 0 ]; then
+  echo ""
+  echo "Push blocked. Fix the failing tests above and try again."
+  exit 1
+fi
+
+echo "All tests passed! Proceeding with push."
+exit 0

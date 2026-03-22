@@ -1,0 +1,89 @@
+#!/bin/bash
+# Enforce architecture rules before commit
+
+ERRORS=0
+
+# ── File size checks ──
+
+# Check backend route files (fail if > 500 lines)
+for file in $(git diff --cached --name-only --diff-filter=ACM | grep 'routes/.*\.js$'); do
+  lines=$(wc -l < "$file" | tr -d ' ')
+  if [ "$lines" -gt 500 ]; then
+    echo "ERROR: $file is $lines lines (max 500). Split it into sub-routers."
+    ERRORS=1
+  fi
+done
+
+# Check frontend JS files (fail if > 400 lines)
+for file in $(git diff --cached --name-only --diff-filter=ACM | grep 'public/js/.*\.js$'); do
+  lines=$(wc -l < "$file" | tr -d ' ')
+  if [ "$lines" -gt 400 ]; then
+    echo "WARNING: $file is $lines lines (target max 400). Consider splitting."
+  fi
+done
+
+# Check middleware files (fail if > 300 lines)
+for file in $(git diff --cached --name-only --diff-filter=ACM | grep 'middleware/.*\.js$'); do
+  lines=$(wc -l < "$file" | tr -d ' ')
+  if [ "$lines" -gt 300 ]; then
+    echo "WARNING: $file is $lines lines (target max 300). Consider splitting."
+  fi
+done
+
+# Check service files (fail if > 500 lines)
+for file in $(git diff --cached --name-only --diff-filter=ACM | grep 'services/.*\.js$'); do
+  lines=$(wc -l < "$file" | tr -d ' ')
+  if [ "$lines" -gt 500 ]; then
+    echo "ERROR: $file is $lines lines (max 500). Split it."
+    ERRORS=1
+  fi
+done
+
+# ── Forbidden pattern checks ──
+# Scans staged diffs for known anti-patterns defined in forbidden-patterns.json.
+# Only checks newly added lines (^\+) so existing code is not flagged until touched.
+REPO_ROOT=$(git rev-parse --show-toplevel)
+PATTERNS_FILE="$REPO_ROOT/.githooks/forbidden-patterns.json"
+
+if [ -f "$PATTERNS_FILE" ] && command -v jq &>/dev/null; then
+  STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
+
+  if [ -n "$STAGED_FILES" ]; then
+    NUM_PATTERNS=$(jq length "$PATTERNS_FILE")
+
+    for i in $(seq 0 $((NUM_PATTERNS - 1))); do
+      PATTERN=$(jq -r ".[$i].pattern" "$PATTERNS_FILE")
+      FILE_FILTER=$(jq -r ".[$i].files" "$PATTERNS_FILE")
+      FILE_EXCLUDE=$(jq -r ".[$i].exclude // \"\"" "$PATTERNS_FILE")
+      MESSAGE=$(jq -r ".[$i].message" "$PATTERNS_FILE")
+      PATTERN_ID=$(jq -r ".[$i].id" "$PATTERNS_FILE")
+
+      for file in $STAGED_FILES; do
+        # Check if this file matches the include filter
+        if echo "$file" | grep -qE "$FILE_FILTER"; then
+          # Check if this file should be excluded
+          if [ -n "$FILE_EXCLUDE" ] && echo "$file" | grep -qE "$FILE_EXCLUDE"; then
+            continue
+          fi
+          # Check only added lines in staged content for the forbidden pattern
+          MATCHES=$(git diff --cached -U0 -- "$file" | grep '^[+]' | grep -v '^[+][+][+]' | cut -c2- | grep -cE "$PATTERN" 2>/dev/null || true)
+          if [ "$MATCHES" -gt 0 ]; then
+            echo ""
+            echo "FORBIDDEN [$PATTERN_ID]: $file"
+            echo "  -> $MESSAGE"
+            ERRORS=1
+          fi
+        fi
+      done
+    done
+  fi
+fi
+
+if [ $ERRORS -ne 0 ]; then
+  echo ""
+  echo "Commit blocked. Fix the issues above and try again."
+  exit 1
+fi
+
+echo "pre-commit: all checks passed"
+exit 0

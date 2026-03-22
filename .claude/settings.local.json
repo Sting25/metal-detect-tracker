@@ -1,6 +1,8 @@
 {
   "permissions": {
     "allow": [
+      "Edit",
+      "Write",
       "Bash(git fetch:*)",
       "Bash(git checkout:*)",
       "Bash(gh pr list:*)",
@@ -20,7 +22,35 @@
       "Bash(git push:*)",
       "Bash(git config:*)",
       "Bash(scp:*)",
-      "Bash(gh repo:*)"
+      "Bash(gh repo:*)",
+      "Bash(brew install:*)",
+      "Bash(find /Users/brain/metaldetecresearchnew/backend/app/api -name *.py)",
+      "Bash(find /Users/brain/metaldetecresearchnew/backend/app -name *.py)",
+      "Bash(find /Users/brain/metaldetecresearchnew/backend -name *.py)",
+      "Bash(find /Users/brain/metaldetecresearchnew/frontend/src -name *.js)",
+      "Bash(cat /Users/brain/metal-detect-tracker/.eslintrc*)",
+      "Bash(cat /Users/brain/metal-detect-tracker/eslint.config*)",
+      "Bash(chmod +x /Users/brain/metal-detect-tracker/.githooks/pre-commit /Users/brain/metal-detect-tracker/.githooks/pre-push)",
+      "Bash(bash .githooks/pre-commit)",
+      "Bash(grep -r GOOGLE_CLIENT_ID /Users/brain/metal-detect-tracker --include=*.js --include=*.json --include=*.config.js)",
+      "Bash(find /Users/brain/metal-detect-tracker -name *.env* -o -name ecosystem.config.js)",
+      "Bash(npm test:*)",
+      "Bash(git reset:*)",
+      "Bash(grep:*)",
+      "Bash(npx vitest:*)",
+      "Bash(brew services:*)",
+      "Read(//opt/homebrew/Cellar/postgresql@17/17.9/bin/**)",
+      "Read(//usr/local/opt/postgresql@17/bin/**)",
+      "Bash(/opt/homebrew/opt/postgresql@17/bin/psql -l)",
+      "Bash(/opt/homebrew/opt/postgresql@17/bin/psql -U brain -d postgres -c \"SELECT rolname FROM pg_roles WHERE rolname IN \\('postgres', 'brain', 'signalbouncer'\\);\")",
+      "Bash(/opt/homebrew/opt/postgresql@17/bin/createdb -U postgres metal_detect_tracker_test 2>&1)",
+      "Bash(git stash:*)",
+      "Bash(gh ssh-key:*)",
+      "Bash(gh api:*)",
+      "Bash(rsync -avz --delete --exclude=node_modules --exclude=.env --exclude=.git --exclude=uploads /Users/brain/metal-detect-tracker/ root@167.172.28.28:/var/www/signalbouncer/)",
+      "Bash(python3 -m json.tool)",
+      "Bash(rsync:*)",
+      "Bash(git:*)"
     ]
   }
 }
