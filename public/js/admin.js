@@ -204,7 +204,7 @@
             console.error('Error updating setting:', err);
             // Revert the toggle on failure
             els.toggleNotifyRegister.checked = !els.toggleNotifyRegister.checked;
-            Auth.showToast(_t('admin.errorLoadingStats') + ' ' + err.message);
+            Auth.showToast(_t('admin.errorLoadingStats'));
         }
     }
 
@@ -309,7 +309,7 @@
             await loadStats();
         } catch (err) {
             console.error('Error changing user role:', err);
-            Auth.showToast(_t('admin.errorChangingRole') + ' ' + err.message);
+            Auth.showToast(_t('admin.errorChangingRole'));
             await loadUsers();
         }
     }
@@ -326,7 +326,7 @@
             await loadUsers();
         } catch (err) {
             console.error('Error toggling user disabled state:', err);
-            Auth.showToast('Error: ' + err.message);
+            Auth.showToast('Failed to update user status. Please try again.');
         }
     }
 
@@ -342,7 +342,7 @@
             await loadStats();
         } catch (err) {
             console.error('Error deleting user:', err);
-            Auth.showToast(_t('admin.errorDeletingUser') + ' ' + err.message);
+            Auth.showToast(_t('admin.errorDeletingUser'));
         }
     }
 
@@ -366,7 +366,7 @@
             prompt('Send this link to ' + userName + '. It expires in 24 hours:', resetUrl);
         } catch (err) {
             console.error('Error generating reset link:', err);
-            Auth.showToast(_t('admin.errorGeneratingResetLink') + ' ' + err.message);
+            Auth.showToast(_t('admin.errorGeneratingResetLink'));
         }
     }
 
@@ -468,7 +468,7 @@
             await loadStats();
         } catch (err) {
             console.error('Error generating invite code:', err);
-            Auth.showToast(_t('admin.errorGeneratingInvite') + ' ' + err.message);
+            Auth.showToast(_t('admin.errorGeneratingInvite'));
         } finally {
             els.btnGenerate.disabled = false;
             els.btnGenerate.textContent = _t('admin.invites.generate');
@@ -507,7 +507,7 @@
             await loadStats();
         } catch (err) {
             console.error('Error deleting invite code:', err);
-            Auth.showToast(_t('admin.errorDeletingInvite') + ' ' + err.message);
+            Auth.showToast(_t('admin.errorDeletingInvite'));
         }
     }
 
@@ -627,7 +627,7 @@
             loadFeedbackStats();
         } catch (err) {
             console.error('Error updating feedback:', err);
-            Auth.showToast(_t('admin.errorUpdatingFeedback') + ' ' + err.message);
+            Auth.showToast(_t('admin.errorUpdatingFeedback'));
             loadFeedback();
         }
     }
@@ -641,7 +641,7 @@
             loadFeedbackStats();
         } catch (err) {
             console.error('Error deleting feedback:', err);
-            Auth.showToast(_t('admin.errorDeletingFeedback') + ' ' + err.message);
+            Auth.showToast(_t('admin.errorDeletingFeedback'));
         }
     }
 
@@ -825,7 +825,7 @@
             await loadLegalContent();
         } catch (err) {
             console.error('Error saving legal section:', err);
-            Auth.showToast('Error: ' + err.message);
+            Auth.showToast('Failed to save legal section. Please try again.');
         }
     }
 
@@ -1047,7 +1047,7 @@
             Auth.showToast('Suggestion ' + status + '.');
         } catch (err) {
             console.error('Error reviewing suggestion:', err);
-            Auth.showToast('Error: ' + err.message);
+            Auth.showToast('Failed to review suggestion. Please try again.');
         }
     }
 
@@ -1149,7 +1149,7 @@
             Auth.showToast('Suggestion applied to content.');
         } catch (err) {
             console.error('Error applying suggestion:', err);
-            Auth.showToast('Error: ' + err.message);
+            Auth.showToast('Failed to apply suggestion. Please try again.');
         }
     }
 
