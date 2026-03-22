@@ -101,7 +101,7 @@
                     <select id="find-site" name="site_id" required class="form-control">
                         <option value="" data-i18n="finds.placeholder.selectSite">Select a site...</option>
                     </select>
-                    <div id="quick-site-create" style="display:none;" class="quick-create-row">
+                    <div id="quick-site-create" class="quick-create-row hidden">
                         <input type="text" id="quick-site-name" class="form-control" placeholder="Site name" data-i18n-placeholder="finds.quickSiteName">
                         <button type="button" id="quick-site-save" class="btn btn-primary btn-sm" data-i18n="finds.quickSiteCreate">Create</button>
                         <button type="button" id="quick-site-cancel" class="btn btn-sm" data-i18n="finds.quickSiteCancel">Cancel</button>
@@ -226,7 +226,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" id="btn-delete-find" style="display:none;" data-i18n="finds.modal.delete">Delete</button>
+                    <button type="button" class="btn btn-danger hidden" id="btn-delete-find" data-i18n="finds.modal.delete">Delete</button>
                     <div class="modal-footer-right">
                         <button type="button" class="btn btn-secondary" id="btn-cancel-find" data-i18n="finds.modal.cancel">Cancel</button>
                         <button type="submit" class="btn btn-primary" id="btn-save-find" data-i18n="finds.modal.save">Save Find</button>
@@ -250,7 +250,7 @@
                             <span class="upload-icon">&#128247;</span>
                             <p data-i18n="finds.quickLog.tapPhoto">Tap to add photo</p>
                         </div>
-                        <img id="quick-log-preview" style="display:none; width:100%; max-height:200px; object-fit:contain; border-radius:8px;">
+                        <img id="quick-log-preview" class="quick-log-preview hidden">
                         <input type="file" id="quick-log-photo" accept="image/*" capture="environment" class="upload-input">
                     </div>
                 </div>
@@ -276,7 +276,7 @@
                 <input type="hidden" id="quick-log-site-id">
                 <input type="hidden" id="quick-log-latitude">
                 <input type="hidden" id="quick-log-longitude">
-                <div id="quick-log-location-status" class="text-muted text-sm" style="margin-bottom:8px;"></div>
+                <div id="quick-log-location-status" class="text-muted text-sm mb-sm"></div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" id="btn-quick-log-details" data-i18n="finds.quickLog.addDetails">Add Details</button>
                     <button type="submit" class="btn btn-primary" id="btn-quick-log-save" data-i18n="finds.quickLog.save">Save</button>
@@ -286,7 +286,7 @@
     </div>
 
     <!-- Photo Lightbox -->
-    <div class="photo-lightbox" id="photo-lightbox" style="display:none;">
+    <div class="photo-lightbox hidden" id="photo-lightbox">
         <button class="photo-lightbox-close" id="lightbox-close">&times;</button>
         <button class="photo-lightbox-nav photo-lightbox-prev" id="lightbox-prev">&#10094;</button>
         <img id="lightbox-img" class="photo-lightbox-img" alt="Photo">

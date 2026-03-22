@@ -115,9 +115,9 @@
 
         // Show/hide upload area based on total count
         if (FP.currentPhotos.length + FP.newPhotoFiles.length >= 10) {
-            FP.els.uploadArea.style.display = 'none';
+            FP.els.uploadArea.classList.add('hidden');
         } else {
-            FP.els.uploadArea.style.display = '';
+            FP.els.uploadArea.classList.remove('hidden');
         }
     };
 
@@ -149,12 +149,12 @@
         if (FP.lightboxPhotos.length === 0) return;
         FP.lightboxIndex = index;
         showLightboxImage();
-        FP.els.lightbox.style.display = 'flex';
+        FP.els.lightbox.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
     };
 
     FP.closeLightbox = function () {
-        FP.els.lightbox.style.display = 'none';
+        FP.els.lightbox.classList.add('hidden');
         if (!FP.els.modalOverlay.classList.contains('open')) {
             document.body.style.overflow = '';
         }
@@ -169,8 +169,8 @@
 
     function showLightboxImage() {
         FP.els.lightboxImg.src = FP.lightboxPhotos[FP.lightboxIndex];
-        FP.els.lightboxPrev.style.display = FP.lightboxPhotos.length > 1 ? '' : 'none';
-        FP.els.lightboxNext.style.display = FP.lightboxPhotos.length > 1 ? '' : 'none';
+        FP.els.lightboxPrev.classList.toggle('hidden', FP.lightboxPhotos.length <= 1);
+        FP.els.lightboxNext.classList.toggle('hidden', FP.lightboxPhotos.length <= 1);
     }
 
     /* ------------------------------------------------------------------ */
@@ -178,8 +178,8 @@
     /* ------------------------------------------------------------------ */
     FP.openQuickLog = function () {
         FP.els.quickLogForm.reset();
-        FP.els.quickLogPreview.style.display = 'none';
-        FP.els.quickLogUploadPlaceholder.style.display = '';
+        FP.els.quickLogPreview.classList.add('hidden');
+        FP.els.quickLogUploadPlaceholder.classList.remove('hidden');
         FP.els.quickLogLocationStatus.textContent = '';
 
         var lastCategory = localStorage.getItem('sb_lastCategory') || '';

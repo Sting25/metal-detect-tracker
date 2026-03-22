@@ -74,11 +74,11 @@
         if (!list || !container) return;
 
         if (!suggestions || suggestions.length === 0) {
-            container.style.display = 'none';
+            container.classList.add('hidden');
             return;
         }
 
-        container.style.display = '';
+        container.classList.remove('hidden');
         var html = '';
         suggestions.forEach(function (s) {
             var typeLabel = s.suggestion_type || 'correction';
@@ -126,7 +126,7 @@
         if (!suggestSection || !suggestBtn) return;
 
         if (!window.Auth || !Auth.getToken()) return;
-        suggestSection.style.display = '';
+        suggestSection.classList.remove('hidden');
 
         loadMySuggestions();
 

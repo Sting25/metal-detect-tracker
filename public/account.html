@@ -79,8 +79,8 @@
                             <span class="auth-method-status" id="google-status"></span>
                         </div>
                     </div>
-                    <button class="btn btn-sm btn-secondary" id="btn-link-google" style="display:none;" data-i18n="account.linkGoogle">Link Google</button>
-                    <button class="btn btn-sm btn-outline" id="btn-unlink-google" style="display:none;" data-i18n="account.unlinkGoogle">Unlink</button>
+                    <button class="btn btn-sm btn-secondary hidden" id="btn-link-google" data-i18n="account.linkGoogle">Link Google</button>
+                    <button class="btn btn-sm btn-outline hidden" id="btn-unlink-google" data-i18n="account.unlinkGoogle">Unlink</button>
                 </div>
             </div>
         </section>
@@ -99,7 +99,7 @@
         </section>
 
         <!-- Change Password Modal (inline) -->
-        <div id="password-modal" class="account-modal" style="display:none;">
+        <div id="password-modal" class="account-modal hidden">
             <div class="account-modal-content">
                 <h3 id="password-modal-title" data-i18n="account.changePassword">Change Password</h3>
                 <form id="password-form">
@@ -124,7 +124,7 @@
             </div>
         </div>
 
-        <div id="account-toast" class="account-toast" style="display:none;"></div>
+        <div id="account-toast" class="account-toast hidden"></div>
     </main>
 
     <script src="/js/auth.js"></script>

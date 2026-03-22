@@ -44,9 +44,9 @@
 
             // Hide demo buttons when already logged in
             var heroDemo = document.getElementById('hero-demo');
-            if (heroDemo) heroDemo.style.display = 'none';
+            if (heroDemo) heroDemo.classList.add('hidden');
             var ctaDemo = document.getElementById('cta-demo');
-            if (ctaDemo) ctaDemo.style.display = 'none';
+            if (ctaDemo) ctaDemo.classList.add('hidden');
 
             // Update hero CTA
             var heroCta = document.getElementById('hero-signup');

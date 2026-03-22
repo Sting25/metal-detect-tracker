@@ -99,7 +99,7 @@
         });
         // Hide Web Share button if API not available
         if (!navigator.share) {
-            els.btnShare.style.display = 'none';
+            els.btnShare.classList.add('hidden');
         }
         // Settings toggle
         els.toggleNotifyRegister.addEventListener('change', toggleNotifyRegister);
@@ -113,7 +113,7 @@
         if (legalEditForm) legalEditForm.addEventListener('submit', saveLegalSection);
         var legalModalCancel = document.getElementById('legal-modal-cancel');
         if (legalModalCancel) legalModalCancel.addEventListener('click', function () {
-            document.getElementById('legal-modal').style.display = 'none';
+            document.getElementById('legal-modal').classList.remove('is-open');
         });
         // Legal suggestion filters + pagination
         if (els.suggestionStatusFilter) els.suggestionStatusFilter.addEventListener('change', function () { suggestionsPage = 1; loadLegalSuggestions(); });
@@ -121,7 +121,7 @@
         if (els.suggestionsNext) els.suggestionsNext.addEventListener('click', function () { suggestionsPage++; loadLegalSuggestions(); });
         var suggestionModalClose = document.getElementById('suggestion-modal-close');
         if (suggestionModalClose) suggestionModalClose.addEventListener('click', function () {
-            document.getElementById('suggestion-modal').style.display = 'none';
+            document.getElementById('suggestion-modal').classList.remove('is-open');
         });
         // Audit log filters
         if (els.auditActionFilter) els.auditActionFilter.addEventListener('change', function () { auditPage = 1; loadAuditLog(); });
@@ -462,7 +462,7 @@
 
             // Show the generated code
             els.generatedCode.textContent = code;
-            els.inviteDisplay.style.display = 'flex';
+            els.inviteDisplay.classList.remove('hidden');
 
             await loadInviteCodes();
             await loadStats();
@@ -668,9 +668,9 @@
             if (els.legalStaleBanner) {
                 if (staleCount > 0) {
                     els.legalStaleBanner.textContent = staleCount + ' section' + (staleCount === 1 ? '' : 's') + ' not verified in 6+ months.';
-                    els.legalStaleBanner.style.display = '';
+                    els.legalStaleBanner.classList.remove('hidden');
                 } else {
-                    els.legalStaleBanner.style.display = 'none';
+                    els.legalStaleBanner.classList.add('hidden');
                 }
             }
         } catch (err) {
@@ -768,7 +768,7 @@
                 document.getElementById('legal-edit-html').value = '';
                 document.getElementById('legal-modal-title').textContent = 'Add Legal Section';
             }
-            document.getElementById('legal-modal').style.display = 'flex';
+            document.getElementById('legal-modal').classList.add('is-open');
 
             // Load revision history for existing sections
             if (id) {
@@ -821,7 +821,7 @@
                 var err = await res.json().catch(function () { return {}; });
                 throw new Error(err.error || 'Failed to save');
             }
-            document.getElementById('legal-modal').style.display = 'none';
+            document.getElementById('legal-modal').classList.remove('is-open');
             await loadLegalContent();
         } catch (err) {
             console.error('Error saving legal section:', err);
@@ -1012,7 +1012,7 @@
             html += '</div>';
 
             document.getElementById('suggestion-modal-body').innerHTML = html;
-            document.getElementById('suggestion-modal').style.display = 'flex';
+            document.getElementById('suggestion-modal').classList.add('is-open');
 
             // Bind action buttons
             var approveBtn = document.getElementById('btn-approve-suggestion');
@@ -1042,7 +1042,7 @@
                 var err = await res.json().catch(function () { return {}; });
                 throw new Error(err.error || 'Failed to update');
             }
-            document.getElementById('suggestion-modal').style.display = 'none';
+            document.getElementById('suggestion-modal').classList.remove('is-open');
             await loadLegalSuggestions();
             Auth.showToast('Suggestion ' + status + '.');
         } catch (err) {
@@ -1053,7 +1053,7 @@
 
     function openApplySuggestion(suggestion) {
         // Close suggestion modal
-        document.getElementById('suggestion-modal').style.display = 'none';
+        document.getElementById('suggestion-modal').classList.remove('is-open');
 
         // Build apply modal content
         var applyModal = document.getElementById('apply-modal');
@@ -1062,7 +1062,7 @@
             applyModal = document.createElement('div');
             applyModal.id = 'apply-modal';
             applyModal.className = 'modal-overlay';
-            applyModal.innerHTML = '<div class="modal-content" style="max-width:640px;">' +
+            applyModal.innerHTML = '<div class="modal-content modal-content--narrow">' +
                 '<h3>Apply Suggestion to Content</h3>' +
                 '<form id="apply-suggestion-form">' +
                 '<input type="hidden" id="apply-suggestion-id">' +
@@ -1078,17 +1078,17 @@
                 '<option value="danger">Danger (Red)</option>' +
                 '</select></div>' +
                 '<div class="form-group"><label for="apply-content-html">Content HTML</label>' +
-                '<textarea id="apply-content-html" class="form-control" rows="10" required style="font-family:monospace;font-size:0.85rem;"></textarea></div>' +
+                '<textarea id="apply-content-html" class="form-control textarea-code" rows="10" required></textarea></div>' +
                 '<div class="form-group"><label for="apply-change-summary">Change Summary (optional)</label>' +
                 '<input type="text" id="apply-change-summary" class="form-control" placeholder="Brief description of what changed"></div>' +
-                '<div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1rem;">' +
+                '<div class="modal-actions">' +
                 '<button type="button" class="btn btn-secondary" id="apply-modal-cancel">Cancel</button>' +
                 '<button type="submit" class="btn btn-primary">Apply</button>' +
                 '</div></form></div>';
             document.body.appendChild(applyModal);
 
             document.getElementById('apply-modal-cancel').addEventListener('click', function () {
-                applyModal.style.display = 'none';
+                applyModal.classList.remove('is-open');
             });
             document.getElementById('apply-suggestion-form').addEventListener('submit', submitApplySuggestion);
         }
@@ -1117,7 +1117,7 @@
                 .catch(function () {});
         }
 
-        applyModal.style.display = 'flex';
+        applyModal.classList.add('is-open');
     }
 
     async function submitApplySuggestion(e) {
@@ -1143,7 +1143,7 @@
                 var err = await res.json().catch(function () { return {}; });
                 throw new Error(err.error || 'Failed to apply');
             }
-            document.getElementById('apply-modal').style.display = 'none';
+            document.getElementById('apply-modal').classList.remove('is-open');
             await loadLegalSuggestions();
             await loadLegalContent();
             Auth.showToast('Suggestion applied to content.');

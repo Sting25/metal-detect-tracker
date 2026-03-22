@@ -31,7 +31,7 @@
         </div>
 
         <!-- Error State -->
-        <div id="error-state" class="approval-state" style="display:none;">
+        <div id="error-state" class="approval-state hidden">
             <div class="approval-card approval-card-error">
                 <div class="approval-icon">&#x26A0;</div>
                 <h2 id="error-title">Error</h2>
@@ -40,7 +40,7 @@
         </div>
 
         <!-- Already Actioned State -->
-        <div id="done-state" class="approval-state" style="display:none;">
+        <div id="done-state" class="approval-state hidden">
             <div class="approval-card approval-card-done">
                 <div class="approval-icon" id="done-icon">&#x2705;</div>
                 <h2 id="done-title">Thank You</h2>
@@ -49,7 +49,7 @@
         </div>
 
         <!-- Main Approval Form -->
-        <div id="approval-form-state" class="approval-state" style="display:none;">
+        <div id="approval-form-state" class="approval-state hidden">
             <div class="approval-card">
                 <h1 class="approval-title">Permission Request</h1>
                 <p class="approval-subtitle">
@@ -62,27 +62,27 @@
                         <span class="approval-detail-label">Landowner / Agency:</span>
                         <span class="approval-detail-value" id="detail-agency"></span>
                     </div>
-                    <div class="approval-detail-row" id="detail-site-row" style="display:none;">
+                    <div class="approval-detail-row hidden" id="detail-site-row">
                         <span class="approval-detail-label">Site:</span>
                         <span class="approval-detail-value" id="detail-site"></span>
                     </div>
-                    <div class="approval-detail-row" id="detail-desc-row" style="display:none;">
+                    <div class="approval-detail-row hidden" id="detail-desc-row">
                         <span class="approval-detail-label">Description:</span>
                         <span class="approval-detail-value" id="detail-description"></span>
                     </div>
-                    <div class="approval-detail-row" id="detail-notes-row" style="display:none;">
+                    <div class="approval-detail-row hidden" id="detail-notes-row">
                         <span class="approval-detail-label">Notes:</span>
                         <span class="approval-detail-value" id="detail-notes"></span>
                     </div>
                 </div>
 
                 <!-- Map (if coordinates available) -->
-                <div id="approval-map-container" style="display:none;">
-                    <div id="approval-map" style="height:200px; border-radius:8px;"></div>
+                <div id="approval-map-container" class="hidden">
+                    <div id="approval-map" class="approval-map"></div>
                 </div>
 
                 <!-- Conditions (if set by requester) -->
-                <div id="conditions-section" style="display:none;">
+                <div id="conditions-section" class="hidden">
                     <h3>Conditions & Commitments</h3>
                     <p id="conditions-text" class="conditions-text"></p>
                 </div>
@@ -117,7 +117,7 @@
                 </div>
 
                 <!-- Deny Reason (shown when deny is clicked) -->
-                <div id="deny-section" style="display:none;">
+                <div id="deny-section" class="hidden">
                     <div class="form-group">
                         <label for="deny-reason">Reason for Denial (optional)</label>
                         <textarea id="deny-reason" class="form-control" rows="2" placeholder="Optionally explain why..."></textarea>

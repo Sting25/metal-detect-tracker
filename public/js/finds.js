@@ -174,8 +174,8 @@
                 var reader = new FileReader();
                 reader.onload = function (e) {
                     FP.els.quickLogPreview.src = e.target.result;
-                    FP.els.quickLogPreview.style.display = 'block';
-                    FP.els.quickLogUploadPlaceholder.style.display = 'none';
+                    FP.els.quickLogPreview.classList.remove('hidden');
+                    FP.els.quickLogUploadPlaceholder.classList.add('hidden');
                 };
                 reader.readAsDataURL(file);
             }
@@ -212,7 +212,7 @@
             FP.els.category.value = find.category || '';
             FP.currentTags = find.tags ? find.tags.split(',').map(function(t) { return t.trim(); }).filter(Boolean) : [];
             FP.renderTags();
-            FP.els.btnDelete.style.display = 'inline-block';
+            FP.els.btnDelete.classList.remove('hidden');
             FP.currentPhotos = (find.photos || []).slice();
             FP.renderPhotoGallery();
         } else {
@@ -223,7 +223,7 @@
             FP.els.category.value = '';
             FP.currentTags = [];
             FP.renderTags();
-            FP.els.btnDelete.style.display = 'none';
+            FP.els.btnDelete.classList.add('hidden');
             FP.renderPhotoGallery();
         }
 

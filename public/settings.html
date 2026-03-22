@@ -47,31 +47,31 @@
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
-                <div class="setting-row" style="margin-top: var(--space-md);">
+                <div class="setting-row mt-1">
                     <div class="setting-info">
                         <span class="setting-label" data-i18n="settings.unitPreference">Measurement units</span>
                         <span class="setting-description text-muted" data-i18n="settings.unitPreferenceDesc">Choose how depths and distances are displayed.</span>
                     </div>
-                    <select id="select-unit-preference" class="form-input" style="width: auto; min-width: 180px;">
+                    <select id="select-unit-preference" class="form-input form-select-auto">
                         <option value="imperial" data-i18n="settings.unitPreference.imperial">Imperial (inches)</option>
                         <option value="metric" data-i18n="settings.unitPreference.metric">Metric (cm)</option>
                     </select>
                 </div>
-                <div class="setting-row" style="margin-top: var(--space-md);">
+                <div class="setting-row mt-1">
                     <div class="setting-info">
                         <span class="setting-label" data-i18n="settings.exportObfuscation">Export coordinate precision</span>
                         <span class="setting-description text-muted" data-i18n="settings.exportObfuscationDesc">Control how precise your coordinates are when you export data.</span>
                     </div>
-                    <select id="select-export-obfuscation" class="form-input" style="width: auto; min-width: 180px;">
+                    <select id="select-export-obfuscation" class="form-input form-select-auto">
                         <option value="none" data-i18n="settings.exportObfuscation.none">Exact coordinates</option>
                         <option value="rounded_1km" data-i18n="settings.exportObfuscation.rounded_1km">Rounded to ~1 km</option>
                         <option value="rounded_10km" data-i18n="settings.exportObfuscation.rounded_10km">Rounded to ~10 km</option>
                         <option value="no_coords" data-i18n="settings.exportObfuscation.no_coords">No coordinates</option>
                     </select>
                 </div>
-                <div style="margin-top: var(--space-md); display: flex; align-items: center; gap: var(--space-sm);">
+                <div class="mt-1 flex items-center gap-sm">
                     <button class="btn btn-sm btn-primary" id="btn-save-privacy" data-i18n="settings.save">Save Privacy Settings</button>
-                    <span id="privacy-save-msg" class="text-muted" style="font-size: var(--font-size-sm);"></span>
+                    <span id="privacy-save-msg" class="text-muted text-sm"></span>
                 </div>
             </div>
         </section>
@@ -85,23 +85,23 @@
                         <span class="setting-label" data-i18n="settings.exportDesc">Export or import your data</span>
                         <span class="setting-description text-muted" data-i18n="settings.exportDescDetail">Download a ZIP file containing all your sites, finds, permissions, and photos.</span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: var(--space-sm);">
+                    <div class="flex items-center gap-sm">
                         <button class="btn btn-sm btn-primary" id="btn-export" data-i18n="settings.exportBtn">Export My Data</button>
-                        <span id="export-msg" class="text-muted" style="font-size: var(--font-size-sm);"></span>
+                        <span id="export-msg" class="text-muted text-sm"></span>
                     </div>
                 </div>
-                <div class="setting-row" style="margin-top: var(--space-md);">
+                <div class="setting-row mt-1">
                     <div class="setting-info">
                         <span class="setting-label" data-i18n="settings.importDesc">Restore data from a previously exported ZIP file.</span>
                         <span class="setting-description text-muted" data-i18n="settings.importTemplateDesc">Not sure about the format? Download a sample template with example data.</span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: var(--space-sm); flex-wrap: wrap;">
-                        <label class="btn btn-sm" style="cursor: pointer;">
+                    <div class="flex items-center gap-sm flex-wrap">
+                        <label class="btn btn-sm cursor-pointer">
                             <span id="import-btn-text" data-i18n="settings.importBtn">Import Data</span>
-                            <input type="file" id="file-import" accept=".zip" style="display: none;">
+                            <input type="file" id="file-import" accept=".zip" class="hidden">
                         </label>
                         <button class="btn btn-sm btn-outline" id="btn-download-template" data-i18n="settings.downloadTemplate">Download Template</button>
-                        <span id="import-msg" class="text-muted" style="font-size: var(--font-size-sm);"></span>
+                        <span id="import-msg" class="text-muted text-sm"></span>
                     </div>
                 </div>
             </div>
@@ -129,17 +129,17 @@
                 <h2 data-i18n="settings.deleteConfirmTitle">Delete Your Account?</h2>
                 <button class="modal-close" id="btn-delete-modal-close">&times;</button>
             </div>
-            <div class="modal-body" style="padding: var(--space-lg);">
-                <p class="text-muted" style="margin-bottom: var(--space-md);" data-i18n="settings.deleteConfirmWarning">This will permanently delete your account. Your data will be removed after a 30-day grace period. This action cannot be undone.</p>
+            <div class="modal-body p-2">
+                <p class="text-muted mb-1" data-i18n="settings.deleteConfirmWarning">This will permanently delete your account. Your data will be removed after a 30-day grace period. This action cannot be undone.</p>
                 <div class="form-group">
                     <label for="delete-confirm-input" data-i18n="settings.deleteConfirmLabel">Type DELETE to confirm</label>
                     <input type="text" id="delete-confirm-input" class="form-control" autocomplete="off" spellcheck="false">
                 </div>
-                <div style="display: flex; gap: var(--space-sm); margin-top: var(--space-md);">
+                <div class="flex gap-sm mt-1">
                     <button class="btn btn-danger" id="btn-delete-confirm" disabled data-i18n="settings.deleteConfirmBtn">Permanently Delete Account</button>
                     <button class="btn" id="btn-delete-cancel" data-i18n="settings.deleteCancel">Cancel</button>
                 </div>
-                <span id="delete-error-msg" class="text-muted" style="font-size: var(--font-size-sm); color: var(--color-status-red); display: block; margin-top: var(--space-sm);"></span>
+                <span id="delete-error-msg" class="text-muted error-msg-block"></span>
             </div>
         </div>
     </div>

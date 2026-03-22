@@ -23,12 +23,12 @@
                 }
                 if (configJson.data.webauthn_enabled && window.PublicKeyCredential) {
                     const passkeyBtn = document.getElementById('btn-passkey-login');
-                    if (passkeyBtn) passkeyBtn.style.display = 'block';
+                    if (passkeyBtn) passkeyBtn.classList.remove('hidden');
                 }
             }
         } catch (configErr) {
             const socialSection = document.getElementById('auth-social');
-            if (socialSection) socialSection.style.display = 'none';
+            if (socialSection) socialSection.classList.add('hidden');
         }
 
         function initGoogleSignIn(clientId, LP) {
@@ -72,9 +72,9 @@
         }
 
         function showGoogleTermsSection(name, email, LP) {
-            document.getElementById('login-form').style.display = 'none';
-            document.getElementById('register-form').style.display = 'none';
-            document.getElementById('auth-social').style.display = 'none';
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('register-form').classList.add('hidden');
+            document.getElementById('auth-social').classList.add('hidden');
             document.querySelectorAll('.auth-tab').forEach(function (t) { t.classList.remove('active'); });
 
             let welcomeMsg = _t('auth.google.welcome');
@@ -85,8 +85,8 @@
             }
             document.getElementById('google-welcome-msg').textContent = welcomeMsg;
             document.getElementById('google-terms').checked = false;
-            document.getElementById('google-terms-section').style.display = 'block';
-            document.getElementById('auth-error').style.display = 'none';
+            document.getElementById('google-terms-section').classList.remove('hidden');
+            document.getElementById('auth-error').classList.add('hidden');
         }
 
         // Google terms accept button
@@ -134,8 +134,8 @@
             linkBackFromGoogle.addEventListener('click', function (e) {
                 e.preventDefault();
                 pendingGoogleToken = null;
-                document.getElementById('google-terms-section').style.display = 'none';
-                document.getElementById('auth-social').style.display = '';
+                document.getElementById('google-terms-section').classList.add('hidden');
+                document.getElementById('auth-social').classList.remove('hidden');
                 LP.switchTab('login');
             });
         }

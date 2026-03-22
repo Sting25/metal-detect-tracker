@@ -103,17 +103,17 @@
 
         if (els.btnDeny) {
             els.btnDeny.addEventListener('click', function () {
-                els.denySection.style.display = '';
-                els.btnApprove.style.display = 'none';
-                els.btnDeny.style.display = 'none';
+                els.denySection.classList.remove('hidden');
+                els.btnApprove.classList.add('hidden');
+                els.btnDeny.classList.add('hidden');
             });
         }
 
         if (els.btnCancelDeny) {
             els.btnCancelDeny.addEventListener('click', function () {
-                els.denySection.style.display = 'none';
-                els.btnApprove.style.display = '';
-                els.btnDeny.style.display = '';
+                els.denySection.classList.add('hidden');
+                els.btnApprove.classList.remove('hidden');
+                els.btnDeny.classList.remove('hidden');
             });
         }
 
@@ -147,36 +147,36 @@
     /*  Render                                                             */
     /* ------------------------------------------------------------------ */
     function renderPermissionDetails(data) {
-        els.loadingState.style.display = 'none';
-        els.formState.style.display = '';
+        els.loadingState.classList.add('hidden');
+        els.formState.classList.remove('hidden');
 
         els.requesterName.textContent = data.requester_name || 'Someone';
         els.detailAgency.textContent = data.permission.agency_or_owner || 'Not specified';
 
         if (data.permission.site_name) {
-            els.detailSiteRow.style.display = '';
+            els.detailSiteRow.classList.remove('hidden');
             els.detailSite.textContent = data.permission.site_name;
         }
 
         if (data.permission.site_description) {
-            els.detailDescRow.style.display = '';
+            els.detailDescRow.classList.remove('hidden');
             els.detailDescription.textContent = data.permission.site_description;
         }
 
         if (data.permission.notes) {
-            els.detailNotesRow.style.display = '';
+            els.detailNotesRow.classList.remove('hidden');
             els.detailNotes.textContent = data.permission.notes;
         }
 
         // Show conditions if set by requester
         if (data.conditions_text) {
-            els.conditionsSection.style.display = '';
+            els.conditionsSection.classList.remove('hidden');
             els.conditionsText.textContent = data.conditions_text;
         }
 
         // Show map if coordinates available
         if (data.permission.site_latitude && data.permission.site_longitude) {
-            els.mapContainer.style.display = '';
+            els.mapContainer.classList.remove('hidden');
             setTimeout(function () {
                 var map = L.map('approval-map').setView(
                     [data.permission.site_latitude, data.permission.site_longitude], 14
@@ -279,19 +279,19 @@
     /*  State Helpers                                                       */
     /* ------------------------------------------------------------------ */
     function showError(title, message) {
-        els.loadingState.style.display = 'none';
-        els.formState.style.display = 'none';
-        els.doneState.style.display = 'none';
-        els.errorState.style.display = '';
+        els.loadingState.classList.add('hidden');
+        els.formState.classList.add('hidden');
+        els.doneState.classList.add('hidden');
+        els.errorState.classList.remove('hidden');
         els.errorTitle.textContent = title;
         els.errorMessage.textContent = message;
     }
 
     function showDone(icon, title, message) {
-        els.loadingState.style.display = 'none';
-        els.formState.style.display = 'none';
-        els.errorState.style.display = 'none';
-        els.doneState.style.display = '';
+        els.loadingState.classList.add('hidden');
+        els.formState.classList.add('hidden');
+        els.errorState.classList.add('hidden');
+        els.doneState.classList.remove('hidden');
         els.doneIcon.textContent = icon;
         els.doneTitle.textContent = title;
         els.doneMessage.textContent = message;

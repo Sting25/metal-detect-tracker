@@ -71,7 +71,7 @@
         // Image
         if (site.image_url) {
             document.getElementById('rpt-image').src = Auth.secureUrl(site.image_url);
-            document.getElementById('section-image').style.display = '';
+            document.getElementById('section-image').classList.remove('hidden');
         }
 
         // Map
@@ -101,7 +101,7 @@
                 setTimeout(() => map.invalidateSize(), 200);
             }, 100);
         } else {
-            document.getElementById('section-map').style.display = 'none';
+            document.getElementById('section-map').classList.add('hidden');
         }
 
         // Description
@@ -110,13 +110,13 @@
         // Notes
         if (site.notes) {
             document.getElementById('rpt-notes').textContent = site.notes;
-            document.getElementById('section-notes').style.display = '';
+            document.getElementById('section-notes').classList.remove('hidden');
         }
 
         // Legal notes
         if (site.legal_notes) {
             document.getElementById('rpt-legal-notes').textContent = site.legal_notes;
-            document.getElementById('section-legal').style.display = '';
+            document.getElementById('section-legal').classList.remove('hidden');
         }
 
         // Contact info
@@ -130,7 +130,7 @@
                 site.contact_phone || site.permission_contact_phone || '-';
             document.getElementById('rpt-contact-email').textContent =
                 site.contact_email || site.permission_contact_email || '-';
-            document.getElementById('section-contact').style.display = '';
+            document.getElementById('section-contact').classList.remove('hidden');
         }
 
         // Tags
@@ -140,7 +140,7 @@
                 document.getElementById('rpt-tags').innerHTML = tagsArr
                     .map(t => '<span class="badge">' + esc(t) + '</span>')
                     .join(' ');
-                document.getElementById('section-tags').style.display = '';
+                document.getElementById('section-tags').classList.remove('hidden');
             }
         }
 

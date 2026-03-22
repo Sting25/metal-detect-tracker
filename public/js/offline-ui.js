@@ -21,7 +21,7 @@ window.OfflineUI = (function () {
         banner = document.createElement('div');
         banner.id = 'offline-banner';
         banner.className = 'offline-banner';
-        banner.style.display = 'none';
+        banner.classList.add('hidden');
 
         var dot = document.createElement('span');
         dot.className = 'offline-banner-dot';
@@ -38,7 +38,7 @@ window.OfflineUI = (function () {
         syncBtn.className = 'offline-sync-btn';
         syncBtn.id = 'offline-sync-btn';
         syncBtn.textContent = 'Sync Now';
-        syncBtn.style.display = 'none';
+        syncBtn.classList.add('hidden');
         syncBtn.addEventListener('click', function () {
             if (window.SyncEngine) {
                 SyncEngine.trySync();
@@ -70,21 +70,21 @@ window.OfflineUI = (function () {
         var isSyncing = window.SyncEngine && SyncEngine.isSyncing();
 
         if (isSyncing) {
-            banner.style.display = '';
+            banner.classList.remove('hidden');
             banner.className = 'offline-banner offline-banner-syncing';
             bannerText.textContent = window.I18n ? I18n.t('offline.syncing') : 'Syncing...';
             queueBadge.textContent = '';
             var syncBtn = document.getElementById('offline-sync-btn');
-            if (syncBtn) syncBtn.style.display = 'none';
+            if (syncBtn) syncBtn.classList.add('hidden');
             return;
         }
 
         if (!online) {
-            banner.style.display = '';
+            banner.classList.remove('hidden');
             banner.className = 'offline-banner';
             bannerText.textContent = window.I18n ? I18n.t('offline.banner') : 'Offline';
             var syncBtn2 = document.getElementById('offline-sync-btn');
-            if (syncBtn2) syncBtn2.style.display = 'none';
+            if (syncBtn2) syncBtn2.classList.add('hidden');
             updateQueueCount();
             return;
         }
@@ -93,21 +93,21 @@ window.OfflineUI = (function () {
         if (window.OfflineStore) {
             OfflineStore.getMutationCount().then(function (count) {
                 if (count > 0) {
-                    banner.style.display = '';
+                    banner.classList.remove('hidden');
                     banner.className = 'offline-banner offline-banner-queued';
                     var msg = window.I18n ? I18n.t('offline.itemsQueued') : '{count} items queued';
                     bannerText.textContent = msg.replace('{count}', count);
                     queueBadge.textContent = '';
                     var syncBtn3 = document.getElementById('offline-sync-btn');
-                    if (syncBtn3) syncBtn3.style.display = '';
+                    if (syncBtn3) syncBtn3.classList.remove('hidden');
                 } else {
-                    banner.style.display = 'none';
+                    banner.classList.add('hidden');
                 }
             }).catch(function () {
-                banner.style.display = 'none';
+                banner.classList.add('hidden');
             });
         } else {
-            banner.style.display = 'none';
+            banner.classList.add('hidden');
         }
     }
 
@@ -188,12 +188,12 @@ window.OfflineUI = (function () {
         window.addEventListener('sync-complete', function () {
             // Brief "synced" state
             if (banner) {
-                banner.style.display = '';
+                banner.classList.remove('hidden');
                 banner.className = 'offline-banner offline-banner-synced';
                 bannerText.textContent = window.I18n ? I18n.t('offline.synced') : 'All synced';
                 queueBadge.textContent = '';
                 var syncBtn = document.getElementById('offline-sync-btn');
-                if (syncBtn) syncBtn.style.display = 'none';
+                if (syncBtn) syncBtn.classList.add('hidden');
                 setTimeout(function () {
                     updateBannerState();
                 }, 3000);

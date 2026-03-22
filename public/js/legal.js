@@ -146,11 +146,11 @@
             if (!body.success) return;
             var regions = body.data || [];
             if (regions.length === 0) {
-                regionWrapper.style.display = 'none';
+                regionWrapper.classList.add('hidden');
                 regionSelect.innerHTML = '';
                 return;
             }
-            regionWrapper.style.display = '';
+            regionWrapper.classList.remove('hidden');
             regionSelect.innerHTML = '<option value="">' + escapeHtml(_t('legal.selectRegion')) + '</option>';
             regions.forEach(function (code) {
                 var opt = document.createElement('option');
@@ -160,7 +160,7 @@
             });
         } catch (err) {
             console.error('Error loading regions:', err);
-            regionWrapper.style.display = 'none';
+            regionWrapper.classList.add('hidden');
         }
     }
 
@@ -272,8 +272,8 @@
         if (localStorage.getItem('mdt_token')) {
             var authed = document.getElementById('nav-authed');
             var pub = document.getElementById('nav-public');
-            if (authed) authed.style.display = '';
-            if (pub) pub.style.display = 'none';
+            if (authed) authed.classList.remove('hidden');
+            if (pub) pub.classList.add('hidden');
         }
     }
     initNavToggle();

@@ -147,9 +147,9 @@
 
     function showView(view) {
         state.view = view;
-        listView.style.display = view === 'list' ? '' : 'none';
-        activeView.style.display = view === 'active' ? '' : 'none';
-        detailView.style.display = view === 'detail' ? '' : 'none';
+        listView.classList.toggle('hidden', view !== 'list');
+        activeView.classList.toggle('hidden', view !== 'active');
+        detailView.classList.toggle('hidden', view !== 'detail');
     }
 
     // ---------------------------------------------------------------------------
@@ -212,11 +212,11 @@
         huntsContainer.innerHTML = '';
 
         if (state.sessions.length === 0) {
-            if (huntsEmpty) huntsEmpty.style.display = '';
+            if (huntsEmpty) huntsEmpty.classList.remove('hidden');
             if (huntsPagination) huntsPagination.innerHTML = '';
             return;
         }
-        if (huntsEmpty) huntsEmpty.style.display = 'none';
+        if (huntsEmpty) huntsEmpty.classList.add('hidden');
 
         for (var i = 0; i < state.sessions.length; i++) {
             var s = state.sessions[i];
@@ -751,7 +751,7 @@
 
         // Render linked finds
         if (s.finds && s.finds.length > 0 && detailFindsList && detailFindsSection) {
-            detailFindsSection.style.display = '';
+            detailFindsSection.classList.remove('hidden');
             detailFindsList.innerHTML = '';
             for (var i = 0; i < s.finds.length; i++) {
                 var f = s.finds[i];
@@ -762,7 +762,7 @@
                 detailFindsList.appendChild(div);
             }
         } else if (detailFindsSection) {
-            detailFindsSection.style.display = 'none';
+            detailFindsSection.classList.add('hidden');
         }
 
         // Coverage controls (if session has a site)
@@ -780,11 +780,11 @@
         container.innerHTML = '';
 
         if (!session.site_id) {
-            container.style.display = 'none';
+            container.classList.add('hidden');
             return;
         }
 
-        container.style.display = '';
+        container.classList.remove('hidden');
         container.innerHTML =
             '<div class="coverage-section">' +
             '<h4>' + t('sites.coverage.title') + '</h4>' +

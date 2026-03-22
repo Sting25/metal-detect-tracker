@@ -57,7 +57,7 @@
         </div>
 
         <!-- Upcoming Reminders Widget -->
-        <section class="reminders-widget" id="reminders-widget" style="display:none;">
+        <section class="reminders-widget hidden" id="reminders-widget">
             <div class="reminders-widget-header">
                 <h2 class="section-title" data-i18n="reminders.upcoming">Upcoming Reminders</h2>
                 <a href="/permissions.html" class="reminders-view-all" data-i18n="permissions.title">Permissions</a>
@@ -100,26 +100,26 @@
                         <span data-i18n="dashboard.siteType.other">Other</span>
                     </div>
                 </div>
-                <h3 style="margin-top: 10px;" data-i18n="dashboard.borderPermissionStatus">Border = Permission Status</h3>
+                <h3 class="legend-heading" data-i18n="dashboard.borderPermissionStatus">Border = Permission Status</h3>
                 <div class="legend-items">
                     <div class="legend-item">
-                        <span class="legend-dot" style="background:#2ecc40;"></span>
+                        <span class="legend-dot legend-dot--green"></span>
                         <span data-i18n="sites.permStatus.granted">Granted</span>
                     </div>
                     <div class="legend-item">
-                        <span class="legend-dot" style="background:#ffdc00;"></span>
+                        <span class="legend-dot legend-dot--yellow"></span>
                         <span data-i18n="sites.permStatus.requested">Requested</span>
                     </div>
                     <div class="legend-item">
-                        <span class="legend-dot" style="background:#e74c3c;"></span>
+                        <span class="legend-dot legend-dot--red"></span>
                         <span data-i18n="sites.permStatus.denied">Denied</span>
                     </div>
                     <div class="legend-item">
-                        <span class="legend-dot" style="background:#3498db;"></span>
+                        <span class="legend-dot legend-dot--blue"></span>
                         <span data-i18n="sites.permStatus.notRequired">Not Required</span>
                     </div>
                     <div class="legend-item">
-                        <span class="legend-dot" style="background:#95a5a6;"></span>
+                        <span class="legend-dot legend-dot--gray"></span>
                         <span data-i18n="sites.permStatus.notRequested">Not Requested</span>
                     </div>
                 </div>

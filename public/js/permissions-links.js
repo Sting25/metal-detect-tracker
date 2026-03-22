@@ -35,7 +35,7 @@
                 return;
             }
 
-            PP.els.linkResult.style.display = '';
+            PP.els.linkResult.classList.remove('hidden');
             PP.els.linkUrl.value = data.data.url;
             PP.els.linkQrImage.src = data.data.qr_code;
             var expiresDate = new Date(data.data.expires_at).toLocaleDateString();
@@ -146,7 +146,7 @@
         if (!PP.editingPermId) return;
         PP.els.btnGenerateLetter.disabled = true;
         PP.els.btnGenerateLetter.textContent = _t('permissions.letter.generating');
-        PP.els.letterStatus.style.display = 'none';
+        PP.els.letterStatus.classList.add('hidden');
 
         try {
             var res = await Auth.authedFetch('/api/permissions/' + PP.editingPermId + '/letter', {
@@ -161,13 +161,13 @@
                     PP.els.letterStatus.textContent = _t('permissions.letter.error');
                 }
                 PP.els.letterStatus.className = 'letter-status letter-status-error';
-                PP.els.letterStatus.style.display = '';
+                PP.els.letterStatus.classList.remove('hidden');
                 return;
             }
 
             PP.els.letterStatus.textContent = _t('permissions.letter.generated');
             PP.els.letterStatus.className = 'letter-status letter-status-success';
-            PP.els.letterStatus.style.display = '';
+            PP.els.letterStatus.classList.remove('hidden');
 
             if (data.data && data.data.download_url) {
                 window.open(data.data.download_url, '_blank');
@@ -178,7 +178,7 @@
             console.error('Error generating letter:', err);
             PP.els.letterStatus.textContent = _t('permissions.letter.error');
             PP.els.letterStatus.className = 'letter-status letter-status-error';
-            PP.els.letterStatus.style.display = '';
+            PP.els.letterStatus.classList.remove('hidden');
         } finally {
             PP.els.btnGenerateLetter.disabled = false;
             PP.els.btnGenerateLetter.textContent = _t('permissions.letter.generate');

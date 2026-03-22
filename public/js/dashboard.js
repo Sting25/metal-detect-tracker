@@ -298,11 +298,11 @@
             var reminders = json.data || [];
 
             if (reminders.length === 0) {
-                widget.style.display = 'none';
+                widget.classList.add('hidden');
                 return;
             }
 
-            widget.style.display = '';
+            widget.classList.remove('hidden');
             var now = new Date();
             var esc = escapeHtmlLocal;
             var html = '';

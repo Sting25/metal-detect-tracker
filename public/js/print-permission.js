@@ -75,8 +75,8 @@
         var chevron = document.getElementById('settings-chevron');
         if (toggle) {
             toggle.addEventListener('click', function () {
-                var isOpen = body.style.display !== 'none';
-                body.style.display = isOpen ? 'none' : '';
+                var isOpen = !body.classList.contains('hidden');
+                body.classList.toggle('hidden');
                 chevron.textContent = isOpen ? '\u25B6' : '\u25BC';
             });
         }
@@ -284,9 +284,9 @@
         var sigTitleVal = prefEls.sigTitle.value || '';
         if (sigTitleVal) {
             sigTitleEl.textContent = sigTitleVal;
-            sigTitleEl.style.display = '';
+            sigTitleEl.classList.remove('hidden');
         } else {
-            sigTitleEl.style.display = 'none';
+            sigTitleEl.classList.add('hidden');
         }
     }
 

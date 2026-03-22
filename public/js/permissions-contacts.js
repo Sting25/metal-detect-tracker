@@ -86,13 +86,13 @@
         PP.els.contactOutcome.value = '';
         PP.els.contactDate.value = today;
         PP.els.contactNotes.value = '';
-        PP.els.contactForm.style.display = '';
-        PP.els.btnAddContact.style.display = 'none';
+        PP.els.contactForm.classList.remove('hidden');
+        PP.els.btnAddContact.classList.add('hidden');
     };
 
     PP.hideContactForm = function () {
-        if (PP.els.contactForm) PP.els.contactForm.style.display = 'none';
-        if (PP.els.btnAddContact) PP.els.btnAddContact.style.display = '';
+        if (PP.els.contactForm) PP.els.contactForm.classList.add('hidden');
+        if (PP.els.btnAddContact) PP.els.btnAddContact.classList.remove('hidden');
     };
 
     PP.handleContactSubmit = async function () {

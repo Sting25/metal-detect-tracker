@@ -302,36 +302,36 @@
             PP.els.dateGranted.value = perm.date_granted || '';
             PP.els.expiration.value = perm.expiration_date || '';
             PP.els.notes.value = perm.notes || '';
-            PP.els.btnDelete.style.display = 'inline-block';
+            PP.els.btnDelete.classList.remove('hidden');
 
             if (perm.document_url) {
-                PP.els.docPreview.style.display = 'flex';
+                PP.els.docPreview.classList.remove('hidden');
                 PP.els.docName.textContent = perm.document_name || 'Attached document';
-                PP.els.uploadPlaceholder.style.display = 'none';
+                PP.els.uploadPlaceholder.classList.add('hidden');
             } else {
-                PP.els.docPreview.style.display = 'none';
-                PP.els.uploadPlaceholder.style.display = '';
+                PP.els.docPreview.classList.add('hidden');
+                PP.els.uploadPlaceholder.classList.remove('hidden');
             }
 
-            PP.els.contactLogSection.style.display = '';
+            PP.els.contactLogSection.classList.remove('hidden');
             PP.loadContacts(perm.id);
-            PP.els.linkSection.style.display = '';
-            PP.els.linkResult.style.display = 'none';
+            PP.els.linkSection.classList.remove('hidden');
+            PP.els.linkResult.classList.add('hidden');
             PP.loadLinkHistory(perm.id);
-            PP.els.letterSection.style.display = '';
-            PP.els.letterStatus.style.display = 'none';
+            PP.els.letterSection.classList.remove('hidden');
+            PP.els.letterStatus.classList.add('hidden');
             PP.loadLetterHistory(perm.id);
         } else {
             PP.els.modalTitle.textContent = _t('permissions.modal.addTitle');
             PP.els.form.reset();
             PP.els.permId.value = '';
             PP.els.dateRequested.value = new Date().toISOString().split('T')[0];
-            PP.els.btnDelete.style.display = 'none';
-            PP.els.docPreview.style.display = 'none';
-            PP.els.uploadPlaceholder.style.display = '';
-            PP.els.contactLogSection.style.display = 'none';
-            PP.els.linkSection.style.display = 'none';
-            PP.els.letterSection.style.display = 'none';
+            PP.els.btnDelete.classList.add('hidden');
+            PP.els.docPreview.classList.add('hidden');
+            PP.els.uploadPlaceholder.classList.remove('hidden');
+            PP.els.contactLogSection.classList.add('hidden');
+            PP.els.linkSection.classList.add('hidden');
+            PP.els.letterSection.classList.add('hidden');
         }
 
         PP.els.modalOverlay.classList.add('open');
@@ -345,9 +345,9 @@
 
     function previewDocument(file) {
         if (!file) return;
-        PP.els.docPreview.style.display = 'flex';
+        PP.els.docPreview.classList.remove('hidden');
         PP.els.docName.textContent = file.name;
-        PP.els.uploadPlaceholder.style.display = 'none';
+        PP.els.uploadPlaceholder.classList.add('hidden');
     }
 
     /* ------------------------------------------------------------------ */

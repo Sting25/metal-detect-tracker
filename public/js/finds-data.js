@@ -48,7 +48,7 @@
 
         FP.els.site.addEventListener('change', function () {
             if (FP.els.site.value === '__new__') {
-                quickRow.style.display = 'flex';
+                quickRow.classList.remove('hidden');
                 nameInput.value = '';
                 nameInput.focus();
                 FP.els.site.removeAttribute('required');
@@ -56,7 +56,7 @@
         });
 
         cancelBtn.addEventListener('click', function () {
-            quickRow.style.display = 'none';
+            quickRow.classList.add('hidden');
             FP.els.site.value = '';
             FP.els.site.setAttribute('required', '');
         });
@@ -81,7 +81,7 @@
                 await FP.loadSitesDropdown();
                 if (newSiteId) FP.els.site.value = newSiteId;
 
-                quickRow.style.display = 'none';
+                quickRow.classList.add('hidden');
                 FP.els.site.setAttribute('required', '');
             } catch (err) {
                 console.error('Error creating site:', err);

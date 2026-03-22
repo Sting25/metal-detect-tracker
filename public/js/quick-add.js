@@ -30,7 +30,7 @@ window.QuickAddSite = (function () {
                 '<form id="quick-add-form" class="quick-add-form">' +
                     '<div class="quick-add-photo-section">' +
                         '<div class="quick-add-photo-area" id="quick-add-photo-area">' +
-                            '<img id="quick-add-preview" class="quick-add-preview" style="display:none;" alt="Preview">' +
+                            '<img id="quick-add-preview" class="quick-add-preview hidden" alt="Preview">' +
                             '<div class="quick-add-photo-placeholder" id="quick-add-photo-placeholder">' +
                                 '<span class="quick-add-camera-icon">&#128247;</span>' +
                                 '<p>Tap to take a photo</p>' +
@@ -56,7 +56,7 @@ window.QuickAddSite = (function () {
                     '</div>' +
                     '<button type="submit" class="btn btn-primary quick-add-submit" id="quick-add-submit">Save Site</button>' +
                 '</form>' +
-                '<div class="quick-add-success" id="quick-add-success" style="display:none;">' +
+                '<div class="quick-add-success hidden" id="quick-add-success">' +
                     '<span class="quick-add-success-icon">&#9989;</span>' +
                     '<p class="quick-add-success-text">Site saved! You can add more details later.</p>' +
                 '</div>' +
@@ -98,8 +98,8 @@ window.QuickAddSite = (function () {
         var reader = new FileReader();
         reader.onload = function (e) {
             els.photoPreview.src = e.target.result;
-            els.photoPreview.style.display = 'block';
-            els.photoPlaceholder.style.display = 'none';
+            els.photoPreview.classList.remove('hidden');
+            els.photoPlaceholder.classList.add('hidden');
         };
         reader.readAsDataURL(file);
     }
@@ -200,8 +200,8 @@ window.QuickAddSite = (function () {
             }
 
             // Show success
-            els.form.style.display = 'none';
-            els.success.style.display = 'block';
+            els.form.classList.add('hidden');
+            els.success.classList.remove('hidden');
 
             // Auto-close after 1.5 seconds
             setTimeout(function () {
@@ -220,10 +220,10 @@ window.QuickAddSite = (function () {
     function resetForm() {
         if (!els.form) return;
         els.form.reset();
-        els.form.style.display = '';
-        els.success.style.display = 'none';
-        els.photoPreview.style.display = 'none';
-        els.photoPlaceholder.style.display = '';
+        els.form.classList.remove('hidden');
+        els.success.classList.add('hidden');
+        els.photoPreview.classList.add('hidden');
+        els.photoPlaceholder.classList.remove('hidden');
         els.submitBtn.disabled = false;
         els.submitBtn.textContent = _t('quickAdd.save');
     }

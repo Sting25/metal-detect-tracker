@@ -474,7 +474,7 @@
         }
 
         // Coverage section placeholder (populated asynchronously)
-        var coverageSectionHtml = '<div class="coverage-section" id="coverage-section-' + site.id + '" style="display:none;"></div>';
+        var coverageSectionHtml = '<div class="coverage-section hidden" id="coverage-section-' + site.id + '"></div>';
 
         expansion.innerHTML =
             '<div class="card-detail-inner">' +
@@ -598,7 +598,7 @@
                 '</div>';
 
             section.innerHTML = html;
-            section.style.display = '';
+            section.classList.remove('hidden');
 
             // Bind toggle
             var toggle = document.getElementById('cov-toggle-' + siteId);
@@ -780,15 +780,15 @@
             els.priorityInput.value = selectedPriority;
             els.notes.value = site.notes || '';
             currentTags = Array.isArray(site.tags) ? [...site.tags] : (site.tags ? site.tags.split(',').map(t => t.trim()) : []);
-            els.btnDelete.style.display = 'inline-block';
+            els.btnDelete.classList.remove('hidden');
 
             if (site.image_url) {
                 els.imagePreview.src = Auth.secureUrl(site.image_url);
-                els.imagePreview.style.display = 'block';
-                els.uploadPlaceholder.style.display = 'none';
+                els.imagePreview.classList.remove('hidden');
+                els.uploadPlaceholder.classList.add('hidden');
             } else {
-                els.imagePreview.style.display = 'none';
-                els.uploadPlaceholder.style.display = '';
+                els.imagePreview.classList.add('hidden');
+                els.uploadPlaceholder.classList.remove('hidden');
             }
         } else {
             els.modalTitle.textContent = _t('sites.modal.addTitle');
@@ -797,9 +797,9 @@
             selectedPriority = 3;
             els.priorityInput.value = 3;
             currentTags = [];
-            els.btnDelete.style.display = 'none';
-            els.imagePreview.style.display = 'none';
-            els.uploadPlaceholder.style.display = '';
+            els.btnDelete.classList.add('hidden');
+            els.imagePreview.classList.add('hidden');
+            els.uploadPlaceholder.classList.remove('hidden');
         }
 
         renderStars();
@@ -853,8 +853,8 @@
         const reader = new FileReader();
         reader.onload = (e) => {
             els.imagePreview.src = e.target.result;
-            els.imagePreview.style.display = 'block';
-            els.uploadPlaceholder.style.display = 'none';
+            els.imagePreview.classList.remove('hidden');
+            els.uploadPlaceholder.classList.add('hidden');
         };
         reader.readAsDataURL(file);
     }
@@ -1021,12 +1021,12 @@
                 esc(String(s.latitude || '')) + ', ' + esc(String(s.longitude || '')) +
                 (s.land_type ? ' (' + esc(s.land_type) + ')' : '') + '</div>'
             ).join('');
-            preview.style.display = 'block';
+            preview.classList.remove('hidden');
             btnSubmit.disabled = bulkParsedSites.length === 0;
         } catch (err) {
             console.error('Bulk import parse error:', err);
             Auth.showToast('Failed to parse file. Please check the format and try again.');
-            preview.style.display = 'none';
+            preview.classList.add('hidden');
             btnSubmit.disabled = true;
         }
     }
@@ -1167,11 +1167,11 @@
             var shares = json.data || [];
 
             if (shares.length === 0) {
-                section.style.display = 'none';
+                section.classList.add('hidden');
                 return;
             }
 
-            section.style.display = '';
+            section.classList.remove('hidden');
             var html = '';
             shares.forEach(function (s) {
                 html += '<div class="share-item">' +
@@ -1201,7 +1201,7 @@
             });
         } catch (err) {
             console.error('Error loading share list:', err);
-            section.style.display = 'none';
+            section.classList.add('hidden');
         }
     }
 })();

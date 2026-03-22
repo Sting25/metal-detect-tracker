@@ -33,7 +33,7 @@
 </head>
 <body>
     <!-- Authenticated nav (shown when logged in) -->
-    <nav class="navbar" id="nav-authed" style="display:none;">
+    <nav class="navbar hidden" id="nav-authed">
         <a href="/landing.html" class="nav-brand"><img src="/icons/logo-nav.png" alt="" class="nav-brand-logo" width="28" height="28"><span class="nav-brand-full" data-i18n="app.name">Signal Bouncer</span><span class="nav-brand-short">Signal Bouncer</span></a>
         <button class="nav-toggle" onclick="document.querySelector('#nav-authed .nav-links').classList.toggle('open')">&#9776;</button>
         <div class="nav-links">
@@ -52,7 +52,7 @@
             <a href="/landing.html" data-i18n="auth.backToHome">Home</a>
             <a href="/legal.html" class="active" data-i18n="nav.legal">Legal Reference</a>
             <a href="/login.html" data-i18n="auth.login">Login</a>
-            <a href="/login.html#register" class="btn btn-primary btn-sm" style="color:#fff;border-radius:var(--radius-md);padding:6px 16px;">Sign Up</a>
+            <a href="/login.html#register" class="btn btn-primary btn-sm legal-signup-btn">Sign Up</a>
         </div>
     </nav>
 
@@ -61,15 +61,15 @@
         <h1 data-i18n="legal.title">Metal Detecting - Legal Reference</h1>
 
         <!-- Disclaimer banner -->
-        <div class="legal-disclaimer" style="background:var(--color-warning-bg, #fff3cd);border:1px solid var(--color-warning-border, #ffc107);border-radius:var(--radius-md, 8px);padding:1rem 1.25rem;margin-bottom:1.5rem;">
-            <p style="margin:0;font-size:0.95rem;" data-i18n-html="legal.disclaimer"><strong>Important:</strong> This information is provided as a general reference only. Laws change frequently and vary by jurisdiction. Always verify current regulations with local authorities before detecting. This is not legal advice.</p>
+        <div class="legal-disclaimer">
+            <p data-i18n-html="legal.disclaimer"><strong>Important:</strong> This information is provided as a general reference only. Laws change frequently and vary by jurisdiction. Always verify current regulations with local authorities before detecting. This is not legal advice.</p>
         </div>
 
         <!-- Country / Region selectors -->
-        <div class="legal-selectors" style="display:flex;flex-wrap:wrap;gap:1rem;align-items:center;margin-bottom:1.5rem;">
+        <div class="legal-selectors">
             <div>
-                <label for="legal-country" style="font-weight:600;margin-right:0.5rem;" data-i18n="legal.countryLabel">Country:</label>
-                <select id="legal-country" class="form-control" style="display:inline-block;width:auto;min-width:180px;">
+                <label for="legal-country" class="label-inline" data-i18n="legal.countryLabel">Country:</label>
+                <select id="legal-country" class="form-control form-select-inline">
                     <option value="US" data-i18n="legal.country.US">United States</option>
                     <option value="GB" data-i18n="legal.country.GB">United Kingdom</option>
                     <option value="AU" data-i18n="legal.country.AU">Australia</option>
@@ -77,9 +77,9 @@
                     <option value="NZ" data-i18n="legal.country.NZ">New Zealand</option>
                 </select>
             </div>
-            <div id="region-selector-wrapper" style="display:none;">
-                <label for="legal-region" style="font-weight:600;margin-right:0.5rem;" data-i18n="legal.regionLabel">State / Region:</label>
-                <select id="legal-region" class="form-control" style="display:inline-block;width:auto;min-width:200px;">
+            <div id="region-selector-wrapper" class="hidden">
+                <label for="legal-region" class="label-inline" data-i18n="legal.regionLabel">State / Region:</label>
+                <select id="legal-region" class="form-control form-select-inline--wide">
                     <option value="" data-i18n="legal.selectRegion">Select a state or region...</option>
                 </select>
             </div>
@@ -94,13 +94,13 @@
         <div id="legal-regional-content"></div>
 
         <!-- Suggest Update (logged-in users only) -->
-        <div id="legal-suggest-section" style="display:none;margin-top:2rem;padding:1.25rem;border:1px solid var(--color-border, #e0e0e0);border-radius:var(--radius-md, 8px);background:var(--color-surface, #fff);">
-            <h3 style="margin:0 0 0.5rem;font-size:1.1rem;" data-i18n="legal.suggest.title">Suggest an Update</h3>
-            <p style="margin:0 0 0.75rem;font-size:0.9rem;color:var(--color-text-muted, #888);" data-i18n="legal.suggest.description">See something outdated or incorrect? Let us know and we'll review it.</p>
-            <div style="display:flex;flex-wrap:wrap;gap:0.75rem;margin-bottom:0.75rem;">
-                <div style="flex:1;min-width:150px;">
-                    <label for="legal-suggest-type" style="font-size:0.85rem;font-weight:600;" data-i18n="legal.suggest.type">Type:</label>
-                    <select id="legal-suggest-type" class="form-control" style="margin-top:0.25rem;">
+        <div id="legal-suggest-section" class="legal-suggest-container hidden">
+            <h3 class="legal-suggest-heading" data-i18n="legal.suggest.title">Suggest an Update</h3>
+            <p class="legal-suggest-desc" data-i18n="legal.suggest.description">See something outdated or incorrect? Let us know and we'll review it.</p>
+            <div class="legal-suggest-form-row">
+                <div class="legal-suggest-field">
+                    <label for="legal-suggest-type" class="legal-suggest-label" data-i18n="legal.suggest.type">Type:</label>
+                    <select id="legal-suggest-type" class="form-control legal-suggest-select">
                         <option value="correction" data-i18n="legal.suggest.type.correction">Correction</option>
                         <option value="outdated" data-i18n="legal.suggest.type.outdated">Outdated Info</option>
                         <option value="new_section" data-i18n="legal.suggest.type.new_section">New Section</option>
@@ -108,24 +108,24 @@
                         <option value="other" data-i18n="legal.suggest.type.other">Other</option>
                     </select>
                 </div>
-                <div style="flex:1;min-width:150px;">
-                    <label for="legal-suggest-section-ref" style="font-size:0.85rem;font-weight:600;" data-i18n="legal.suggest.section">Related Section:</label>
-                    <select id="legal-suggest-section-ref" class="form-control" style="margin-top:0.25rem;">
+                <div class="legal-suggest-field">
+                    <label for="legal-suggest-section-ref" class="legal-suggest-label" data-i18n="legal.suggest.section">Related Section:</label>
+                    <select id="legal-suggest-section-ref" class="form-control legal-suggest-select">
                         <option value="">(None / General)</option>
                     </select>
                 </div>
             </div>
-            <textarea id="legal-suggest-text" class="form-control" rows="3" placeholder="Describe what needs updating..." style="margin-bottom:0.75rem;" data-i18n-placeholder="legal.suggest.textPlaceholder"></textarea>
-            <textarea id="legal-suggest-reason" class="form-control" rows="2" placeholder="Why is this change needed? (optional)" style="margin-bottom:0.75rem;" data-i18n-placeholder="legal.suggest.reasonPlaceholder"></textarea>
-            <div style="display:flex;gap:0.5rem;align-items:center;">
+            <textarea id="legal-suggest-text" class="form-control legal-suggest-textarea" rows="3" placeholder="Describe what needs updating..." data-i18n-placeholder="legal.suggest.textPlaceholder"></textarea>
+            <textarea id="legal-suggest-reason" class="form-control legal-suggest-textarea" rows="2" placeholder="Why is this change needed? (optional)" data-i18n-placeholder="legal.suggest.reasonPlaceholder"></textarea>
+            <div class="legal-suggest-submit">
                 <button class="btn btn-primary btn-sm" id="btn-suggest-legal" data-i18n="legal.suggest.submit">Submit Suggestion</button>
-                <span id="legal-suggest-status" style="font-size:0.85rem;"></span>
+                <span id="legal-suggest-status" class="legal-suggest-status"></span>
             </div>
         </div>
 
         <!-- My Suggestions (logged-in users only) -->
-        <div id="legal-my-suggestions" style="display:none;margin-top:1.5rem;">
-            <h3 style="margin:0 0 0.75rem;font-size:1.1rem;" data-i18n="legal.suggest.history">My Suggestions</h3>
+        <div id="legal-my-suggestions" class="legal-my-suggestions-section hidden">
+            <h3 class="legal-my-suggestions-heading" data-i18n="legal.suggest.history">My Suggestions</h3>
             <div id="legal-my-suggestions-list"></div>
         </div>
     </main>

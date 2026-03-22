@@ -26,9 +26,9 @@
             </div>
 
             <!-- First-time setup (no users exist) -->
-            <div id="setup-section" style="display:none;">
+            <div id="setup-section" class="hidden">
                 <h2 class="login-heading" data-i18n="auth.createAdmin">Create Admin Account</h2>
-                <p class="text-muted" style="margin-bottom:1rem;font-size:0.9rem;" data-i18n="auth.createAdminDesc">First time setup. Create your admin account to get started.</p>
+                <p class="text-muted auth-desc" data-i18n="auth.createAdminDesc">First time setup. Create your admin account to get started.</p>
                 <form id="setup-form">
                     <div class="form-group">
                         <label for="setup-name" data-i18n="auth.label.displayName">Display Name</label>
@@ -52,7 +52,7 @@
             </div>
 
             <!-- Login / Register tabs -->
-            <div id="auth-section" style="display:none;">
+            <div id="auth-section" class="hidden">
                 <div class="auth-tabs">
                     <button class="auth-tab active" data-tab="login" data-i18n="auth.login">Login</button>
                     <button class="auth-tab" data-tab="register" data-i18n="auth.register">Register</button>
@@ -61,16 +61,16 @@
                 <!-- Social / Passkey login options -->
                 <div class="auth-social" id="auth-social">
                     <div id="google-signin-btn"></div>
-                    <button type="button" id="btn-passkey-login" class="btn btn-outline btn-block btn-passkey" style="display:none;">
+                    <button type="button" id="btn-passkey-login" class="btn btn-outline btn-block btn-passkey hidden">
                         &#128273; <span data-i18n="auth.passkeyLogin">Sign in with Passkey</span>
                     </button>
                     <div class="auth-divider"><span data-i18n="auth.orDivider">or</span></div>
                 </div>
 
                 <!-- Google terms acceptance for new users -->
-                <div id="google-terms-section" style="display:none;">
-                    <h3 style="margin-bottom:0.5rem;" data-i18n="auth.google.completeReg">Complete Registration</h3>
-                    <p class="text-muted" style="font-size:0.9rem;margin-bottom:1rem;" id="google-welcome-msg"></p>
+                <div id="google-terms-section" class="hidden">
+                    <h3 class="mb-sm" data-i18n="auth.google.completeReg">Complete Registration</h3>
+                    <p class="text-muted auth-desc" id="google-welcome-msg"></p>
                     <div class="form-group">
                         <label class="terms-checkbox">
                             <input type="checkbox" id="google-terms">
@@ -81,8 +81,8 @@
                         </div>
                     </div>
                     <button type="button" class="btn btn-primary btn-block" id="btn-google-accept" data-i18n="auth.google.createAccount">Create Account</button>
-                    <div style="text-align:center;margin-top:0.75rem;">
-                        <a href="#" id="link-back-from-google" class="text-muted" style="font-size:0.85rem;" data-i18n="auth.backToLogin">&larr; Back to login</a>
+                    <div class="auth-helper-text">
+                        <a href="#" id="link-back-from-google" class="text-muted text-sm" data-i18n="auth.backToLogin">&larr; Back to login</a>
                     </div>
                 </div>
 
@@ -96,12 +96,12 @@
                         <input type="password" id="login-password" class="form-control" placeholder="Password" required>
                     </div>
                     <button type="submit" class="btn btn-primary btn-block" id="btn-login" data-i18n="auth.login">Login</button>
-                    <div style="text-align:center;margin-top:0.75rem;">
-                        <a href="/reset-password.html" class="text-muted" style="font-size:0.85rem;" data-i18n="auth.forgotPassword">Forgot password?</a>
+                    <div class="auth-helper-text">
+                        <a href="/reset-password.html" class="text-muted text-sm" data-i18n="auth.forgotPassword">Forgot password?</a>
                     </div>
                 </form>
 
-                <form id="register-form" style="display:none;">
+                <form id="register-form" class="hidden">
                     <div class="form-group">
                         <label for="reg-name"><span data-i18n="auth.label.displayName">Display Name</span> <span class="required-star">*</span></label>
                         <input type="text" id="reg-name" class="form-control" placeholder="Your name" data-i18n-placeholder="auth.placeholder.name" required>
@@ -111,7 +111,7 @@
                         <input type="email" id="reg-email" class="form-control" placeholder="you@example.com" data-i18n-placeholder="auth.placeholder.email" required>
                     </div>
                     <div class="form-group">
-                        <label for="reg-phone"><span data-i18n="auth.label.phone">Phone Number</span> <span class="text-muted" style="font-size:0.8rem;" data-i18n="auth.label.phoneOptional">(optional)</span></label>
+                        <label for="reg-phone"><span data-i18n="auth.label.phone">Phone Number</span> <span class="text-muted text-sm" data-i18n="auth.label.phoneOptional">(optional)</span></label>
                         <input type="tel" id="reg-phone" class="form-control" placeholder="+1 (555) 123-4567" data-i18n-placeholder="auth.placeholder.phone">
                     </div>
                     <div class="form-group">
@@ -129,7 +129,7 @@
                         <label for="reg-password"><span data-i18n="auth.label.password">Password</span> <span class="required-star">*</span></label>
                         <input type="password" id="reg-password" class="form-control" placeholder="Create a strong password" data-i18n-placeholder="auth.placeholder.password" required minlength="12">
                         <small class="form-hint" data-i18n="auth.passwordHint">At least 12 characters with uppercase, lowercase, and a number</small>
-                        <div id="password-strength" class="password-strength" style="display:none;">
+                        <div id="password-strength" class="password-strength hidden">
                             <div class="password-strength-bar"><div class="password-strength-fill"></div></div>
                             <span class="password-strength-label"></span>
                         </div>
@@ -151,28 +151,28 @@
                 </form>
 
                 <!-- Email Verification -->
-                <div id="verify-section" style="display:none;">
-                    <div style="text-align:center;margin-bottom:1rem;">
-                        <div style="font-size:2rem;margin-bottom:0.5rem;">&#9993;</div>
-                        <h3 style="margin-bottom:0.5rem;" data-i18n="auth.verifyEmail.title">Verify Your Email</h3>
-                        <p class="text-muted" style="font-size:0.9rem;" id="verify-sent-msg">We sent a 6-digit code to your email</p>
+                <div id="verify-section" class="hidden">
+                    <div class="text-center mb-1">
+                        <div class="verify-icon">&#9993;</div>
+                        <h3 class="mb-sm" data-i18n="auth.verifyEmail.title">Verify Your Email</h3>
+                        <p class="text-muted text-sm" id="verify-sent-msg">We sent a 6-digit code to your email</p>
                     </div>
                     <form id="verify-form">
                         <div class="form-group">
                             <label for="verify-code" data-i18n="auth.verifyEmail.codeLabel">Verification Code</label>
-                            <input type="text" id="verify-code" class="form-control" placeholder="6-digit code" data-i18n-placeholder="auth.verifyEmail.codePlaceholder" required maxlength="6" style="font-family:monospace;letter-spacing:4px;text-align:center;font-size:1.3rem;">
+                            <input type="text" id="verify-code" class="form-control verify-code-input" placeholder="6-digit code" data-i18n-placeholder="auth.verifyEmail.codePlaceholder" required maxlength="6">
                         </div>
                         <input type="hidden" id="verify-email">
                         <button type="submit" class="btn btn-primary btn-block" id="btn-verify" data-i18n="auth.verifyEmail.submit">Verify Email</button>
                     </form>
-                    <div style="text-align:center;margin-top:0.75rem;">
-                        <a href="#" id="link-resend-code" class="text-muted" style="font-size:0.85rem;" data-i18n="auth.verifyEmail.resend">Didn't get a code? Resend</a>
+                    <div class="auth-helper-text">
+                        <a href="#" id="link-resend-code" class="text-muted text-sm" data-i18n="auth.verifyEmail.resend">Didn't get a code? Resend</a>
                     </div>
-                    <div id="verify-resent" style="display:none;text-align:center;margin-top:0.5rem;color:var(--color-status-green);font-size:0.85rem;" data-i18n="auth.verifyEmail.resent">New code sent!</div>
+                    <div id="verify-resent" class="verify-resent hidden" data-i18n="auth.verifyEmail.resent">New code sent!</div>
                 </div>
             </div>
 
-            <div id="auth-error" class="auth-error" style="display:none;"></div>
+            <div id="auth-error" class="auth-error hidden"></div>
 
             <div class="login-back-link">
                 <a href="/landing.html" data-i18n="auth.backToHome">&larr; Back to home</a>

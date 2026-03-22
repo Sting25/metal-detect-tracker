@@ -17,15 +17,15 @@
     function showError(msg) {
         var el = document.getElementById('reset-error');
         el.textContent = msg;
-        el.style.display = 'block';
-        setTimeout(function () { el.style.display = 'none'; }, 5000);
+        el.classList.remove('hidden');
+        setTimeout(function () { el.classList.add('hidden'); }, 5000);
     }
 
     function hideAll() {
-        document.getElementById('email-section').style.display = 'none';
-        document.getElementById('code-section').style.display = 'none';
-        document.getElementById('token-section').style.display = 'none';
-        document.getElementById('success-section').style.display = 'none';
+        document.getElementById('email-section').classList.add('hidden');
+        document.getElementById('code-section').classList.add('hidden');
+        document.getElementById('token-section').classList.add('hidden');
+        document.getElementById('success-section').classList.add('hidden');
     }
 
     function getSelectedChannel() {
@@ -40,7 +40,7 @@
         if (token) {
             // Admin token flow
             hideAll();
-            document.getElementById('token-section').style.display = 'block';
+            document.getElementById('token-section').classList.remove('hidden');
             setupTokenForm(token);
         } else {
             // Code flow — email section is already visible
@@ -93,7 +93,7 @@
 
             // Show step 2
             hideAll();
-            document.getElementById('code-section').style.display = 'block';
+            document.getElementById('code-section').classList.remove('hidden');
 
             var msgEl = document.getElementById('code-sent-msg');
             if (json.data && json.data.channel === 'phone' && json.data.maskedPhone) {
@@ -143,7 +143,7 @@
 
                 // Success
                 hideAll();
-                document.getElementById('success-section').style.display = 'block';
+                document.getElementById('success-section').classList.remove('hidden');
             } catch (err) {
                 showError('Connection error');
                 btn.disabled = false;
@@ -182,7 +182,7 @@
                 }
 
                 hideAll();
-                document.getElementById('success-section').style.display = 'block';
+                document.getElementById('success-section').classList.remove('hidden');
             } catch (err) {
                 showError('Connection error');
                 btn.disabled = false;

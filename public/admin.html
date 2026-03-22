@@ -108,7 +108,7 @@
         <section class="admin-section" id="feedback-section">
             <div class="section-header">
                 <h2 class="section-title" data-i18n="admin.section.feedback">User Feedback</h2>
-                <select id="feedback-filter" class="form-control filter-input" style="width:auto;">
+                <select id="feedback-filter" class="form-control filter-input w-auto">
                     <option value="" data-i18n="admin.feedback.filterAll">All</option>
                     <option value="new" data-i18n="admin.feedback.filterNew">New</option>
                     <option value="reviewed" data-i18n="admin.feedback.filterReviewed">Reviewed</option>
@@ -139,8 +139,8 @@
         <section class="admin-section" id="legal-section">
             <div class="section-header">
                 <h2 class="section-title">Legal Content</h2>
-                <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
-                    <select id="legal-country-filter" class="form-control filter-input" style="width:auto;">
+                <div class="flex gap-sm items-center flex-wrap">
+                    <select id="legal-country-filter" class="form-control filter-input w-auto">
                         <option value="">All Countries</option>
                         <option value="US">US</option>
                         <option value="GB">GB</option>
@@ -148,13 +148,13 @@
                         <option value="CA">CA</option>
                         <option value="NZ">NZ</option>
                     </select>
-                    <label style="display:flex;align-items:center;gap:0.35rem;font-size:0.9rem;cursor:pointer;">
+                    <label class="filter-checkbox-label">
                         <input type="checkbox" id="legal-stale-filter"> Stale only
                     </label>
                     <button class="btn btn-primary btn-sm" id="btn-add-legal">+ Add Section</button>
                 </div>
             </div>
-            <p id="legal-stale-banner" style="display:none;background:var(--color-warning-bg, #fff3cd);border:1px solid var(--color-warning-border, #ffc107);border-radius:var(--radius-md, 8px);padding:0.6rem 1rem;font-size:0.9rem;margin-bottom:0.75rem;"></p>
+            <p id="legal-stale-banner" class="stale-banner hidden"></p>
             <div class="admin-table-wrap">
                 <table class="admin-table" id="legal-table">
                     <thead>
@@ -175,8 +175,8 @@
         </section>
 
         <!-- Legal Content Edit Modal -->
-        <div id="legal-modal" class="modal-overlay" style="display:none;">
-            <div class="modal-content" style="max-width:640px;">
+        <div id="legal-modal" class="modal-overlay">
+            <div class="modal-content modal-content--narrow">
                 <h3 id="legal-modal-title">Edit Legal Section</h3>
                 <form id="legal-edit-form">
                     <input type="hidden" id="legal-edit-id">
@@ -216,9 +216,9 @@
                     </div>
                     <div class="form-group">
                         <label for="legal-edit-html">Content HTML</label>
-                        <textarea id="legal-edit-html" class="form-control" rows="10" required style="font-family:monospace;font-size:0.85rem;"></textarea>
+                        <textarea id="legal-edit-html" class="form-control textarea-code" rows="10" required></textarea>
                     </div>
-                    <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1rem;">
+                    <div class="modal-actions">
                         <button type="button" class="btn btn-secondary" id="legal-modal-cancel">Cancel</button>
                         <button type="submit" class="btn btn-primary" id="legal-modal-save">Save</button>
                     </div>
@@ -230,8 +230,8 @@
         <section class="admin-section" id="legal-suggestions-section">
             <div class="section-header">
                 <h2 class="section-title" data-i18n="admin.legal.suggestions">Legal Suggestions</h2>
-                <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
-                    <select id="suggestion-status-filter" class="form-control filter-input" style="width:auto;">
+                <div class="flex gap-sm items-center flex-wrap">
+                    <select id="suggestion-status-filter" class="form-control filter-input w-auto">
                         <option value="">All</option>
                         <option value="pending">Pending</option>
                         <option value="approved">Approved</option>
@@ -258,7 +258,7 @@
                     </tbody>
                 </table>
             </div>
-            <div id="suggestions-pagination" style="display:flex;justify-content:center;align-items:center;gap:1rem;padding:0.75rem;font-size:var(--font-size-sm);">
+            <div id="suggestions-pagination" class="pagination-bar">
                 <button class="btn btn--sm btn--secondary" id="suggestions-prev" disabled>Previous</button>
                 <span id="suggestions-page-indicator"></span>
                 <button class="btn btn--sm btn--secondary" id="suggestions-next" disabled>Next</button>
@@ -266,11 +266,11 @@
         </section>
 
         <!-- Suggestion Detail Modal -->
-        <div id="suggestion-modal" class="modal-overlay" style="display:none;">
-            <div class="modal-content" style="max-width:640px;">
+        <div id="suggestion-modal" class="modal-overlay">
+            <div class="modal-content modal-content--narrow">
                 <h3 id="suggestion-modal-title">Suggestion Details</h3>
                 <div id="suggestion-modal-body"></div>
-                <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1rem;">
+                <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" id="suggestion-modal-close">Close</button>
                 </div>
             </div>
@@ -280,11 +280,11 @@
         <section class="admin-section" id="audit-section">
             <div class="section-header">
                 <h2 class="section-title" data-i18n="admin.section.auditLog">Audit Log</h2>
-                <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
-                    <select id="audit-action-filter" class="form-control form-control-sm filter-input" style="width:auto;">
+                <div class="flex gap-sm items-center flex-wrap">
+                    <select id="audit-action-filter" class="form-control form-control-sm filter-input w-auto">
                         <option value="" data-i18n="admin.audit.allActions">All Actions</option>
                     </select>
-                    <select id="audit-entity-filter" class="form-control form-control-sm filter-input" style="width:auto;">
+                    <select id="audit-entity-filter" class="form-control form-control-sm filter-input w-auto">
                         <option value="" data-i18n="admin.audit.allEntityTypes">All Entity Types</option>
                         <option value="user">User</option>
                         <option value="site">Site</option>
@@ -293,9 +293,9 @@
                         <option value="invite_code">Invite Code</option>
                         <option value="invite_request">Invite Request</option>
                     </select>
-                    <input type="text" id="audit-user-filter" class="form-control form-control-sm filter-input" style="width:auto;max-width:160px;" placeholder="User search..." data-i18n-placeholder="admin.audit.filterUser">
-                    <input type="date" id="audit-start-date" class="form-control form-control-sm filter-input" style="width:auto;">
-                    <input type="date" id="audit-end-date" class="form-control form-control-sm filter-input" style="width:auto;">
+                    <input type="text" id="audit-user-filter" class="form-control form-control-sm filter-input filter-input-narrow" placeholder="User search..." data-i18n-placeholder="admin.audit.filterUser">
+                    <input type="date" id="audit-start-date" class="form-control form-control-sm filter-input w-auto">
+                    <input type="date" id="audit-end-date" class="form-control form-control-sm filter-input w-auto">
                 </div>
             </div>
             <div class="admin-table-wrap">
@@ -316,7 +316,7 @@
                     </tbody>
                 </table>
             </div>
-            <div id="audit-pagination" style="display:flex;justify-content:center;align-items:center;gap:1rem;padding:0.75rem;font-size:var(--font-size-sm);">
+            <div id="audit-pagination" class="pagination-bar">
                 <button class="btn btn--sm btn--secondary" id="audit-prev" disabled data-i18n="admin.audit.prev">Previous</button>
                 <span id="audit-page-indicator"></span>
                 <button class="btn btn--sm btn--secondary" id="audit-next" disabled data-i18n="admin.audit.next">Next</button>
@@ -329,7 +329,7 @@
                 <h2 class="section-title" data-i18n="admin.section.inviteCodes">Invite Codes</h2>
                 <button class="btn btn-primary" id="btn-generate-invite" data-i18n="admin.invites.generate">Generate Invite Code</button>
             </div>
-            <div id="invite-code-display" class="invite-code-display" style="display:none;">
+            <div id="invite-code-display" class="invite-code-display hidden">
                 <span class="invite-code" id="generated-code"></span>
                 <div class="invite-actions">
                     <button class="btn btn-sm btn-secondary" id="btn-copy-invite" data-i18n="admin.invites.copy">Copy</button>

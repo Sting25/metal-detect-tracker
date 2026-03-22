@@ -136,7 +136,7 @@
                             <span class="upload-icon">&#128196;</span>
                             <p data-i18n="permissions.placeholder.docUpload">Drag &amp; drop a document or click to browse</p>
                         </div>
-                        <div id="perm-doc-preview" class="doc-preview" style="display:none;">
+                        <div id="perm-doc-preview" class="doc-preview hidden">
                             <span class="doc-icon">&#128196;</span>
                             <span id="perm-doc-name" class="doc-name"></span>
                         </div>
@@ -150,14 +150,14 @@
                 </div>
 
                 <!-- Contact Log Timeline (visible in edit mode only) -->
-                <div id="contact-log-section" class="contact-log-section" style="display:none;">
+                <div id="contact-log-section" class="contact-log-section hidden">
                     <div class="contact-log-header">
                         <h3 data-i18n="permissions.contacts.title">Contact Log</h3>
                         <button type="button" class="btn btn-sm btn-secondary" id="btn-add-contact" data-i18n="permissions.contacts.add">Log Contact</button>
                     </div>
 
                     <!-- Inline add contact form (hidden by default) -->
-                    <div id="contact-form" class="contact-form" style="display:none;">
+                    <div id="contact-form" class="contact-form hidden">
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="contact-type" data-i18n="permissions.contacts.type">Contact Type</label>
@@ -204,12 +204,12 @@
                 </div>
 
                 <!-- Permission Link / Approval Section -->
-                <div id="link-section" class="link-section" style="display:none;">
+                <div id="link-section" class="link-section hidden">
                     <div class="link-section-header">
                         <h4 data-i18n="permissions.link.share">Share Approval Link</h4>
                         <button type="button" class="btn btn-sm btn-primary" id="btn-create-link" data-i18n="permissions.link.create">Create Link</button>
                     </div>
-                    <div id="link-result" class="link-result" style="display:none;">
+                    <div id="link-result" class="link-result hidden">
                         <div class="link-url-row">
                             <input type="text" id="link-url" class="form-control form-control-sm link-url-input" readonly>
                             <button type="button" class="btn btn-sm btn-outline" id="btn-copy-link" data-i18n="permissions.link.copyUrl">Copy</button>
@@ -225,19 +225,19 @@
                 </div>
 
                 <!-- Letter Generation Section -->
-                <div id="letter-section" class="letter-section" style="display:none;">
+                <div id="letter-section" class="letter-section hidden">
                     <div class="letter-section-header">
                         <h4 data-i18n="permissions.letter.generate">Generate Letter</h4>
                         <button type="button" class="btn btn-sm btn-primary" id="btn-generate-letter" data-i18n="permissions.letter.generate">Generate Letter</button>
                     </div>
-                    <div id="letter-status" class="letter-status" style="display:none;"></div>
+                    <div id="letter-status" class="letter-status hidden"></div>
                     <div id="letter-history" class="letter-history">
                         <p class="letter-empty" data-i18n="permissions.letter.empty">No letters generated yet.</p>
                     </div>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" id="btn-delete-perm" style="display:none;" data-i18n="permissions.modal.delete">Delete</button>
+                    <button type="button" class="btn btn-danger hidden" id="btn-delete-perm" data-i18n="permissions.modal.delete">Delete</button>
                     <div class="modal-footer-right">
                         <button type="button" class="btn btn-secondary" id="btn-cancel-perm" data-i18n="permissions.modal.cancel">Cancel</button>
                         <button type="submit" class="btn btn-primary" id="btn-save-perm" data-i18n="permissions.modal.save">Save Permission</button>
