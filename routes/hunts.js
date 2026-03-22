@@ -1,9 +1,9 @@
-var express = require('express');
-var router = express.Router();
-var { verifyToken, denyDemoUser } = require('../middleware/auth');
-var { validate, schemas } = require('../middleware/validate');
-var idempotent = require('../middleware/idempotency');
-var db = require('../database');
+const express = require('express');
+const router = express.Router();
+const { verifyToken, denyDemoUser } = require('../middleware/auth');
+const { validate, schemas } = require('../middleware/validate');
+const idempotent = require('../middleware/idempotency');
+const db = require('../database');
 
 // All routes require authentication
 router.use(verifyToken);
@@ -16,10 +16,10 @@ router.use(verifyToken);
  * Haversine distance between two points in meters.
  */
 function haversineMeters(lat1, lng1, lat2, lng2) {
-    var R = 6371000;
-    var dLat = (lat2 - lat1) * Math.PI / 180;
-    var dLng = (lng2 - lng1) * Math.PI / 180;
-    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    const R = 6371000;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
         Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
         Math.sin(dLng / 2) * Math.sin(dLng / 2);
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
@@ -30,8 +30,8 @@ function haversineMeters(lat1, lng1, lat2, lng2) {
  * ordered by recorded_at. Points must have lat, lng properties.
  */
 function computeDistance(points) {
-    var total = 0;
-    for (var i = 1; i < points.length; i++) {
+    let total = 0;
+    for (let i = 1; i < points.length; i++) {
         total += haversineMeters(
             points[i - 1].lat, points[i - 1].lng,
             points[i].lat, points[i].lng
@@ -45,11 +45,11 @@ function computeDistance(points) {
  * Each segment has started_at and ended_at timestamps.
  */
 function computeDuration(segments) {
-    var total = 0;
-    for (var i = 0; i < segments.length; i++) {
+    let total = 0;
+    for (let i = 0; i < segments.length; i++) {
         if (segments[i].started_at && segments[i].ended_at) {
-            var start = new Date(segments[i].started_at).getTime();
-            var end = new Date(segments[i].ended_at).getTime();
+            const start = new Date(segments[i].started_at).getTime();
+            const end = new Date(segments[i].ended_at).getTime();
             total += Math.max(0, Math.floor((end - start) / 1000));
         }
     }
@@ -61,15 +61,15 @@ function computeDuration(segments) {
 // ---------------------------------------------------------------------------
 router.get('/', async function (req, res) {
     try {
-        var userId = req.user.id;
-        var page = Math.max(1, parseInt(req.query.page) || 1);
-        var limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
-        var offset = (page - 1) * limit;
+        const userId = req.user.id;
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+        const offset = (page - 1) * limit;
 
         // Build WHERE clauses
-        var conditions = ['hs.user_id = $1'];
-        var params = [userId];
-        var paramIdx = 2;
+        const conditions = ['hs.user_id = $1'];
+        const params = [userId];
+        let paramIdx = 2;
 
         if (req.query.status) {
             conditions.push('hs.status = $' + paramIdx);
@@ -92,18 +92,18 @@ router.get('/', async function (req, res) {
             paramIdx++;
         }
 
-        var where = conditions.join(' AND ');
+        const where = conditions.join(' AND ');
 
         // Count total
-        var countResult = await db.query(
+        const countResult = await db.query(
             'SELECT COUNT(*) AS total FROM hunt_sessions hs WHERE ' + where,
             params
         );
-        var total = parseInt(countResult.rows[0].total);
+        const total = parseInt(countResult.rows[0].total);
 
         // Get sessions with site name and find count
-        var dataParams = params.concat([limit, offset]);
-        var rows = (await db.query(
+        const dataParams = params.concat([limit, offset]);
+        const rows = (await db.query(
             'SELECT hs.*, s.name AS site_name, ' +
             '(SELECT COUNT(*) FROM finds f WHERE f.hunt_session_id = hs.id) AS find_count ' +
             'FROM hunt_sessions hs ' +
@@ -135,7 +135,7 @@ router.get('/', async function (req, res) {
 // ---------------------------------------------------------------------------
 router.get('/:id', async function (req, res) {
     try {
-        var session = await db.queryOne(
+        const session = await db.queryOne(
             'SELECT hs.*, s.name AS site_name ' +
             'FROM hunt_sessions hs ' +
             'LEFT JOIN sites s ON hs.site_id = s.id ' +
@@ -147,13 +147,13 @@ router.get('/:id', async function (req, res) {
         }
 
         // Get segments
-        var segments = (await db.query(
+        const segments = (await db.query(
             'SELECT * FROM track_segments WHERE session_id = $1 ORDER BY segment_number',
             [session.id]
         )).rows;
 
         // Get find count and IDs
-        var finds = (await db.query(
+        const finds = (await db.query(
             'SELECT id, description, date_found FROM finds WHERE hunt_session_id = $1 ORDER BY date_found',
             [session.id]
         )).rows;
@@ -174,10 +174,10 @@ router.get('/:id', async function (req, res) {
 // ---------------------------------------------------------------------------
 router.post('/', denyDemoUser, idempotent, validate(schemas.startHunt), async function (req, res) {
     try {
-        var userId = req.user.id;
+        const userId = req.user.id;
 
         // Check no other active/paused session exists
-        var existing = await db.queryOne(
+        const existing = await db.queryOne(
             "SELECT id FROM hunt_sessions WHERE user_id = $1 AND status IN ('active', 'paused')",
             [userId]
         );
@@ -190,7 +190,7 @@ router.post('/', denyDemoUser, idempotent, validate(schemas.startHunt), async fu
 
         // Validate site_id belongs to user (if provided)
         if (req.body.site_id) {
-            var site = await db.queryOne(
+            const site = await db.queryOne(
                 'SELECT id FROM sites WHERE id = $1 AND user_id = $2',
                 [req.body.site_id, userId]
             );
@@ -200,19 +200,19 @@ router.post('/', denyDemoUser, idempotent, validate(schemas.startHunt), async fu
         }
 
         // Create session
-        var sessionResult = await db.query(
+        const sessionResult = await db.query(
             "INSERT INTO hunt_sessions (user_id, site_id, status, notes) VALUES ($1, $2, 'active', $3) RETURNING id",
             [userId, req.body.site_id || null, req.body.notes || null]
         );
-        var sessionId = sessionResult.rows[0].id;
+        const sessionId = sessionResult.rows[0].id;
 
         // Create first segment
-        var segmentResult = await db.query(
+        const segmentResult = await db.query(
             'INSERT INTO track_segments (session_id, segment_number) VALUES ($1, 1) RETURNING id',
             [sessionId]
         );
 
-        var session = await db.queryOne(
+        const session = await db.queryOne(
             'SELECT hs.*, s.name AS site_name FROM hunt_sessions hs LEFT JOIN sites s ON hs.site_id = s.id WHERE hs.id = $1',
             [sessionId]
         );
@@ -239,7 +239,7 @@ router.post('/', denyDemoUser, idempotent, validate(schemas.startHunt), async fu
 // ---------------------------------------------------------------------------
 router.post('/:id/pause', denyDemoUser, async function (req, res) {
     try {
-        var session = await db.queryOne(
+        const session = await db.queryOne(
             'SELECT * FROM hunt_sessions WHERE id = $1 AND user_id = $2',
             [req.params.id, req.user.id]
         );
@@ -257,11 +257,11 @@ router.post('/:id/pause', denyDemoUser, async function (req, res) {
         );
 
         // Compute duration from all completed segments
-        var segments = (await db.query(
+        const segments = (await db.query(
             'SELECT started_at, ended_at FROM track_segments WHERE session_id = $1',
             [session.id]
         )).rows;
-        var duration = computeDuration(segments);
+        const duration = computeDuration(segments);
 
         // Update session
         await db.query(
@@ -269,7 +269,7 @@ router.post('/:id/pause', denyDemoUser, async function (req, res) {
             [duration, session.id]
         );
 
-        var updated = await db.queryOne(
+        const updated = await db.queryOne(
             'SELECT hs.*, s.name AS site_name FROM hunt_sessions hs LEFT JOIN sites s ON hs.site_id = s.id WHERE hs.id = $1',
             [session.id]
         );
@@ -294,7 +294,7 @@ router.post('/:id/pause', denyDemoUser, async function (req, res) {
 // ---------------------------------------------------------------------------
 router.post('/:id/resume', denyDemoUser, async function (req, res) {
     try {
-        var session = await db.queryOne(
+        const session = await db.queryOne(
             'SELECT * FROM hunt_sessions WHERE id = $1 AND user_id = $2',
             [req.params.id, req.user.id]
         );
@@ -306,14 +306,14 @@ router.post('/:id/resume', denyDemoUser, async function (req, res) {
         }
 
         // Get next segment number
-        var maxSeg = await db.queryOne(
+        const maxSeg = await db.queryOne(
             'SELECT MAX(segment_number) AS max_num FROM track_segments WHERE session_id = $1',
             [session.id]
         );
-        var nextSegNum = (maxSeg && maxSeg.max_num ? maxSeg.max_num : 0) + 1;
+        const nextSegNum = (maxSeg && maxSeg.max_num ? maxSeg.max_num : 0) + 1;
 
         // Create new segment
-        var segmentResult = await db.query(
+        const segmentResult = await db.query(
             'INSERT INTO track_segments (session_id, segment_number) VALUES ($1, $2) RETURNING id',
             [session.id, nextSegNum]
         );
@@ -324,7 +324,7 @@ router.post('/:id/resume', denyDemoUser, async function (req, res) {
             [session.id]
         );
 
-        var updated = await db.queryOne(
+        const updated = await db.queryOne(
             'SELECT hs.*, s.name AS site_name FROM hunt_sessions hs LEFT JOIN sites s ON hs.site_id = s.id WHERE hs.id = $1',
             [session.id]
         );
@@ -350,7 +350,7 @@ router.post('/:id/resume', denyDemoUser, async function (req, res) {
 // ---------------------------------------------------------------------------
 router.post('/:id/end', denyDemoUser, async function (req, res) {
     try {
-        var session = await db.queryOne(
+        const session = await db.queryOne(
             'SELECT * FROM hunt_sessions WHERE id = $1 AND user_id = $2',
             [req.params.id, req.user.id]
         );
@@ -368,29 +368,29 @@ router.post('/:id/end', denyDemoUser, async function (req, res) {
         );
 
         // Compute final duration from all segments
-        var segments = (await db.query(
+        const segments = (await db.query(
             'SELECT started_at, ended_at FROM track_segments WHERE session_id = $1',
             [session.id]
         )).rows;
-        var duration = computeDuration(segments);
+        const duration = computeDuration(segments);
 
         // Compute total distance from all trackpoints (ordered)
-        var allPoints = (await db.query(
+        const allPoints = (await db.query(
             'SELECT tp.lat, tp.lng FROM track_points tp ' +
             'JOIN track_segments ts ON tp.segment_id = ts.id ' +
             'WHERE ts.session_id = $1 ORDER BY tp.recorded_at',
             [session.id]
         )).rows;
-        var distance = computeDistance(allPoints);
+        const distance = computeDistance(allPoints);
 
         // Count trackpoints
-        var countResult = await db.queryOne(
+        const countResult = await db.queryOne(
             'SELECT COUNT(*) AS cnt FROM track_points tp ' +
             'JOIN track_segments ts ON tp.segment_id = ts.id ' +
             'WHERE ts.session_id = $1',
             [session.id]
         );
-        var trackpointCount = parseInt(countResult.cnt);
+        const trackpointCount = parseInt(countResult.cnt);
 
         // Update session
         await db.query(
@@ -398,7 +398,7 @@ router.post('/:id/end', denyDemoUser, async function (req, res) {
             [duration, distance, trackpointCount, session.id]
         );
 
-        var updated = await db.queryOne(
+        const updated = await db.queryOne(
             'SELECT hs.*, s.name AS site_name FROM hunt_sessions hs LEFT JOIN sites s ON hs.site_id = s.id WHERE hs.id = $1',
             [session.id]
         );
@@ -424,7 +424,7 @@ router.post('/:id/end', denyDemoUser, async function (req, res) {
 // ---------------------------------------------------------------------------
 router.put('/:id', denyDemoUser, idempotent, validate(schemas.updateHunt), async function (req, res) {
     try {
-        var session = await db.queryOne(
+        const session = await db.queryOne(
             'SELECT * FROM hunt_sessions WHERE id = $1 AND user_id = $2',
             [req.params.id, req.user.id]
         );
@@ -434,7 +434,7 @@ router.put('/:id', denyDemoUser, idempotent, validate(schemas.updateHunt), async
 
         // Validate site_id if provided
         if (req.body.site_id) {
-            var site = await db.queryOne(
+            const site = await db.queryOne(
                 'SELECT id FROM sites WHERE id = $1 AND user_id = $2',
                 [req.body.site_id, req.user.id]
             );
@@ -443,9 +443,9 @@ router.put('/:id', denyDemoUser, idempotent, validate(schemas.updateHunt), async
             }
         }
 
-        var fields = [];
-        var params = [];
-        var idx = 1;
+        const fields = [];
+        const params = [];
+        let idx = 1;
 
         if (req.body.notes !== undefined) {
             fields.push('notes = $' + idx);
@@ -468,7 +468,7 @@ router.put('/:id', denyDemoUser, idempotent, validate(schemas.updateHunt), async
             params
         );
 
-        var updated = await db.queryOne(
+        const updated = await db.queryOne(
             'SELECT hs.*, s.name AS site_name FROM hunt_sessions hs LEFT JOIN sites s ON hs.site_id = s.id WHERE hs.id = $1',
             [session.id]
         );
@@ -493,7 +493,7 @@ router.put('/:id', denyDemoUser, idempotent, validate(schemas.updateHunt), async
 // ---------------------------------------------------------------------------
 router.delete('/:id', denyDemoUser, async function (req, res) {
     try {
-        var session = await db.queryOne(
+        const session = await db.queryOne(
             'SELECT * FROM hunt_sessions WHERE id = $1 AND user_id = $2',
             [req.params.id, req.user.id]
         );
@@ -536,7 +536,7 @@ router.post('/:id/trackpoints', denyDemoUser, function (req, res, next) {
     next();
 }, idempotent, validate(schemas.uploadTrackpoints), async function (req, res) {
     try {
-        var session = await db.queryOne(
+        const session = await db.queryOne(
             'SELECT * FROM hunt_sessions WHERE id = $1 AND user_id = $2',
             [req.params.id, req.user.id]
         );
@@ -548,7 +548,7 @@ router.post('/:id/trackpoints', denyDemoUser, function (req, res, next) {
         }
 
         // Find current open segment
-        var segment = await db.queryOne(
+        const segment = await db.queryOne(
             'SELECT id FROM track_segments WHERE session_id = $1 AND ended_at IS NULL ORDER BY segment_number DESC LIMIT 1',
             [session.id]
         );
@@ -556,14 +556,14 @@ router.post('/:id/trackpoints', denyDemoUser, function (req, res, next) {
             return res.status(400).json({ success: false, error: 'No open segment found' });
         }
 
-        var points = req.body.points;
+        const points = req.body.points;
 
         // Build batch INSERT
-        var values = [];
-        var insertParams = [];
-        var pIdx = 1;
-        for (var i = 0; i < points.length; i++) {
-            var p = points[i];
+        const values = [];
+        const insertParams = [];
+        let pIdx = 1;
+        for (let i = 0; i < points.length; i++) {
+            const p = points[i];
             values.push('($' + pIdx + ', $' + (pIdx + 1) + ', $' + (pIdx + 2) + ', $' + (pIdx + 3) + ', $' + (pIdx + 4) + ', $' + (pIdx + 5) + ')');
             insertParams.push(segment.id, p.lat, p.lng, p.accuracy_m || null, p.altitude_m || null, p.recorded_at);
             pIdx += 6;
@@ -575,7 +575,7 @@ router.post('/:id/trackpoints', denyDemoUser, function (req, res, next) {
         );
 
         // Update trackpoint count on session
-        var countResult = await db.queryOne(
+        const countResult = await db.queryOne(
             'SELECT COUNT(*) AS cnt FROM track_points tp JOIN track_segments ts ON tp.segment_id = ts.id WHERE ts.session_id = $1',
             [session.id]
         );
@@ -605,7 +605,7 @@ router.post('/:id/trackpoints', denyDemoUser, function (req, res, next) {
 // ---------------------------------------------------------------------------
 router.get('/:id/trackpoints', async function (req, res) {
     try {
-        var session = await db.queryOne(
+        const session = await db.queryOne(
             'SELECT id FROM hunt_sessions WHERE id = $1 AND user_id = $2',
             [req.params.id, req.user.id]
         );
@@ -614,26 +614,26 @@ router.get('/:id/trackpoints', async function (req, res) {
         }
 
         // Get all segments
-        var segments = (await db.query(
+        const segments = (await db.query(
             'SELECT id, segment_number FROM track_segments WHERE session_id = $1 ORDER BY segment_number',
             [session.id]
         )).rows;
 
         // Get total count
-        var countResult = await db.queryOne(
+        const countResult = await db.queryOne(
             'SELECT COUNT(*) AS cnt FROM track_points tp JOIN track_segments ts ON tp.segment_id = ts.id WHERE ts.session_id = $1',
             [session.id]
         );
-        var totalCount = parseInt(countResult.cnt);
+        const totalCount = parseInt(countResult.cnt);
 
         // Determine downsampling factor
-        var maxPoints = 2000;
-        var nth = totalCount > maxPoints ? Math.ceil(totalCount / maxPoints) : 1;
+        const maxPoints = 2000;
+        const nth = totalCount > maxPoints ? Math.ceil(totalCount / maxPoints) : 1;
 
-        var result = [];
-        for (var i = 0; i < segments.length; i++) {
-            var seg = segments[i];
-            var points;
+        const result = [];
+        for (let i = 0; i < segments.length; i++) {
+            const seg = segments[i];
+            let points;
             if (nth > 1) {
                 // Use row_number for nth-point sampling
                 points = (await db.query(

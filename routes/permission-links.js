@@ -13,11 +13,11 @@ const { validate, schemas } = require('../middleware/validate');
 // ---------------------------------------------------------------------------
 // Rate limiting — stricter for public endpoints
 // ---------------------------------------------------------------------------
-var isTest = function () {
+const isTest = function () {
     return process.env.NODE_ENV === 'test' || !!process.env.TEST_DB_PATH;
 };
 
-var publicLinkLimiter = rateLimit({
+const publicLinkLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 30,
     standardHeaders: true,
@@ -61,14 +61,14 @@ function checkLinkActionable(link) {
 // ---------------------------------------------------------------------------
 router.get('/:token', async function (req, res) {
     try {
-        var link = await loadLink(req.params.token);
-        var check = checkLinkActionable(link);
+        const link = await loadLink(req.params.token);
+        const check = checkLinkActionable(link);
         if (!check.ok) {
             return res.status(check.status).json({ success: false, error: check.error });
         }
 
         // Fetch permission + site details
-        var perm = await db.queryOne(
+        const perm = await db.queryOne(
             `SELECT p.*, s.name AS site_name, s.description AS site_description,
                     s.latitude AS site_latitude, s.longitude AS site_longitude
              FROM permissions p
@@ -82,7 +82,7 @@ router.get('/:token', async function (req, res) {
         }
 
         // Get the requester's display name (no sensitive PII)
-        var user = await db.queryOne('SELECT display_name FROM users WHERE id = $1', [perm.user_id]);
+        const user = await db.queryOne('SELECT display_name FROM users WHERE id = $1', [perm.user_id]);
 
         res.json({
             success: true,
@@ -117,24 +117,24 @@ router.get('/:token', async function (req, res) {
 // ---------------------------------------------------------------------------
 router.post('/:token/approve', validate(schemas.approvePermissionLink), async function (req, res) {
     try {
-        var link = await loadLink(req.params.token);
-        var check = checkLinkActionable(link);
+        const link = await loadLink(req.params.token);
+        const check = checkLinkActionable(link);
         if (!check.ok) {
             return res.status(check.status).json({ success: false, error: check.error });
         }
 
-        var { signed_name, signature_image, conditions_text } = req.body;
+        const { signed_name, signature_image, conditions_text } = req.body;
 
         // Handle optional signature image upload to S3
-        var signatureImagePath = null;
+        let signatureImagePath = null;
         if (signature_image && signature_image.startsWith('data:image/')) {
             try {
                 // Extract base64 data from data URI
-                var matches = signature_image.match(/^data:image\/(\w+);base64,(.+)$/);
+                const matches = signature_image.match(/^data:image\/(\w+);base64,(.+)$/);
                 if (matches) {
-                    var ext = matches[1] === 'jpeg' ? 'jpg' : matches[1];
-                    var buffer = Buffer.from(matches[2], 'base64');
-                    var s3Key = 'signatures/' + link.permission_id + '/' + link.token + '.' + ext;
+                    const ext = matches[1] === 'jpeg' ? 'jpg' : matches[1];
+                    const buffer = Buffer.from(matches[2], 'base64');
+                    const s3Key = 'signatures/' + link.permission_id + '/' + link.token + '.' + ext;
                     await s3.uploadToS3(buffer, s3Key, 'image/' + matches[1]);
                     signatureImagePath = s3Key;
                 }
@@ -163,14 +163,14 @@ router.post('/:token/approve', validate(schemas.approvePermissionLink), async fu
         );
 
         // Fetch permission owner for audit log
-        var perm = await db.queryOne('SELECT user_id FROM permissions WHERE id = $1', [link.permission_id]);
+        const perm = await db.queryOne('SELECT user_id FROM permissions WHERE id = $1', [link.permission_id]);
 
         // Generate signed PDF if pdf service is available
-        var signedPdfPath = null;
+        let signedPdfPath = null;
         try {
-            var pdfService = require('../services/pdf');
+            const pdfService = require('../services/pdf');
             if (pdfService.generateSignedPermissionPDF) {
-                var fullPerm = await db.queryOne(
+                const fullPerm = await db.queryOne(
                     `SELECT p.*, s.name AS site_name, s.description AS site_description,
                             s.latitude AS site_latitude, s.longitude AS site_longitude
                      FROM permissions p
@@ -178,10 +178,10 @@ router.post('/:token/approve', validate(schemas.approvePermissionLink), async fu
                      WHERE p.id = $1`,
                     [link.permission_id]
                 );
-                var letterPrefs = await db.queryOne('SELECT * FROM letter_preferences WHERE user_id = $1', [perm.user_id]);
-                var updatedLink = await db.queryOne('SELECT * FROM permission_links WHERE id = $1', [link.id]);
-                var pdfBuffer = await pdfService.generateSignedPermissionPDF(updatedLink, fullPerm, letterPrefs);
-                var pdfKey = 'signed-letters/' + link.permission_id + '/' + link.token + '.pdf';
+                const letterPrefs = await db.queryOne('SELECT * FROM letter_preferences WHERE user_id = $1', [perm.user_id]);
+                const updatedLink = await db.queryOne('SELECT * FROM permission_links WHERE id = $1', [link.id]);
+                const pdfBuffer = await pdfService.generateSignedPermissionPDF(updatedLink, fullPerm, letterPrefs);
+                const pdfKey = 'signed-letters/' + link.permission_id + '/' + link.token + '.pdf';
                 await s3.uploadToS3(pdfBuffer, pdfKey, 'application/pdf');
                 signedPdfPath = pdfKey;
                 await db.query('UPDATE permission_links SET signed_pdf_path = $1 WHERE id = $2', [pdfKey, link.id]);
@@ -222,8 +222,8 @@ router.post('/:token/approve', validate(schemas.approvePermissionLink), async fu
 // ---------------------------------------------------------------------------
 router.post('/:token/deny', validate(schemas.denyPermissionLink), async function (req, res) {
     try {
-        var link = await loadLink(req.params.token);
-        var check = checkLinkActionable(link);
+        const link = await loadLink(req.params.token);
+        const check = checkLinkActionable(link);
         if (!check.ok) {
             return res.status(check.status).json({ success: false, error: check.error });
         }
@@ -241,7 +241,7 @@ router.post('/:token/deny', validate(schemas.denyPermissionLink), async function
         );
 
         // Fetch permission owner for audit log
-        var perm = await db.queryOne('SELECT user_id FROM permissions WHERE id = $1', [link.permission_id]);
+        const perm = await db.queryOne('SELECT user_id FROM permissions WHERE id = $1', [link.permission_id]);
 
         if (perm) {
             db.logAuditEvent({

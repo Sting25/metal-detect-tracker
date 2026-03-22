@@ -1,12 +1,12 @@
-var express = require('express');
-var router = express.Router();
-var archiver = require('archiver');
-var { verifyToken, denyDemoUser } = require('../middleware/auth');
-var { createImportUpload } = require('../middleware/upload');
-var { processImportZip } = require('../services/import');
-var db = require('../database');
+const express = require('express');
+const router = express.Router();
+const archiver = require('archiver');
+const { verifyToken, denyDemoUser } = require('../middleware/auth');
+const { createImportUpload } = require('../middleware/upload');
+const { processImportZip } = require('../services/import');
+const db = require('../database');
 
-var upload = createImportUpload();
+const upload = createImportUpload();
 
 // All routes require authentication
 router.use(verifyToken);
@@ -16,15 +16,15 @@ router.use(verifyToken);
  * Shows users the expected format for each data type.
  */
 router.get('/template', function (_req, res) {
-    var archive = archiver('zip', { zlib: { level: 6 } });
-    var PREFIX = 'signal-bouncer-export/';
+    const archive = archiver('zip', { zlib: { level: 6 } });
+    const PREFIX = 'signal-bouncer-export/';
 
     res.set('Content-Type', 'application/zip');
     res.set('Content-Disposition', 'attachment; filename="signal-bouncer-import-template.zip"');
     archive.pipe(res);
 
     // Manifest
-    var manifest = {
+    const manifest = {
         version: 1,
         exported_at: new Date().toISOString(),
         user_email: 'template@example.com',
@@ -33,7 +33,7 @@ router.get('/template', function (_req, res) {
     archive.append(JSON.stringify(manifest, null, 2), { name: PREFIX + 'manifest.json' });
 
     // Sample sites
-    var sites = [
+    const sites = [
         {
             id: 1,
             name: 'Riverside Park',
@@ -58,7 +58,7 @@ router.get('/template', function (_req, res) {
     archive.append(JSON.stringify(sites, null, 2), { name: PREFIX + 'sites.json' });
 
     // Sample finds
-    var finds = [
+    const finds = [
         {
             id: 1,
             site_id: 1,
@@ -111,7 +111,7 @@ router.get('/template', function (_req, res) {
     archive.append(JSON.stringify(finds, null, 2), { name: PREFIX + 'finds.json' });
 
     // Sample permissions
-    var permissions = [
+    const permissions = [
         {
             id: 1,
             site_id: 2,
@@ -131,7 +131,7 @@ router.get('/template', function (_req, res) {
     archive.append(JSON.stringify(permissions, null, 2), { name: PREFIX + 'permissions.json' });
 
     // Sample letter preferences
-    var letterPrefs = {
+    const letterPrefs = {
         full_name: 'Jane Detectorist',
         address: '456 Metal Ave, Findtown, VA 22001',
         phone: '(555) 987-6543',
@@ -144,25 +144,25 @@ router.get('/template', function (_req, res) {
     archive.append(JSON.stringify(letterPrefs, null, 2), { name: PREFIX + 'letter_preferences.json' });
 
     // CSV versions (sites)
-    var sitesCsv = '\uFEFFid,name,latitude,longitude,land_type,site_status,notes\r\n'
+    const sitesCsv = '\uFEFFid,name,latitude,longitude,land_type,site_status,notes\r\n'
         + '1,Riverside Park,38.8977,-77.0365,city,detecting,Permission granted by city parks dept\r\n'
         + '2,Johnson Farm Field,39.1234,-76.5678,private,scouted,\r\n';
     archive.append(sitesCsv, { name: PREFIX + 'sites.csv' });
 
     // CSV versions (finds)
-    var findsCsv = '\uFEFFid,site_id,description,date_found,material,category,tags,depth_inches,weight_grams,latitude,longitude,notes,condition,estimated_age\r\n'
+    const findsCsv = '\uFEFFid,site_id,description,date_found,material,category,tags,depth_inches,weight_grams,latitude,longitude,notes,condition,estimated_age\r\n'
         + '1,1,1943 Steel Wheat Penny,2026-01-15,iron,Coins,"penny,wheat,steel",4,2.7,38.8978,-77.0366,Found near the old oak tree,good,1943\r\n'
         + '2,1,Brass button — military style,2026-01-15,brass,Buttons,"military,button,brass",6,8.5,38.8979,-77.0364,Possible Civil War era,fair,1860s\r\n'
         + '3,2,Silver ring — plain band,2026-02-01,silver,Jewelry,"ring,silver",3,5.2,,,,,excellent,\r\n';
     archive.append(findsCsv, { name: PREFIX + 'finds.csv' });
 
     // CSV versions (permissions)
-    var permsCsv = '\uFEFFid,site_id,land_type,agency_or_owner,status,date_requested,date_granted,date_expires,notes\r\n'
+    const permsCsv = '\uFEFFid,site_id,land_type,agency_or_owner,status,date_requested,date_granted,date_expires,notes\r\n'
         + '1,2,private,Robert Johnson,approved,2026-01-10,2026-01-12,2026-12-31,"Verbal permission, confirmed by email"\r\n';
     archive.append(permsCsv, { name: PREFIX + 'permissions.csv' });
 
     // README with format instructions
-    var readme = '# Signal Bouncer Import Template\n'
+    const readme = '# Signal Bouncer Import Template\n'
         + '\n'
         + 'This ZIP file shows the expected format for importing data into Signal Bouncer.\n'
         + '\n'
@@ -218,7 +218,7 @@ router.post('/', denyDemoUser, upload.single('file'), async function (req, res) 
             return res.status(400).json({ success: false, error: 'No file uploaded' });
         }
 
-        var result = await processImportZip(req.file.buffer, req.user.id);
+        const result = await processImportZip(req.file.buffer, req.user.id);
 
         db.logAuditEvent({
             userId: req.user.id,
