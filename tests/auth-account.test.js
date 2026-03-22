@@ -1,4 +1,4 @@
-const { request, createUser, createGoogleUser, createAdmin } = require('./helpers');
+const { request, createUser, createGoogleUser, createAdmin, createDemoUser } = require('./helpers');
 const db = require('../database');
 const crypto = require('crypto');
 
@@ -312,4 +312,281 @@ describe('Auth Account Routes', () => {
         });
     });
 
+});
+
+// --- GET /api/auth/me - profile fields (complementary to oauth-passkey.test.js) ---
+describe('GET /api/auth/me - profile fields', () => {
+    it('returns country_code and unit_preference defaults', async () => {
+        const { token } = await createUser();
+
+        const res = await request()
+            .get('/api/auth/me')
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body.success).toBe(true);
+        expect(res.body.data.country_code).toBe('US');
+        expect(res.body.data.unit_preference).toBe('imperial');
+    });
+
+    it('returns language_preference field', async () => {
+        const { user, token } = await createUser();
+        await db.query("UPDATE users SET language_preference = 'fr' WHERE id = $1", [user.id]);
+
+        const res = await request()
+            .get('/api/auth/me')
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body.data.language_preference).toBe('fr');
+    });
+
+    it('returns store_exact_gps and export_obfuscation fields', async () => {
+        const { user, token } = await createUser();
+        await db.query("UPDATE users SET store_exact_gps = false, export_obfuscation = 'rounded_1km' WHERE id = $1", [user.id]);
+
+        const res = await request()
+            .get('/api/auth/me')
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body.data.store_exact_gps).toBe(false);
+        expect(res.body.data.export_obfuscation).toBe('rounded_1km');
+    });
+
+    it('returns is_demo=true for demo users', async () => {
+        const { token } = await createDemoUser();
+
+        const res = await request()
+            .get('/api/auth/me')
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body.data.is_demo).toBe(true);
+    });
+
+    it('returns is_demo=false for regular users', async () => {
+        const { token } = await createUser();
+
+        const res = await request()
+            .get('/api/auth/me')
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body.data.is_demo).toBe(false);
+    });
+
+    it('returns country_code after it was updated', async () => {
+        const { user, token } = await createUser();
+        await db.query("UPDATE users SET country_code = 'GB', region = 'England' WHERE id = $1", [user.id]);
+
+        const res = await request()
+            .get('/api/auth/me')
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body.data.country_code).toBe('GB');
+        expect(res.body.data.region).toBe('England');
+    });
+
+    it('requires authentication', async () => {
+        const res = await request().get('/api/auth/me');
+        expect(res.status).toBe(401);
+    });
+
+    it('rejects invalid token', async () => {
+        const res = await request()
+            .get('/api/auth/me')
+            .set('Authorization', 'Bearer invalid-token-here');
+
+        expect(res.status).toBe(401);
+    });
+});
+
+// --- PUT /api/auth/preferences (complementary tests) ---
+describe('PUT /api/auth/preferences - combined updates', () => {
+    it('updates multiple preferences in a single request', async () => {
+        const { token } = await createUser();
+        const res = await request()
+            .put('/api/auth/preferences')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                unit_preference: 'metric',
+                country_code: 'GB',
+                region: 'Scotland',
+                language_preference: 'en',
+            });
+
+        expect(res.status).toBe(200);
+        expect(res.body.data.unit_preference).toBe('metric');
+        expect(res.body.data.country_code).toBe('GB');
+        expect(res.body.data.region).toBe('Scotland');
+        expect(res.body.data.language_preference).toBe('en');
+    });
+
+    it('clears region by sending null', async () => {
+        const { user, token } = await createUser();
+        await db.query("UPDATE users SET region = 'Colorado' WHERE id = $1", [user.id]);
+
+        const res = await request()
+            .put('/api/auth/preferences')
+            .set('Authorization', `Bearer ${token}`)
+            .send({ region: null, country_code: 'US' });
+
+        expect(res.status).toBe(200);
+        expect(res.body.data.region).toBeNull();
+    });
+
+    it('persists preferences across requests', async () => {
+        const { token } = await createUser();
+
+        await request()
+            .put('/api/auth/preferences')
+            .set('Authorization', `Bearer ${token}`)
+            .send({ unit_preference: 'metric', country_code: 'AU' });
+
+        const res = await request()
+            .get('/api/auth/me')
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body.data.unit_preference).toBe('metric');
+        expect(res.body.data.country_code).toBe('AU');
+    });
+
+    it('requires authentication', async () => {
+        const res = await request()
+            .put('/api/auth/preferences')
+            .send({ unit_preference: 'metric' });
+
+        expect(res.status).toBe(401);
+    });
+
+    it('updates store_exact_gps and export_obfuscation together', async () => {
+        const { token } = await createUser();
+        const res = await request()
+            .put('/api/auth/preferences')
+            .set('Authorization', `Bearer ${token}`)
+            .send({ store_exact_gps: false, export_obfuscation: 'no_coords' });
+
+        expect(res.status).toBe(200);
+        expect(res.body.data.store_exact_gps).toBe(false);
+        expect(res.body.data.export_obfuscation).toBe('no_coords');
+    });
+
+    it('rejects invalid export_obfuscation with combined valid fields', async () => {
+        const { token } = await createUser();
+        const res = await request()
+            .put('/api/auth/preferences')
+            .set('Authorization', `Bearer ${token}`)
+            .send({ unit_preference: 'metric', export_obfuscation: 'bad_value' });
+
+        expect(res.status).toBe(400);
+    });
+});
+
+// --- POST /api/auth/request-invite ---
+describe('POST /api/auth/request-invite', () => {
+    it('creates an invite request with name and email', async () => {
+        const res = await request()
+            .post('/api/auth/request-invite')
+            .send({ name: 'Jane Doe', email: 'jane@example.com' });
+
+        expect(res.status).toBe(200);
+        expect(res.body.success).toBe(true);
+        expect(res.body.data.message).toMatch(/request submitted/i);
+
+        const row = await db.queryOne(
+            "SELECT * FROM invite_requests WHERE email = 'jane@example.com'"
+        );
+        expect(row).toBeTruthy();
+        expect(row.name).toBe('Jane Doe');
+        expect(row.status).toBe('pending');
+    });
+
+    it('creates an invite request with optional message', async () => {
+        const res = await request()
+            .post('/api/auth/request-invite')
+            .send({ name: 'Bob Smith', email: 'bob@example.com', message: 'I love metal detecting!' });
+
+        expect(res.status).toBe(200);
+        expect(res.body.success).toBe(true);
+
+        const row = await db.queryOne(
+            "SELECT * FROM invite_requests WHERE email = 'bob@example.com'"
+        );
+        expect(row.message).toBe('I love metal detecting!');
+    });
+
+    it('handles duplicate pending request gracefully', async () => {
+        await request()
+            .post('/api/auth/request-invite')
+            .send({ name: 'Dup User', email: 'dup@example.com' });
+
+        const res = await request()
+            .post('/api/auth/request-invite')
+            .send({ name: 'Dup User', email: 'dup@example.com' });
+
+        expect(res.status).toBe(200);
+        expect(res.body.success).toBe(true);
+
+        const rows = await db.query(
+            "SELECT * FROM invite_requests WHERE email = 'dup@example.com' AND status = 'pending'"
+        );
+        expect(rows.rows).toHaveLength(1);
+    });
+
+    it('returns 400 when name is missing', async () => {
+        const res = await request()
+            .post('/api/auth/request-invite')
+            .send({ email: 'noname@example.com' });
+
+        expect(res.status).toBe(400);
+        expect(res.body.error).toMatch(/name.*email.*required/i);
+    });
+
+    it('returns 400 when email is missing', async () => {
+        const res = await request()
+            .post('/api/auth/request-invite')
+            .send({ name: 'No Email' });
+
+        expect(res.status).toBe(400);
+        expect(res.body.error).toMatch(/name.*email.*required/i);
+    });
+
+    it('normalizes email to lowercase', async () => {
+        const res = await request()
+            .post('/api/auth/request-invite')
+            .send({ name: 'Case Test', email: 'UPPER@Example.COM' });
+
+        expect(res.status).toBe(200);
+
+        const row = await db.queryOne(
+            "SELECT * FROM invite_requests WHERE email = 'upper@example.com'"
+        );
+        expect(row).toBeTruthy();
+    });
+
+    it('trims whitespace from name and email', async () => {
+        const res = await request()
+            .post('/api/auth/request-invite')
+            .send({ name: '  Trimmed User  ', email: '  trimmed@example.com  ' });
+
+        expect(res.status).toBe(200);
+
+        const row = await db.queryOne(
+            "SELECT * FROM invite_requests WHERE email = 'trimmed@example.com'"
+        );
+        expect(row).toBeTruthy();
+        expect(row.name).toBe('Trimmed User');
+    });
+
+    it('does not require authentication', async () => {
+        const res = await request()
+            .post('/api/auth/request-invite')
+            .send({ name: 'Anon User', email: 'anon@example.com' });
+
+        expect(res.status).toBe(200);
+        expect(res.body.success).toBe(true);
+    });
 });
