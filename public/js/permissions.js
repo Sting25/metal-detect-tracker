@@ -203,7 +203,7 @@
                 '<div class="empty-state-icon">&#128221;</div>' +
                 '<h3 class="empty-state-title">' + _t('permissions.empty.title') + '</h3>' +
                 '<p class="empty-state-text">' + _t('permissions.empty.text') + '</p>' +
-                '<button class="btn btn--primary" onclick="document.getElementById(\'btn-add-permission\').click()">' + _t('permissions.empty.cta') + '</button>' +
+                '<button class="btn btn-primary" onclick="document.getElementById(\'btn-add-permission\').click()">' + _t('permissions.empty.cta') + '</button>' +
                 '</div>';
             return;
         }

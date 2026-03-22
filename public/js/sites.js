@@ -357,7 +357,12 @@
     /* ------------------------------------------------------------------ */
     function renderSitesList(sites) {
         if (sites.length === 0) {
-            els.sitesList.innerHTML = '<p class="empty-text">' + _t('sites.empty') + '</p>';
+            els.sitesList.innerHTML = '<div class="empty-state">' +
+                '<div class="empty-state-icon">&#128205;</div>' +
+                '<h3 class="empty-state-title">' + _t('sites.empty.title') + '</h3>' +
+                '<p class="empty-state-text">' + _t('sites.empty.text') + '</p>' +
+                '<button class="btn btn-primary" onclick="document.getElementById(\'btn-add-site\').click()">' + _t('sites.empty.cta') + '</button>' +
+                '</div>';
             return;
         }
 

@@ -196,7 +196,7 @@
                 '<div class="empty-state-icon">&#129689;</div>' +
                 '<h3 class="empty-state-title">' + _t('finds.empty.title') + '</h3>' +
                 '<p class="empty-state-text">' + _t('finds.empty.text') + '</p>' +
-                '<button class="btn btn--primary" onclick="document.getElementById(\'btn-add-find\').click()">' + _t('finds.empty.cta') + '</button>' +
+                '<button class="btn btn-primary" onclick="document.getElementById(\'btn-add-find\').click()">' + _t('finds.empty.cta') + '</button>' +
                 '</div>';
             return;
         }
