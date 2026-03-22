@@ -225,7 +225,7 @@ router.get('/:id/coverage', async (req, res) => {
     }
 
     // Validate cell_size
-    var cellSize = 2;
+    let cellSize = 2;
     if (req.query.cell_size !== undefined) {
       cellSize = parseFloat(req.query.cell_size);
       if (isNaN(cellSize) || cellSize < 1 || cellSize > 10) {
@@ -234,14 +234,14 @@ router.get('/:id/coverage', async (req, res) => {
     }
 
     // Build query — all trackpoints for this site, optionally filtered by session
-    var params = [site.id, req.user.id];
-    var sessionFilter = '';
+    const params = [site.id, req.user.id];
+    let sessionFilter = '';
     if (req.query.session_id) {
       sessionFilter = ' AND hs.id = $3';
       params.push(parseInt(req.query.session_id));
     }
 
-    var sql = `
+    const sql = `
       SELECT tp.lat, tp.lng
       FROM track_points tp
       JOIN track_segments ts ON tp.segment_id = ts.id
@@ -250,14 +250,14 @@ router.get('/:id/coverage', async (req, res) => {
       ORDER BY tp.recorded_at
     `;
 
-    var rows = (await db.query(sql, params)).rows;
-    var points = rows.map(function (r) { return { lat: parseFloat(r.lat), lng: parseFloat(r.lng) }; });
+    const rows = (await db.query(sql, params)).rows;
+    const points = rows.map(function (r) { return { lat: parseFloat(r.lat), lng: parseFloat(r.lng) }; });
 
     // Compute coverage
-    var covGeoJSON = coverage.computeCoverage(points, cellSize);
+    const covGeoJSON = coverage.computeCoverage(points, cellSize);
 
     // Stats
-    var stats = {
+    const stats = {
       total_points: points.length,
       unique_cells: covGeoJSON.features.length,
     };
@@ -270,12 +270,12 @@ router.get('/:id/coverage', async (req, res) => {
     }
 
     // Last hunted date
-    var lastHuntedSql = `
+    const lastHuntedSql = `
       SELECT MAX(ended_at) AS last_hunted
       FROM hunt_sessions
       WHERE site_id = $1 AND user_id = $2 AND status = 'completed'
     `;
-    var lastRow = await db.queryOne(lastHuntedSql, [site.id, req.user.id]);
+    const lastRow = await db.queryOne(lastHuntedSql, [site.id, req.user.id]);
     if (lastRow && lastRow.last_hunted) {
       stats.last_hunted = lastRow.last_hunted;
     }

@@ -57,7 +57,7 @@ function canEditFind(user, find) {
 }
 
 function mapFindRow(r, photos) {
-  var photoList = photos || [];
+  const photoList = photos || [];
   return {
     ...r,
     photo_url: photoList.length > 0
@@ -72,7 +72,7 @@ function mapFindRow(r, photos) {
 }
 
 async function getPhotosForFind(findId) {
-  var result = await db.query(
+  const result = await db.query(
     'SELECT id, photo_path, sort_order, caption, created_at FROM find_photos WHERE find_id = $1 ORDER BY sort_order, id',
     [findId]
   );
@@ -89,13 +89,13 @@ async function getPhotosForFind(findId) {
 
 async function getPhotosForFinds(findIds) {
   if (!findIds.length) return {};
-  var result = await db.query(
+  const result = await db.query(
     'SELECT id, find_id, photo_path, sort_order, caption FROM find_photos WHERE find_id = ANY($1) ORDER BY sort_order, id',
     [findIds]
   );
-  var map = {};
-  for (var i = 0; i < result.rows.length; i++) {
-    var p = result.rows[i];
+  const map = {};
+  for (let i = 0; i < result.rows.length; i++) {
+    const p = result.rows[i];
     if (!map[p.find_id]) map[p.find_id] = [];
     map[p.find_id].push({
       id: p.id,
@@ -250,7 +250,7 @@ router.get('/:id', async (req, res) => {
       return res.status(403).json({ success: false, error: 'Access denied' });
     }
 
-    var photos = await getPhotosForFind(row.id);
+    const photos = await getPhotosForFind(row.id);
     res.json({
       success: true,
       data: mapFindRow(row, photos),
@@ -276,9 +276,9 @@ router.post('/', denyDemoUser, idempotent, upload.array('photos', 10), validate(
     }
 
     // Auto-attach to active hunt session (unless explicitly overridden)
-    var huntSessionId = b.hunt_session_id !== undefined ? b.hunt_session_id : undefined;
+    let huntSessionId = b.hunt_session_id !== undefined ? b.hunt_session_id : undefined;
     if (huntSessionId === undefined) {
-      var activeHunt = await db.queryOne(
+      const activeHunt = await db.queryOne(
         "SELECT id FROM hunt_sessions WHERE user_id = $1 AND status = 'active'",
         [req.user.id]
       );
@@ -321,10 +321,10 @@ router.post('/', denyDemoUser, idempotent, upload.array('photos', 10), validate(
     const newId = result.rows[0].id;
 
     // Upload photos to S3 and insert into find_photos
-    var files = req.files || [];
-    var firstPhotoPath = null;
-    for (var fi = 0; fi < files.length; fi++) {
-      var s3Key = s3.generateKey('finds', files[fi].originalname);
+    const files = req.files || [];
+    let firstPhotoPath = null;
+    for (let fi = 0; fi < files.length; fi++) {
+      const s3Key = s3.generateKey('finds', files[fi].originalname);
       await s3.uploadToS3(files[fi].buffer, s3Key, files[fi].mimetype);
       await db.query(
         'INSERT INTO find_photos (find_id, photo_path, sort_order) VALUES ($1, $2, $3)',
@@ -346,7 +346,7 @@ router.post('/', denyDemoUser, idempotent, upload.array('photos', 10), validate(
       [newId]
     );
 
-    var photos = await getPhotosForFind(newId);
+    const photos = await getPhotosForFind(newId);
 
     db.logAuditEvent({
       userId: req.user.id,
@@ -396,16 +396,16 @@ router.put('/:id', denyDemoUser, idempotent, upload.array('photos', 10), validat
     }
 
     // Append new photos to gallery
-    var files = req.files || [];
+    const files = req.files || [];
     if (files.length > 0) {
-      var maxRow = await db.queryOne(
+      const maxRow = await db.queryOne(
         'SELECT COALESCE(MAX(sort_order), -1) AS max_order FROM find_photos WHERE find_id = $1',
         [req.params.id]
       );
-      var sortOrder = (maxRow.max_order || 0) + 1;
+      let sortOrder = (maxRow.max_order || 0) + 1;
 
-      for (var fi = 0; fi < files.length; fi++) {
-        var s3Key = s3.generateKey('finds', files[fi].originalname);
+      for (let fi = 0; fi < files.length; fi++) {
+        const s3Key = s3.generateKey('finds', files[fi].originalname);
         await s3.uploadToS3(files[fi].buffer, s3Key, files[fi].mimetype);
         await db.query(
           'INSERT INTO find_photos (find_id, photo_path, sort_order) VALUES ($1, $2, $3)',
@@ -415,7 +415,7 @@ router.put('/:id', denyDemoUser, idempotent, upload.array('photos', 10), validat
     }
 
     // Sync finds.photo_path with first photo
-    var firstPhoto = await db.queryOne(
+    const firstPhoto = await db.queryOne(
       'SELECT photo_path FROM find_photos WHERE find_id = $1 ORDER BY sort_order LIMIT 1',
       [req.params.id]
     );
@@ -467,7 +467,7 @@ router.put('/:id', denyDemoUser, idempotent, upload.array('photos', 10), validat
       [req.params.id]
     );
 
-    var updatedPhotos = await getPhotosForFind(Number(req.params.id));
+    const updatedPhotos = await getPhotosForFind(Number(req.params.id));
 
     db.logAuditEvent({
       userId: req.user.id,
@@ -503,8 +503,8 @@ router.delete('/:id', denyDemoUser, async (req, res) => {
     }
 
     // Delete all photos from S3
-    var photoRows = await db.query('SELECT photo_path FROM find_photos WHERE find_id = $1', [req.params.id]);
-    for (var pi = 0; pi < photoRows.rows.length; pi++) {
+    const photoRows = await db.query('SELECT photo_path FROM find_photos WHERE find_id = $1', [req.params.id]);
+    for (let pi = 0; pi < photoRows.rows.length; pi++) {
       await s3.deleteFromS3(photoRows.rows[pi].photo_path);
     }
     // Also delete legacy photo_path if it exists and wasn't in find_photos
@@ -535,11 +535,11 @@ router.delete('/:id', denyDemoUser, async (req, res) => {
 // ---------------------------------------------------------------------------
 router.delete('/:id/photos/:photoId', denyDemoUser, async (req, res) => {
   try {
-    var find = await db.queryOne('SELECT * FROM finds WHERE id = $1', [req.params.id]);
+    const find = await db.queryOne('SELECT * FROM finds WHERE id = $1', [req.params.id]);
     if (!find) return res.status(404).json({ success: false, error: 'Find not found' });
     if (!canEditFind(req.user, find)) return res.status(403).json({ success: false, error: 'Access denied' });
 
-    var photo = await db.queryOne(
+    const photo = await db.queryOne(
       'SELECT * FROM find_photos WHERE id = $1 AND find_id = $2',
       [req.params.photoId, req.params.id]
     );
@@ -549,7 +549,7 @@ router.delete('/:id/photos/:photoId', denyDemoUser, async (req, res) => {
     await db.query('DELETE FROM find_photos WHERE id = $1', [req.params.photoId]);
 
     // Update finds.photo_path to first remaining photo
-    var firstRemaining = await db.queryOne(
+    const firstRemaining = await db.queryOne(
       'SELECT photo_path FROM find_photos WHERE find_id = $1 ORDER BY sort_order LIMIT 1',
       [req.params.id]
     );
@@ -577,28 +577,28 @@ router.delete('/:id/photos/:photoId', denyDemoUser, async (req, res) => {
 // ---------------------------------------------------------------------------
 router.put('/:id/photos/reorder', denyDemoUser, async (req, res) => {
   try {
-    var find = await db.queryOne('SELECT * FROM finds WHERE id = $1', [req.params.id]);
+    const find = await db.queryOne('SELECT * FROM finds WHERE id = $1', [req.params.id]);
     if (!find) return res.status(404).json({ success: false, error: 'Find not found' });
     if (!canEditFind(req.user, find)) return res.status(403).json({ success: false, error: 'Access denied' });
 
-    var photoIds = req.body.photo_ids;
+    const photoIds = req.body.photo_ids;
     if (!Array.isArray(photoIds) || photoIds.length === 0) {
       return res.status(400).json({ success: false, error: 'photo_ids array required' });
     }
 
     // Verify all photo_ids belong to this find
-    var existingPhotos = await db.query(
+    const existingPhotos = await db.query(
       'SELECT id FROM find_photos WHERE find_id = $1',
       [req.params.id]
     );
-    var existingIdSet = new Set(existingPhotos.rows.map(function (r) { return r.id; }));
-    for (var ri = 0; ri < photoIds.length; ri++) {
+    const existingIdSet = new Set(existingPhotos.rows.map(function (r) { return r.id; }));
+    for (let ri = 0; ri < photoIds.length; ri++) {
       if (!existingIdSet.has(photoIds[ri])) {
         return res.status(400).json({ success: false, error: 'Photo ID ' + photoIds[ri] + ' does not belong to this find' });
       }
     }
 
-    for (var oi = 0; oi < photoIds.length; oi++) {
+    for (let oi = 0; oi < photoIds.length; oi++) {
       await db.query(
         'UPDATE find_photos SET sort_order = $1 WHERE id = $2 AND find_id = $3',
         [oi, photoIds[oi], req.params.id]
@@ -606,7 +606,7 @@ router.put('/:id/photos/reorder', denyDemoUser, async (req, res) => {
     }
 
     // Sync finds.photo_path to first in new order
-    var firstReordered = await db.queryOne(
+    const firstReordered = await db.queryOne(
       'SELECT photo_path FROM find_photos WHERE find_id = $1 ORDER BY sort_order LIMIT 1',
       [req.params.id]
     );
@@ -615,7 +615,7 @@ router.put('/:id/photos/reorder', denyDemoUser, async (req, res) => {
         [firstReordered.photo_path, req.params.id]);
     }
 
-    var reorderedPhotos = await getPhotosForFind(Number(req.params.id));
+    const reorderedPhotos = await getPhotosForFind(Number(req.params.id));
     res.json({ success: true, data: reorderedPhotos });
   } catch (err) {
     console.error('PUT /api/finds/:id/photos/reorder error:', err);
