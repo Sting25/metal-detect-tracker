@@ -312,7 +312,8 @@
             closeStartModal();
             enterActiveView(json.data);
         } catch (err) {
-            if (startErrorMsg) startErrorMsg.textContent = err.message;
+            console.error('Error starting hunt:', err);
+            if (startErrorMsg) startErrorMsg.textContent = 'Something went wrong. Please try again.';
         } finally {
             if (btnConfirmStart) btnConfirmStart.disabled = false;
         }

@@ -98,7 +98,7 @@
         } catch (err) {
             console.error('Export failed:', err);
             if (exportMsg) {
-                exportMsg.textContent = err.message || (window.I18n ? I18n.t('settings.exportError') : 'Export failed');
+                exportMsg.textContent = window.I18n ? I18n.t('settings.exportError') : 'Export failed';
                 exportMsg.style.color = 'var(--color-status-red)';
             }
         } finally {
@@ -146,7 +146,7 @@
         } catch (err) {
             console.error('Import failed:', err);
             if (importMsg) {
-                importMsg.textContent = err.message || (window.I18n ? I18n.t('settings.importError') : 'Import failed');
+                importMsg.textContent = window.I18n ? I18n.t('settings.importError') : 'Import failed';
                 importMsg.style.color = 'var(--color-status-red)';
             }
         } finally {
@@ -185,7 +185,7 @@
         } catch (err) {
             console.error('Template download failed:', err);
             if (importMsg) {
-                importMsg.textContent = err.message;
+                importMsg.textContent = 'Download failed. Please try again.';
                 importMsg.style.color = 'var(--color-status-red)';
                 setTimeout(function () { importMsg.textContent = ''; }, 5000);
             }

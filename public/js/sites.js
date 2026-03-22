@@ -910,7 +910,7 @@
             await loadSites();
         } catch (err) {
             console.error('Error saving site:', err);
-            Auth.showToast(_t('sites.errorSaving') + ' ' + err.message);
+            Auth.showToast(_t('sites.errorSaving'));
         } finally {
             els.btnSave.disabled = false;
             els.btnSave.textContent = _t('sites.modal.save');
@@ -932,7 +932,7 @@
             await loadSites();
         } catch (err) {
             console.error('Error deleting site:', err);
-            Auth.showToast(_t('sites.errorDeleting') + ' ' + err.message);
+            Auth.showToast(_t('sites.errorDeleting'));
         }
     }
 
@@ -1024,7 +1024,8 @@
             preview.style.display = 'block';
             btnSubmit.disabled = bulkParsedSites.length === 0;
         } catch (err) {
-            Auth.showToast('Parse error: ' + err.message);
+            console.error('Bulk import parse error:', err);
+            Auth.showToast('Failed to parse file. Please check the format and try again.');
             preview.style.display = 'none';
             btnSubmit.disabled = true;
         }
@@ -1145,7 +1146,8 @@
                 emailInput.value = '';
                 loadShareList(site.id);
             } catch (err) {
-                Auth.showToast(_t('sites.share.errorSharing') + ' ' + err.message);
+                console.error('Error sharing site:', err);
+                Auth.showToast(_t('sites.share.errorSharing'));
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = _t('sites.share.btn');
@@ -1192,7 +1194,8 @@
                         if (!resp.ok) throw new Error('Failed to remove share');
                         loadShareList(siteId);
                     } catch (err) {
-                        Auth.showToast(_t('sites.share.errorRemoving') + ' ' + err.message);
+                        console.error('Error removing share:', err);
+                        Auth.showToast(_t('sites.share.errorRemoving'));
                     }
                 });
             });

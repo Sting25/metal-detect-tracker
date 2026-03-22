@@ -46,7 +46,7 @@
         } catch (err) {
             console.error('Error loading site report:', err);
             document.getElementById('report-content').innerHTML =
-                '<p class="error-text">Failed to load site data: ' + escapeHtml(err.message) + '</p>';
+                '<p class="error-text">Failed to load site data. Please try again.</p>';
         }
     }
 

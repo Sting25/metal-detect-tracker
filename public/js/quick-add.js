@@ -210,7 +210,7 @@ window.QuickAddSite = (function () {
 
         } catch (err) {
             console.error('Quick add error:', err);
-            Auth.showToast(_t('quickAdd.errorSaving') + ' ' + err.message);
+            Auth.showToast(_t('quickAdd.errorSaving'));
         } finally {
             els.submitBtn.disabled = false;
             els.submitBtn.textContent = _t('quickAdd.save');
