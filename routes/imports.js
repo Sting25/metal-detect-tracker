@@ -231,7 +231,11 @@ router.post('/', denyDemoUser, upload.single('file'), async function (req, res) 
         res.json({ success: true, data: result });
     } catch (err) {
         console.error('Import error:', err);
-        res.status(400).json({ success: false, error: err.message });
+        var knownMessages = ['Invalid ZIP file', 'ZIP is missing manifest.json'];
+        var isKnown = knownMessages.some(function (m) { return err.message && err.message.includes(m); })
+            || (err.message && err.message.startsWith('Unsupported manifest version'));
+        var userError = isKnown ? err.message : 'Failed to import data';
+        res.status(400).json({ success: false, error: userError });
     }
 });
 

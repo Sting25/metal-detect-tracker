@@ -46,20 +46,21 @@ router.get('/stats', async (req, res) => {
 // -------------------------------------------------------------------------
 router.get('/users', async (req, res) => {
     try {
-        const users = (await db.query(
-            'SELECT id, email, display_name, role, is_disabled, created_at FROM users ORDER BY created_at DESC'
+        const usersWithStats = (await db.query(
+            `SELECT u.id, u.email, u.display_name, u.role, u.is_disabled, u.created_at,
+                    COUNT(DISTINCT s.id)::int AS sites_count,
+                    COUNT(DISTINCT f.id)::int AS finds_count
+             FROM users u
+             LEFT JOIN sites s ON s.user_id = u.id
+             LEFT JOIN finds f ON f.user_id = u.id
+             GROUP BY u.id, u.email, u.display_name, u.role, u.is_disabled, u.created_at
+             ORDER BY u.created_at DESC`
         )).rows;
-
-        const usersWithStats = [];
-        for (const u of users) {
-            const sitesCount = (await db.queryOne('SELECT COUNT(*)::int AS cnt FROM sites WHERE user_id = $1', [u.id])).cnt;
-            const findsCount = (await db.queryOne('SELECT COUNT(*)::int AS cnt FROM finds WHERE user_id = $1', [u.id])).cnt;
-            usersWithStats.push({ ...u, sites_count: sitesCount, finds_count: findsCount });
-        }
 
         res.json({ success: true, data: usersWithStats });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Failed to list users:', err);
+        res.status(500).json({ success: false, error: 'Failed to load users' });
     }
 });
 

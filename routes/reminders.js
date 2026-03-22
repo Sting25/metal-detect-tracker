@@ -37,7 +37,8 @@ router.get('/', async (req, res) => {
     var result = await db.query(sql, params);
     res.json({ success: true, data: result.rows, count: result.rows.length });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('Failed to list reminders:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to load reminders' });
   }
 });
 
@@ -80,7 +81,8 @@ router.post('/', denyDemoUser, validate(schemas.createReminder), async (req, res
 
     res.status(201).json({ success: true, data: reminder });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('Failed to create reminder:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to create reminder' });
   }
 });
 
@@ -133,7 +135,8 @@ router.put('/:id', denyDemoUser, validate(schemas.updateReminder), async (req, r
 
     res.json({ success: true, data: updated });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('Failed to update reminder:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to update reminder' });
   }
 });
 
@@ -174,7 +177,8 @@ router.patch('/:id/complete', denyDemoUser, validate(schemas.completeReminder), 
 
     res.json({ success: true, data: updated });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('Failed to complete reminder:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to update reminder' });
   }
 });
 
@@ -204,7 +208,8 @@ router.delete('/:id', denyDemoUser, async (req, res) => {
 
     res.json({ success: true, data: { id: Number(req.params.id) } });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('Failed to delete reminder:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to delete reminder' });
   }
 });
 

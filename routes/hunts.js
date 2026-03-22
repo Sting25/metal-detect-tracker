@@ -125,7 +125,8 @@ router.get('/', async function (req, res) {
             },
         });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Failed to list hunt sessions:', err.message);
+        res.status(500).json({ success: false, error: 'Failed to load hunt sessions' });
     }
 });
 
@@ -163,7 +164,8 @@ router.get('/:id', async function (req, res) {
 
         res.json({ success: true, data: session });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Failed to get hunt session:', err.message);
+        res.status(500).json({ success: false, error: 'Failed to load hunt session' });
     }
 });
 
@@ -227,7 +229,8 @@ router.post('/', denyDemoUser, idempotent, validate(schemas.startHunt), async fu
 
         res.status(201).json({ success: true, data: session });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Failed to start hunt session:', err.message);
+        res.status(500).json({ success: false, error: 'Failed to start hunt session' });
     }
 });
 
@@ -281,7 +284,8 @@ router.post('/:id/pause', denyDemoUser, async function (req, res) {
 
         res.json({ success: true, data: updated });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Failed to pause hunt session:', err.message);
+        res.status(500).json({ success: false, error: 'Failed to pause hunt session' });
     }
 });
 
@@ -336,7 +340,8 @@ router.post('/:id/resume', denyDemoUser, async function (req, res) {
 
         res.json({ success: true, data: updated });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Failed to resume hunt session:', err.message);
+        res.status(500).json({ success: false, error: 'Failed to resume hunt session' });
     }
 });
 
@@ -409,7 +414,8 @@ router.post('/:id/end', denyDemoUser, async function (req, res) {
 
         res.json({ success: true, data: updated });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Failed to end hunt session:', err.message);
+        res.status(500).json({ success: false, error: 'Failed to end hunt session' });
     }
 });
 
@@ -477,7 +483,8 @@ router.put('/:id', denyDemoUser, idempotent, validate(schemas.updateHunt), async
 
         res.json({ success: true, data: updated });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Failed to update hunt session:', err.message);
+        res.status(500).json({ success: false, error: 'Failed to update hunt session' });
     }
 });
 
@@ -513,7 +520,8 @@ router.delete('/:id', denyDemoUser, async function (req, res) {
 
         res.json({ success: true, message: 'Hunt session deleted' });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Failed to delete hunt session:', err.message);
+        res.status(500).json({ success: false, error: 'Failed to delete hunt session' });
     }
 });
 
@@ -587,7 +595,8 @@ router.post('/:id/trackpoints', denyDemoUser, function (req, res, next) {
 
         res.json({ success: true, points_added: points.length });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Failed to upload trackpoints:', err.message);
+        res.status(500).json({ success: false, error: 'Failed to upload trackpoints' });
     }
 });
 
@@ -650,7 +659,8 @@ router.get('/:id/trackpoints', async function (req, res) {
 
         res.json({ success: true, data: { segments: result, total_points: totalCount } });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Failed to get trackpoints:', err.message);
+        res.status(500).json({ success: false, error: 'Failed to load trackpoints' });
     }
 });
 

@@ -136,7 +136,8 @@ router.get('/', async (req, res) => {
 
     res.json({ success: true, data, count: data.length });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('Failed to load permissions:', err);
+    res.status(500).json({ success: false, error: 'Failed to load permissions' });
   }
 });
 
@@ -166,7 +167,8 @@ router.get('/:id', async (req, res) => {
       data: mapPermRow(row),
     });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('Failed to load permission:', err);
+    res.status(500).json({ success: false, error: 'Failed to load permission' });
   }
 });
 
@@ -195,7 +197,8 @@ router.get('/:id/document', async (req, res) => {
     const url = await s3.getPresignedUrl(row.document_path);
     res.redirect(url);
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('Failed to load permission document:', err);
+    res.status(500).json({ success: false, error: 'Failed to load permission document' });
   }
 });
 
@@ -283,7 +286,8 @@ router.post('/', denyDemoUser, idempotent, upload.single('document'), validate(s
       data: mapPermRow(newPerm),
     });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('Failed to create permission:', err);
+    res.status(500).json({ success: false, error: 'Failed to create permission' });
   }
 });
 
@@ -388,7 +392,8 @@ router.put('/:id', denyDemoUser, idempotent, upload.single('document'), validate
       data: mapPermRow(updated),
     });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('Failed to update permission:', err);
+    res.status(500).json({ success: false, error: 'Failed to update permission' });
   }
 });
 
@@ -426,7 +431,8 @@ router.delete('/:id', denyDemoUser, async (req, res) => {
 
     res.json({ success: true, data: { id: Number(req.params.id) } });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('Failed to delete permission:', err);
+    res.status(500).json({ success: false, error: 'Failed to delete permission' });
   }
 });
 
@@ -454,7 +460,8 @@ router.get('/:id/contacts', async (req, res) => {
 
     res.json({ success: true, data: result.rows, count: result.rows.length });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('Failed to load contacts:', err);
+    res.status(500).json({ success: false, error: 'Failed to load contacts' });
   }
 });
 
@@ -502,7 +509,8 @@ router.post('/:id/contacts', denyDemoUser, validate(schemas.createContact), asyn
 
     res.status(201).json({ success: true, data: contact });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('Failed to create contact:', err);
+    res.status(500).json({ success: false, error: 'Failed to create contact' });
   }
 });
 
@@ -561,7 +569,8 @@ router.put('/:id/contacts/:cid', denyDemoUser, validate(schemas.updateContact), 
 
     res.json({ success: true, data: updated });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('Failed to update contact:', err);
+    res.status(500).json({ success: false, error: 'Failed to update contact' });
   }
 });
 
@@ -599,7 +608,8 @@ router.delete('/:id/contacts/:cid', denyDemoUser, async (req, res) => {
 
     res.json({ success: true, data: { id: Number(req.params.cid) } });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('Failed to delete contact:', err);
+    res.status(500).json({ success: false, error: 'Failed to delete contact' });
   }
 });
 
@@ -675,7 +685,8 @@ router.post('/:id/letter', denyDemoUser, async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('Failed to generate letter:', err);
+    res.status(500).json({ success: false, error: 'Failed to generate letter' });
   }
 });
 
@@ -714,7 +725,8 @@ router.get('/:id/letters', async (req, res) => {
 
     res.json({ success: true, data: letters, count: letters.length });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('Failed to load letters:', err);
+    res.status(500).json({ success: false, error: 'Failed to load letters' });
   }
 });
 
@@ -780,7 +792,8 @@ router.post('/:id/link', denyDemoUser, validate(schemas.createPermissionLink), a
       },
     });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('Failed to create permission link:', err);
+    res.status(500).json({ success: false, error: 'Failed to create permission link' });
   }
 });
 
@@ -804,7 +817,8 @@ router.get('/:id/links', async (req, res) => {
 
     res.json({ success: true, data: result.rows, count: result.rows.length });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('Failed to load permission links:', err);
+    res.status(500).json({ success: false, error: 'Failed to load permission links' });
   }
 });
 
@@ -845,7 +859,8 @@ router.delete('/:id/links/:lid', denyDemoUser, async (req, res) => {
 
     res.json({ success: true, data: { id: Number(req.params.lid), status: 'revoked' } });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('Failed to revoke permission link:', err);
+    res.status(500).json({ success: false, error: 'Failed to revoke permission link' });
   }
 });
 

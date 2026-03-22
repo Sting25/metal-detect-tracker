@@ -111,7 +111,8 @@ router.get('/', async (req, res) => {
 
     res.json({ success: true, data, count: data.length });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('GET /api/sites error:', err);
+    res.status(500).json({ success: false, error: 'Failed to load sites' });
   }
 });
 
@@ -148,7 +149,8 @@ router.get('/stats', async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('GET /api/sites/stats error:', err);
+    res.status(500).json({ success: false, error: 'Failed to load site stats' });
   }
 });
 
@@ -168,7 +170,8 @@ router.get('/map', async (req, res) => {
 
     res.json({ success: true, data: rows, count: rows.length });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('GET /api/sites/map error:', err);
+    res.status(500).json({ success: false, error: 'Failed to load map data' });
   }
 });
 
@@ -201,7 +204,8 @@ router.get('/:id', async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('GET /api/sites/:id error:', err);
+    res.status(500).json({ success: false, error: 'Failed to load site' });
   }
 });
 
@@ -284,7 +288,8 @@ router.get('/:id/coverage', async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('GET /api/sites/:id/coverage error:', err);
+    res.status(500).json({ success: false, error: 'Failed to load coverage data' });
   }
 });
 
@@ -351,7 +356,8 @@ router.post('/', denyDemoUser, idempotent, upload.single('image'), validate(sche
       data: mapSiteRow(newSite),
     });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('POST /api/sites error:', err);
+    res.status(500).json({ success: false, error: 'Failed to create site' });
   }
 });
 
@@ -439,7 +445,8 @@ router.put('/:id', denyDemoUser, idempotent, upload.single('image'), validate(sc
       data: mapSiteRow(updated),
     });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('PUT /api/sites/:id error:', err);
+    res.status(500).json({ success: false, error: 'Failed to update site' });
   }
 });
 
@@ -476,7 +483,8 @@ router.delete('/:id', denyDemoUser, async (req, res) => {
 
     res.json({ success: true, data: { id: Number(req.params.id) } });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('DELETE /api/sites/:id error:', err);
+    res.status(500).json({ success: false, error: 'Failed to delete site' });
   }
 });
 
@@ -549,7 +557,8 @@ router.post('/:id/share', denyDemoUser, async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('POST /api/sites/:id/share error:', err);
+    res.status(500).json({ success: false, error: 'Failed to share site' });
   }
 });
 
@@ -578,7 +587,8 @@ router.get('/:id/shares', async (req, res) => {
 
     res.json({ success: true, data: shares, count: shares.length });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('GET /api/sites/:id/shares error:', err);
+    res.status(500).json({ success: false, error: 'Failed to load site shares' });
   }
 });
 
@@ -617,7 +627,8 @@ router.delete('/:id/share/:userId', denyDemoUser, async (req, res) => {
 
     res.json({ success: true, data: { site_id: site.id, removed_user_id: Number(req.params.userId) } });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('DELETE /api/sites/:id/share/:userId error:', err);
+    res.status(500).json({ success: false, error: 'Failed to remove site share' });
   }
 });
 

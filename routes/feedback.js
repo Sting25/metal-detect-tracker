@@ -87,7 +87,7 @@ router.post('/', denyDemoUser, upload.single('screenshot'), validate(schemas.cre
         });
     } catch (err) {
         console.error('Failed to submit feedback:', err.message);
-        res.status(500).json({ success: false, error: err.message });
+        res.status(500).json({ success: false, error: 'Failed to submit feedback' });
     }
 });
 
@@ -123,7 +123,7 @@ router.get('/', requireAdmin, async (req, res) => {
         res.json({ success: true, data, count: data.length });
     } catch (err) {
         console.error('Failed to list feedback:', err.message);
-        res.status(500).json({ success: false, error: err.message });
+        res.status(500).json({ success: false, error: 'Failed to load feedback' });
     }
 });
 
@@ -156,7 +156,7 @@ router.get('/stats', requireAdmin, async (req, res) => {
         });
     } catch (err) {
         console.error('Failed to get feedback stats:', err.message);
-        res.status(500).json({ success: false, error: err.message });
+        res.status(500).json({ success: false, error: 'Failed to load feedback stats' });
     }
 });
 
@@ -202,7 +202,7 @@ router.put('/:id', requireAdmin, validate(schemas.updateFeedback), async (req, r
         });
     } catch (err) {
         console.error('Failed to update feedback:', err.message);
-        res.status(500).json({ success: false, error: err.message });
+        res.status(500).json({ success: false, error: 'Failed to update feedback' });
     }
 });
 
@@ -225,7 +225,7 @@ router.delete('/:id', requireAdmin, async (req, res) => {
         res.json({ success: true, data: { id: Number(req.params.id) } });
     } catch (err) {
         console.error('Failed to delete feedback:', err.message);
-        res.status(500).json({ success: false, error: err.message });
+        res.status(500).json({ success: false, error: 'Failed to delete feedback' });
     }
 });
 

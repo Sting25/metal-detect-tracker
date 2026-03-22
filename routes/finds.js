@@ -158,7 +158,8 @@ router.get('/', async (req, res) => {
 
     res.json({ success: true, data, count: data.length });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('GET /api/finds error:', err);
+    res.status(500).json({ success: false, error: 'Failed to load finds' });
   }
 });
 
@@ -174,7 +175,8 @@ router.get('/tags', async (req, res) => {
     const tags = result.rows.map(r => r.tag.trim()).filter(Boolean).sort();
     res.json({ success: true, data: tags });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('GET /api/finds/tags error:', err);
+    res.status(500).json({ success: false, error: 'Failed to load tags' });
   }
 });
 
@@ -222,7 +224,8 @@ router.get('/stats', async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('GET /api/finds/stats error:', err);
+    res.status(500).json({ success: false, error: 'Failed to load find stats' });
   }
 });
 
@@ -253,7 +256,8 @@ router.get('/:id', async (req, res) => {
       data: mapFindRow(row, photos),
     });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('GET /api/finds/:id error:', err);
+    res.status(500).json({ success: false, error: 'Failed to load find' });
   }
 });
 
@@ -358,7 +362,8 @@ router.post('/', denyDemoUser, idempotent, upload.array('photos', 10), validate(
       data: mapFindRow(newFind, photos),
     });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('POST /api/finds error:', err);
+    res.status(500).json({ success: false, error: 'Failed to create find' });
   }
 });
 
@@ -478,7 +483,8 @@ router.put('/:id', denyDemoUser, idempotent, upload.array('photos', 10), validat
       data: mapFindRow(updated, updatedPhotos),
     });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('PUT /api/finds/:id error:', err);
+    res.status(500).json({ success: false, error: 'Failed to update find' });
   }
 });
 
@@ -519,7 +525,8 @@ router.delete('/:id', denyDemoUser, async (req, res) => {
 
     res.json({ success: true, data: { id: Number(req.params.id) } });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('DELETE /api/finds/:id error:', err);
+    res.status(500).json({ success: false, error: 'Failed to delete find' });
   }
 });
 
@@ -560,7 +567,8 @@ router.delete('/:id/photos/:photoId', denyDemoUser, async (req, res) => {
 
     res.json({ success: true, data: { id: Number(req.params.photoId) } });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('DELETE /api/finds/:id/photos/:photoId error:', err);
+    res.status(500).json({ success: false, error: 'Failed to delete photo' });
   }
 });
 
@@ -610,7 +618,8 @@ router.put('/:id/photos/reorder', denyDemoUser, async (req, res) => {
     var reorderedPhotos = await getPhotosForFind(Number(req.params.id));
     res.json({ success: true, data: reorderedPhotos });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('PUT /api/finds/:id/photos/reorder error:', err);
+    res.status(500).json({ success: false, error: 'Failed to reorder photos' });
   }
 });
 
