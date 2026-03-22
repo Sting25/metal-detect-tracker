@@ -9,6 +9,18 @@
 
     let pendingGoogleToken = null;
 
+    // Wait for the Google GSI library to load (async defer script)
+    function waitForGoogle(maxWait) {
+        return new Promise(function (resolve) {
+            if (typeof google !== 'undefined' && google.accounts) { resolve(true); return; }
+            const start = Date.now();
+            const iv = setInterval(function () {
+                if (typeof google !== 'undefined' && google.accounts) { clearInterval(iv); resolve(true); }
+                else if (Date.now() - start > maxWait) { clearInterval(iv); resolve(false); }
+            }, 100);
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', async function () {
         const LP = window.LoginPage;
         if (!LP) return;
@@ -18,8 +30,11 @@
             const configRes = await fetch('/api/auth/config');
             const configJson = await configRes.json();
             if (configJson.success && configJson.data) {
-                if (configJson.data.google_client_id && typeof google !== 'undefined' && google.accounts) {
-                    initGoogleSignIn(configJson.data.google_client_id, LP);
+                if (configJson.data.google_client_id) {
+                    const googleReady = await waitForGoogle(5000);
+                    if (googleReady) {
+                        initGoogleSignIn(configJson.data.google_client_id, LP);
+                    }
                 }
                 if (configJson.data.webauthn_enabled && window.PublicKeyCredential) {
                     const passkeyBtn = document.getElementById('btn-passkey-login');
