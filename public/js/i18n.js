@@ -10,10 +10,10 @@
 window.I18n = (function () {
     'use strict';
 
-    var _strings = {};
-    var _lang = 'en';
-    var _ready = false;
-    var _callbacks = [];
+    let _strings = {};
+    let _lang = 'en';
+    let _ready = false;
+    let _callbacks = [];
 
     /**
      * Initialize with a language code. Fetches the locale JSON file.
@@ -48,7 +48,7 @@ window.I18n = (function () {
      * Returns the key itself if no translation found.
      */
     function t(key, params) {
-        var str = _strings[key];
+        let str = _strings[key];
         if (str === undefined) return key;
         if (params) {
             Object.keys(params).forEach(function (k) {
@@ -62,9 +62,9 @@ window.I18n = (function () {
      * Pluralized lookup. Uses key.one for count===1, key.other otherwise.
      */
     function tPlural(key, count, params) {
-        var pluralKey = count === 1 ? key + '.one' : key + '.other';
-        var merged = {};
-        if (params) { for (var k in params) { merged[k] = params[k]; } }
+        const pluralKey = count === 1 ? key + '.one' : key + '.other';
+        const merged = {};
+        if (params) { for (const k in params) { merged[k] = params[k]; } }
         merged.count = count;
         return t(pluralKey, merged);
     }
@@ -75,28 +75,28 @@ window.I18n = (function () {
      *           data-i18n-html (innerHTML for trusted content)
      */
     function translatePage() {
-        var els = document.querySelectorAll('[data-i18n]');
-        for (var i = 0; i < els.length; i++) {
-            var key = els[i].getAttribute('data-i18n');
-            var val = _strings[key];
+        const els = document.querySelectorAll('[data-i18n]');
+        for (let i = 0; i < els.length; i++) {
+            const key = els[i].getAttribute('data-i18n');
+            const val = _strings[key];
             if (val !== undefined) els[i].textContent = val;
         }
-        var placeholders = document.querySelectorAll('[data-i18n-placeholder]');
-        for (var j = 0; j < placeholders.length; j++) {
-            var pkey = placeholders[j].getAttribute('data-i18n-placeholder');
-            var pval = _strings[pkey];
+        const placeholders = document.querySelectorAll('[data-i18n-placeholder]');
+        for (let j = 0; j < placeholders.length; j++) {
+            const pkey = placeholders[j].getAttribute('data-i18n-placeholder');
+            const pval = _strings[pkey];
             if (pval !== undefined) placeholders[j].placeholder = pval;
         }
-        var titles = document.querySelectorAll('[data-i18n-title]');
-        for (var k = 0; k < titles.length; k++) {
-            var tkey = titles[k].getAttribute('data-i18n-title');
-            var tval = _strings[tkey];
+        const titles = document.querySelectorAll('[data-i18n-title]');
+        for (let k = 0; k < titles.length; k++) {
+            const tkey = titles[k].getAttribute('data-i18n-title');
+            const tval = _strings[tkey];
             if (tval !== undefined) titles[k].title = tval;
         }
-        var htmlEls = document.querySelectorAll('[data-i18n-html]');
-        for (var l = 0; l < htmlEls.length; l++) {
-            var hkey = htmlEls[l].getAttribute('data-i18n-html');
-            var hval = _strings[hkey];
+        const htmlEls = document.querySelectorAll('[data-i18n-html]');
+        for (let l = 0; l < htmlEls.length; l++) {
+            const hkey = htmlEls[l].getAttribute('data-i18n-html');
+            const hval = _strings[hkey];
             if (hval !== undefined) htmlEls[l].innerHTML = hval;
         }
     }
@@ -117,12 +117,12 @@ window.I18n = (function () {
      * Detects language from localStorage or navigator.language.
      */
     function autoInit() {
-        var saved = null;
+        let saved = null;
         try { saved = localStorage.getItem('mdt_lang'); } catch (e) { /* ignore */ }
         if (saved && ['en', 'es', 'fr'].indexOf(saved) !== -1) {
             return init(saved);
         }
-        var navLang = (navigator.language || 'en').split('-')[0].toLowerCase();
+        const navLang = (navigator.language || 'en').split('-')[0].toLowerCase();
         if (['en', 'es', 'fr'].indexOf(navLang) !== -1) {
             return init(navLang);
         }
@@ -132,7 +132,7 @@ window.I18n = (function () {
     // ------------------------------------------------------------------
     // Public language selector dropdown (for unauthenticated pages)
     // ------------------------------------------------------------------
-    var SUPPORTED_LANGS = [
+    const SUPPORTED_LANGS = [
         { code: 'en', label: 'EN', name: 'English' },
         { code: 'es', label: 'ES', name: 'Español' },
         { code: 'fr', label: 'FR', name: 'Français' }
@@ -144,35 +144,35 @@ window.I18n = (function () {
      * Saves selection to localStorage and reloads the page.
      */
     function injectLanguageSelector(containerSelector) {
-        var container = document.querySelector(containerSelector);
+        const container = document.querySelector(containerSelector);
         if (!container) return;
 
-        var currentLang = _lang || 'en';
-        var currentLabel = 'EN';
+        const currentLang = _lang || 'en';
+        let currentLabel = 'EN';
         SUPPORTED_LANGS.forEach(function (l) {
             if (l.code === currentLang) currentLabel = l.label;
         });
 
-        var wrapper = document.createElement('div');
+        const wrapper = document.createElement('div');
         wrapper.className = 'nav-dropdown';
 
-        var toggle = document.createElement('button');
+        const toggle = document.createElement('button');
         toggle.type = 'button';
         toggle.className = 'nav-dropdown-toggle';
         toggle.innerHTML = '&#127760; ' + currentLabel + ' <span class="nav-dropdown-chevron">&#9662;</span>';
         toggle.setAttribute('aria-expanded', 'false');
         toggle.setAttribute('aria-haspopup', 'true');
 
-        var menu = document.createElement('div');
+        const menu = document.createElement('div');
         menu.className = 'nav-dropdown-menu';
         menu.setAttribute('role', 'menu');
 
         SUPPORTED_LANGS.forEach(function (lang) {
-            var item = document.createElement('button');
+            const item = document.createElement('button');
             item.type = 'button';
             item.className = 'nav-dropdown-item' + (lang.code === currentLang ? ' active' : '');
             item.setAttribute('role', 'menuitem');
-            var checkMark = lang.code === currentLang ? '&#10003;' : '&nbsp;';
+            const checkMark = lang.code === currentLang ? '&#10003;' : '&nbsp;';
             item.innerHTML = '<span class="nav-dropdown-item-check">' + checkMark + '</span> ' +
                              lang.name;
             item.addEventListener('click', function () {
@@ -188,7 +188,7 @@ window.I18n = (function () {
 
         toggle.addEventListener('click', function (e) {
             e.stopPropagation();
-            var isOpen = wrapper.classList.toggle('open');
+            const isOpen = wrapper.classList.toggle('open');
             toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         });
 

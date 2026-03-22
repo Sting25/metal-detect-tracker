@@ -7,9 +7,9 @@
 window.OfflineStore = (function () {
     'use strict';
 
-    var DB_NAME = 'metal-detect-tracker-offline';
-    var DB_VERSION = 1;
-    var db = null;
+    const DB_NAME = 'metal-detect-tracker-offline';
+    const DB_VERSION = 1;
+    let db = null;
 
     /* ------------------------------------------------------------------ */
     /*  Init / Open Database                                               */
@@ -19,10 +19,10 @@ window.OfflineStore = (function () {
             if (db) return resolve(db);
             if (!window.indexedDB) return reject(new Error('IndexedDB not supported'));
 
-            var request = indexedDB.open(DB_NAME, DB_VERSION);
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
 
             request.onupgradeneeded = function (e) {
-                var idb = e.target.result;
+                const idb = e.target.result;
 
                 // cached_data — key-value cache for GET responses
                 if (!idb.objectStoreNames.contains('cached_data')) {
@@ -31,20 +31,20 @@ window.OfflineStore = (function () {
 
                 // mutation_queue — POST/PUT/DELETE queued while offline
                 if (!idb.objectStoreNames.contains('mutation_queue')) {
-                    var mutStore = idb.createObjectStore('mutation_queue', { keyPath: 'id', autoIncrement: true });
+                    const mutStore = idb.createObjectStore('mutation_queue', { keyPath: 'id', autoIncrement: true });
                     mutStore.createIndex('status', 'status', { unique: false });
                     mutStore.createIndex('created_at', 'created_at', { unique: false });
                 }
 
                 // offline_photos — camera photos stored as blobs until S3 upload
                 if (!idb.objectStoreNames.contains('offline_photos')) {
-                    var photoStore = idb.createObjectStore('offline_photos', { keyPath: 'id' });
+                    const photoStore = idb.createObjectStore('offline_photos', { keyPath: 'id' });
                     photoStore.createIndex('mutation_queue_id', 'mutation_queue_id', { unique: false });
                 }
 
                 // offline_trackpoints — GPS trackpoint batches
                 if (!idb.objectStoreNames.contains('offline_trackpoints')) {
-                    var tpStore = idb.createObjectStore('offline_trackpoints', { keyPath: 'id', autoIncrement: true });
+                    const tpStore = idb.createObjectStore('offline_trackpoints', { keyPath: 'id', autoIncrement: true });
                     tpStore.createIndex('status', 'status', { unique: false });
                     tpStore.createIndex('created_at', 'created_at', { unique: false });
                 }
@@ -65,7 +65,7 @@ window.OfflineStore = (function () {
     /*  Helpers                                                            */
     /* ------------------------------------------------------------------ */
     function getStore(name, mode) {
-        var tx = db.transaction(name, mode || 'readonly');
+        const tx = db.transaction(name, mode || 'readonly');
         return tx.objectStore(name);
     }
 
@@ -85,7 +85,7 @@ window.OfflineStore = (function () {
     /* ------------------------------------------------------------------ */
     function cacheResponse(key, data) {
         if (!db) return Promise.resolve();
-        var store = getStore('cached_data', 'readwrite');
+        const store = getStore('cached_data', 'readwrite');
         return promisifyRequest(store.put({
             key: key,
             data: data,
@@ -95,13 +95,13 @@ window.OfflineStore = (function () {
 
     function getCached(key) {
         if (!db) return Promise.resolve(null);
-        var store = getStore('cached_data');
+        const store = getStore('cached_data');
         return promisifyRequest(store.get(key));
     }
 
     function clearCache() {
         if (!db) return Promise.resolve();
-        var store = getStore('cached_data', 'readwrite');
+        const store = getStore('cached_data', 'readwrite');
         return promisifyRequest(store.clear());
     }
 
@@ -110,8 +110,8 @@ window.OfflineStore = (function () {
     /* ------------------------------------------------------------------ */
     function queueMutation(method, url, body) {
         if (!db) return Promise.reject(new Error('OfflineStore not initialized'));
-        var idempotencyKey = generateId();
-        var store = getStore('mutation_queue', 'readwrite');
+        const idempotencyKey = generateId();
+        const store = getStore('mutation_queue', 'readwrite');
         return promisifyRequest(store.add({
             method: method,
             url: url,
@@ -127,14 +127,14 @@ window.OfflineStore = (function () {
     function getPendingMutations() {
         if (!db) return Promise.resolve([]);
         return new Promise(function (resolve, reject) {
-            var store = getStore('mutation_queue');
-            var index = store.index('created_at');
-            var results = [];
-            var request = index.openCursor();
+            const store = getStore('mutation_queue');
+            const index = store.index('created_at');
+            const results = [];
+            const request = index.openCursor();
             request.onsuccess = function (e) {
-                var cursor = e.target.result;
+                const cursor = e.target.result;
                 if (cursor) {
-                    var val = cursor.value;
+                    const val = cursor.value;
                     if (val.status === 'pending' || val.status === 'failed') {
                         results.push(val);
                     }
@@ -150,13 +150,13 @@ window.OfflineStore = (function () {
     function getMutationCount() {
         if (!db) return Promise.resolve(0);
         return new Promise(function (resolve, reject) {
-            var store = getStore('mutation_queue');
-            var count = 0;
-            var request = store.openCursor();
+            const store = getStore('mutation_queue');
+            let count = 0;
+            const request = store.openCursor();
             request.onsuccess = function (e) {
-                var cursor = e.target.result;
+                const cursor = e.target.result;
                 if (cursor) {
-                    var s = cursor.value.status;
+                    const s = cursor.value.status;
                     if (s === 'pending' || s === 'failed') count++;
                     cursor.continue();
                 } else {
@@ -170,10 +170,10 @@ window.OfflineStore = (function () {
     function updateMutationStatus(id, status, error) {
         if (!db) return Promise.resolve();
         return new Promise(function (resolve, reject) {
-            var store = getStore('mutation_queue', 'readwrite');
-            var request = store.get(id);
+            const store = getStore('mutation_queue', 'readwrite');
+            const request = store.get(id);
             request.onsuccess = function () {
-                var record = request.result;
+                const record = request.result;
                 if (!record) return resolve();
                 record.status = status;
                 if (error !== undefined) record.error = error;
@@ -188,7 +188,7 @@ window.OfflineStore = (function () {
 
     function deleteMutation(id) {
         if (!db) return Promise.resolve();
-        var store = getStore('mutation_queue', 'readwrite');
+        const store = getStore('mutation_queue', 'readwrite');
         return promisifyRequest(store.delete(id));
     }
 
@@ -197,8 +197,8 @@ window.OfflineStore = (function () {
     /* ------------------------------------------------------------------ */
     function storePhoto(blob, filename, mimeType, entityType, mutationId) {
         if (!db) return Promise.reject(new Error('OfflineStore not initialized'));
-        var id = 'offline_photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
-        var store = getStore('offline_photos', 'readwrite');
+        const id = 'offline_photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+        const store = getStore('offline_photos', 'readwrite');
         return promisifyRequest(store.put({
             id: id,
             blob: blob,
@@ -212,25 +212,25 @@ window.OfflineStore = (function () {
 
     function getPhoto(tempId) {
         if (!db) return Promise.resolve(null);
-        var store = getStore('offline_photos');
+        const store = getStore('offline_photos');
         return promisifyRequest(store.get(tempId));
     }
 
     function deletePhoto(tempId) {
         if (!db) return Promise.resolve();
-        var store = getStore('offline_photos', 'readwrite');
+        const store = getStore('offline_photos', 'readwrite');
         return promisifyRequest(store.delete(tempId));
     }
 
     function getPhotosForMutation(mutationId) {
         if (!db) return Promise.resolve([]);
         return new Promise(function (resolve, reject) {
-            var store = getStore('offline_photos');
-            var index = store.index('mutation_queue_id');
-            var results = [];
-            var request = index.openCursor(IDBKeyRange.only(mutationId));
+            const store = getStore('offline_photos');
+            const index = store.index('mutation_queue_id');
+            const results = [];
+            const request = index.openCursor(IDBKeyRange.only(mutationId));
             request.onsuccess = function (e) {
-                var cursor = e.target.result;
+                const cursor = e.target.result;
                 if (cursor) {
                     results.push(cursor.value);
                     cursor.continue();
@@ -247,7 +247,7 @@ window.OfflineStore = (function () {
     /* ------------------------------------------------------------------ */
     function bufferTrackpoints(sessionId, segmentId, points, idempotencyKey) {
         if (!db) return Promise.reject(new Error('OfflineStore not initialized'));
-        var store = getStore('offline_trackpoints', 'readwrite');
+        const store = getStore('offline_trackpoints', 'readwrite');
         return promisifyRequest(store.add({
             session_id: sessionId,
             segment_id: segmentId,
@@ -261,12 +261,12 @@ window.OfflineStore = (function () {
     function getPendingTrackpoints() {
         if (!db) return Promise.resolve([]);
         return new Promise(function (resolve, reject) {
-            var store = getStore('offline_trackpoints');
-            var index = store.index('created_at');
-            var results = [];
-            var request = index.openCursor();
+            const store = getStore('offline_trackpoints');
+            const index = store.index('created_at');
+            const results = [];
+            const request = index.openCursor();
             request.onsuccess = function (e) {
-                var cursor = e.target.result;
+                const cursor = e.target.result;
                 if (cursor) {
                     if (cursor.value.status === 'pending') {
                         results.push(cursor.value);
@@ -283,10 +283,10 @@ window.OfflineStore = (function () {
     function updateTrackpointStatus(id, status) {
         if (!db) return Promise.resolve();
         return new Promise(function (resolve, reject) {
-            var store = getStore('offline_trackpoints', 'readwrite');
-            var request = store.get(id);
+            const store = getStore('offline_trackpoints', 'readwrite');
+            const request = store.get(id);
             request.onsuccess = function () {
-                var record = request.result;
+                const record = request.result;
                 if (!record) return resolve();
                 record.status = status;
                 promisifyRequest(store.put(record)).then(resolve).catch(reject);
@@ -297,7 +297,7 @@ window.OfflineStore = (function () {
 
     function deleteTrackpointBatch(id) {
         if (!db) return Promise.resolve();
-        var store = getStore('offline_trackpoints', 'readwrite');
+        const store = getStore('offline_trackpoints', 'readwrite');
         return promisifyRequest(store.delete(id));
     }
 
@@ -313,17 +313,17 @@ window.OfflineStore = (function () {
         return Promise.all([
             getMutationCount(),
             new Promise(function (resolve) {
-                var store = getStore('offline_photos');
-                var request = store.count();
+                const store = getStore('offline_photos');
+                const request = store.count();
                 request.onsuccess = function () { resolve(request.result); };
                 request.onerror = function () { resolve(0); };
             }),
             new Promise(function (resolve) {
-                var store = getStore('offline_trackpoints');
-                var count = 0;
-                var request = store.openCursor();
+                const store = getStore('offline_trackpoints');
+                let count = 0;
+                const request = store.openCursor();
                 request.onsuccess = function (e) {
-                    var cursor = e.target.result;
+                    const cursor = e.target.result;
                     if (cursor) {
                         if (cursor.value.status === 'pending') count++;
                         cursor.continue();

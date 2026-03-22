@@ -7,16 +7,16 @@
 
     if (typeof I18n !== 'undefined') { I18n.autoInit(); }
 
-    var _t = (typeof I18n !== 'undefined') ? I18n.t : function(k) { return k; };
+    const _t = (typeof I18n !== 'undefined') ? I18n.t : function(k) { return k; };
 
-    var TOKEN_KEY = 'mdt_token';
-    var USER_KEY = 'mdt_user';
-    var verifyRealEmail = '';
+    const TOKEN_KEY = 'mdt_token';
+    const USER_KEY = 'mdt_user';
+    let verifyRealEmail = '';
 
     // Show disabled account message if redirected from authedFetch
     if (window.location.search.indexOf('disabled=1') !== -1) {
         setTimeout(function () {
-            var el = document.getElementById('auth-error');
+            const el = document.getElementById('auth-error');
             if (el) {
                 el.textContent = 'Your account has been disabled. Contact an administrator for assistance.';
                 el.classList.remove('hidden');
@@ -25,7 +25,7 @@
     }
 
     function showError(msg) {
-        var el = document.getElementById('auth-error');
+        const el = document.getElementById('auth-error');
         el.textContent = msg;
         el.classList.remove('hidden');
         setTimeout(function () { el.classList.add('hidden'); }, 5000);
@@ -50,12 +50,12 @@
         verifyRealEmail = realEmail || '';
         document.getElementById('login-form').classList.add('hidden');
         document.getElementById('register-form').classList.add('hidden');
-        var socialEl = document.getElementById('auth-social');
+        const socialEl = document.getElementById('auth-social');
         if (socialEl) socialEl.classList.add('hidden');
         document.querySelectorAll('.auth-tab').forEach(function (t) { t.classList.remove('active'); });
         document.getElementById('verify-section').classList.remove('hidden');
         document.getElementById('verify-email').value = realEmail || '';
-        var sentMsg = _t('auth.verifyEmail.sent');
+        let sentMsg = _t('auth.verifyEmail.sent');
         if (sentMsg.indexOf('{email}') !== -1) {
             sentMsg = sentMsg.replace('{email}', maskedEmail);
         } else {
@@ -78,7 +78,7 @@
 
     function detectCountryFromTimezone() {
         try {
-            var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
             if (tz.startsWith('America/')) return 'US';
             if (tz === 'Europe/London' || tz.startsWith('Europe/London')) return 'GB';
             if (tz.startsWith('Australia/')) return 'AU';
@@ -90,10 +90,10 @@
 
     function injectLoginLangSelector() {
         if (typeof I18n !== 'undefined' && I18n.injectLanguageSelector) {
-            var loginPage = document.querySelector('.login-page');
+            const loginPage = document.querySelector('.login-page');
             if (loginPage) {
                 loginPage.style.position = 'relative';
-                var langContainer = document.createElement('div');
+                const langContainer = document.createElement('div');
                 langContainer.className = 'login-lang-selector';
                 loginPage.appendChild(langContainer);
                 I18n.injectLanguageSelector('.login-lang-selector');
@@ -107,7 +107,7 @@
     /*  Password strength                                                  */
     /* ------------------------------------------------------------------ */
     function checkPasswordStrength(pw) {
-        var score = 0;
+        let score = 0;
         if (pw.length >= 12) score++;
         if (pw.length >= 16) score++;
         if (/[A-Z]/.test(pw)) score++;
@@ -118,14 +118,14 @@
     }
 
     function updatePasswordStrength(pw) {
-        var container = document.getElementById('password-strength');
+        const container = document.getElementById('password-strength');
         if (!container) return;
         if (!pw) { container.classList.add('hidden'); return; }
         container.classList.remove('hidden');
-        var score = checkPasswordStrength(pw);
-        var fill = container.querySelector('.password-strength-fill');
-        var label = container.querySelector('.password-strength-label');
-        var pct, color, text;
+        const score = checkPasswordStrength(pw);
+        const fill = container.querySelector('.password-strength-fill');
+        const label = container.querySelector('.password-strength-label');
+        let pct, color, text;
         if (score <= 2) { pct = '25%'; color = 'var(--color-status-red)'; text = 'Weak'; }
         else if (score <= 3) { pct = '50%'; color = 'var(--color-status-yellow)'; text = 'Fair'; }
         else if (score <= 4) { pct = '75%'; color = 'var(--color-status-blue)'; text = 'Good'; }
@@ -149,14 +149,14 @@
     /* ------------------------------------------------------------------ */
     document.addEventListener('DOMContentLoaded', async function () {
         // Pre-select country dropdown from timezone detection
-        var countrySelect = document.getElementById('reg-country');
+        const countrySelect = document.getElementById('reg-country');
         if (countrySelect) countrySelect.value = detectCountryFromTimezone();
 
         // If already logged in, redirect (unless user explicitly wants to register)
-        var token = localStorage.getItem(TOKEN_KEY);
+        const token = localStorage.getItem(TOKEN_KEY);
         if (token && window.location.hash !== '#register') {
             try {
-                var res = await fetch('/api/auth/me', {
+                const res = await fetch('/api/auth/me', {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 if (res.ok) { window.location.href = '/index.html'; return; }
@@ -167,8 +167,8 @@
 
         // Check if setup is needed
         try {
-            var setupRes = await fetch('/api/auth/needs-setup');
-            var setupJson = await setupRes.json();
+            const setupRes = await fetch('/api/auth/needs-setup');
+            const setupJson = await setupRes.json();
             if (setupJson.data && setupJson.data.needsSetup) {
                 document.getElementById('setup-section').classList.remove('hidden');
             } else {
@@ -188,24 +188,24 @@
         // Setup form
         document.getElementById('setup-form').addEventListener('submit', async function (e) {
             e.preventDefault();
-            var name = document.getElementById('setup-name').value.trim();
-            var email = document.getElementById('setup-email').value.trim();
-            var pw = document.getElementById('setup-password').value;
-            var pw2 = document.getElementById('setup-password2').value;
+            const name = document.getElementById('setup-name').value.trim();
+            const email = document.getElementById('setup-email').value.trim();
+            const pw = document.getElementById('setup-password').value;
+            const pw2 = document.getElementById('setup-password2').value;
 
             if (pw !== pw2) { showError(_t('auth.passwordsNoMatch')); return; }
 
-            var btn = document.getElementById('btn-setup');
+            const btn = document.getElementById('btn-setup');
             btn.disabled = true;
             btn.textContent = _t('auth.creating');
 
             try {
-                var res = await fetch('/api/auth/setup', {
+                const res = await fetch('/api/auth/setup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: email, password: pw, display_name: name }),
                 });
-                var json = await res.json();
+                const json = await res.json();
                 if (!res.ok || !json.success) {
                     showError(json.error || _t('auth.setupFailed'));
                     btn.disabled = false; btn.textContent = _t('auth.createAdmin'); return;
@@ -221,18 +221,18 @@
         // Login form
         document.getElementById('login-form').addEventListener('submit', async function (e) {
             e.preventDefault();
-            var email = document.getElementById('login-email').value.trim();
-            var pw = document.getElementById('login-password').value;
-            var btn = document.getElementById('btn-login');
+            const email = document.getElementById('login-email').value.trim();
+            const pw = document.getElementById('login-password').value;
+            const btn = document.getElementById('btn-login');
             btn.disabled = true; btn.textContent = _t('auth.loggingIn');
 
             try {
-                var res = await fetch('/api/auth/login', {
+                const res = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: email, password: pw }),
                 });
-                var json = await res.json();
+                const json = await res.json();
                 if (!res.ok || !json.success) {
                     if (json.needsVerification) {
                         showVerifySection(json.email || email, email);
@@ -252,18 +252,18 @@
         // Verify email form
         document.getElementById('verify-form').addEventListener('submit', async function (e) {
             e.preventDefault();
-            var code = document.getElementById('verify-code').value.trim();
-            var email = document.getElementById('verify-email').value || verifyRealEmail;
-            var btn = document.getElementById('btn-verify');
+            const code = document.getElementById('verify-code').value.trim();
+            const email = document.getElementById('verify-email').value || verifyRealEmail;
+            const btn = document.getElementById('btn-verify');
             btn.disabled = true; btn.textContent = _t('common.loading');
 
             try {
-                var res = await fetch('/api/auth/verify-email', {
+                const res = await fetch('/api/auth/verify-email', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: email, code: code }),
                 });
-                var json = await res.json();
+                const json = await res.json();
                 if (!res.ok || !json.success) {
                     showError(json.error || _t('auth.verifyEmail.invalid'));
                     btn.disabled = false; btn.textContent = _t('auth.verifyEmail.submit'); return;
@@ -279,7 +279,7 @@
         // Resend verification code
         document.getElementById('link-resend-code').addEventListener('click', async function (e) {
             e.preventDefault();
-            var email = document.getElementById('verify-email').value || verifyRealEmail;
+            const email = document.getElementById('verify-email').value || verifyRealEmail;
             if (!email) return;
             try {
                 await fetch('/api/auth/resend-verification', {
@@ -287,14 +287,14 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: email }),
                 });
-                var resentEl = document.getElementById('verify-resent');
+                const resentEl = document.getElementById('verify-resent');
                 resentEl.classList.remove('hidden');
                 setTimeout(function () { resentEl.classList.add('hidden'); }, 3000);
             } catch (err) { /* silently fail */ }
         });
 
         // Password strength indicator
-        var regPwInput = document.getElementById('reg-password');
+        const regPwInput = document.getElementById('reg-password');
         if (regPwInput) {
             regPwInput.addEventListener('input', function () { updatePasswordStrength(regPwInput.value); });
         }
@@ -302,24 +302,24 @@
         // Register form
         document.getElementById('register-form').addEventListener('submit', async function (e) {
             e.preventDefault();
-            var name = document.getElementById('reg-name').value.trim();
-            var email = document.getElementById('reg-email').value.trim();
-            var phone = document.getElementById('reg-phone').value.trim();
-            var country = document.getElementById('reg-country').value;
-            var pw = document.getElementById('reg-password').value;
-            var pw2 = document.getElementById('reg-password2').value;
-            var termsChecked = document.getElementById('reg-terms').checked;
+            const name = document.getElementById('reg-name').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            const country = document.getElementById('reg-country').value;
+            const pw = document.getElementById('reg-password').value;
+            const pw2 = document.getElementById('reg-password2').value;
+            const termsChecked = document.getElementById('reg-terms').checked;
 
             if (!termsChecked) { showError(_t('auth.terms.required')); return; }
-            var pwError = validatePasswordRules(pw);
+            const pwError = validatePasswordRules(pw);
             if (pwError) { showError(pwError); return; }
             if (pw !== pw2) { showError(_t('auth.passwordsNoMatch')); return; }
 
-            var btn = document.getElementById('btn-register');
+            const btn = document.getElementById('btn-register');
             btn.disabled = true; btn.textContent = _t('auth.registering');
 
             try {
-                var res = await fetch('/api/auth/register', {
+                const res = await fetch('/api/auth/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -328,7 +328,7 @@
                         country_code: country || 'US',
                     }),
                 });
-                var json = await res.json();
+                const json = await res.json();
                 if (!res.ok || !json.success) {
                     showError(json.error || _t('auth.registrationFailed'));
                     btn.disabled = false; btn.textContent = _t('auth.register'); return;

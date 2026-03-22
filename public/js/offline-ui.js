@@ -7,10 +7,10 @@
 window.OfflineUI = (function () {
     'use strict';
 
-    var banner = null;
-    var bannerText = null;
-    var queueBadge = null;
-    var updateTimer = null;
+    let banner = null;
+    let bannerText = null;
+    let queueBadge = null;
+    let updateTimer = null;
 
     /* ------------------------------------------------------------------ */
     /*  Create banner DOM                                                  */
@@ -23,7 +23,7 @@ window.OfflineUI = (function () {
         banner.className = 'offline-banner';
         banner.classList.add('hidden');
 
-        var dot = document.createElement('span');
+        const dot = document.createElement('span');
         dot.className = 'offline-banner-dot';
 
         bannerText = document.createElement('span');
@@ -34,7 +34,7 @@ window.OfflineUI = (function () {
         queueBadge.id = 'offline-queue-count';
         queueBadge.className = 'offline-queue-badge';
 
-        var syncBtn = document.createElement('button');
+        const syncBtn = document.createElement('button');
         syncBtn.className = 'offline-sync-btn';
         syncBtn.id = 'offline-sync-btn';
         syncBtn.textContent = 'Sync Now';
@@ -52,7 +52,7 @@ window.OfflineUI = (function () {
         banner.appendChild(syncBtn);
 
         // Insert after navbar
-        var navbar = document.querySelector('.navbar');
+        const navbar = document.querySelector('.navbar');
         if (navbar && navbar.nextSibling) {
             navbar.parentNode.insertBefore(banner, navbar.nextSibling);
         } else {
@@ -66,15 +66,15 @@ window.OfflineUI = (function () {
     function updateBannerState() {
         if (!banner) return;
 
-        var online = navigator.onLine;
-        var isSyncing = window.SyncEngine && SyncEngine.isSyncing();
+        const online = navigator.onLine;
+        const isSyncing = window.SyncEngine && SyncEngine.isSyncing();
 
         if (isSyncing) {
             banner.classList.remove('hidden');
             banner.className = 'offline-banner offline-banner-syncing';
             bannerText.textContent = window.I18n ? I18n.t('offline.syncing') : 'Syncing...';
             queueBadge.textContent = '';
-            var syncBtn = document.getElementById('offline-sync-btn');
+            const syncBtn = document.getElementById('offline-sync-btn');
             if (syncBtn) syncBtn.classList.add('hidden');
             return;
         }
@@ -83,7 +83,7 @@ window.OfflineUI = (function () {
             banner.classList.remove('hidden');
             banner.className = 'offline-banner';
             bannerText.textContent = window.I18n ? I18n.t('offline.banner') : 'Offline';
-            var syncBtn2 = document.getElementById('offline-sync-btn');
+            const syncBtn2 = document.getElementById('offline-sync-btn');
             if (syncBtn2) syncBtn2.classList.add('hidden');
             updateQueueCount();
             return;
@@ -95,10 +95,10 @@ window.OfflineUI = (function () {
                 if (count > 0) {
                     banner.classList.remove('hidden');
                     banner.className = 'offline-banner offline-banner-queued';
-                    var msg = window.I18n ? I18n.t('offline.itemsQueued') : '{count} items queued';
+                    const msg = window.I18n ? I18n.t('offline.itemsQueued') : '{count} items queued';
                     bannerText.textContent = msg.replace('{count}', count);
                     queueBadge.textContent = '';
-                    var syncBtn3 = document.getElementById('offline-sync-btn');
+                    const syncBtn3 = document.getElementById('offline-sync-btn');
                     if (syncBtn3) syncBtn3.classList.remove('hidden');
                 } else {
                     banner.classList.add('hidden');
@@ -115,7 +115,7 @@ window.OfflineUI = (function () {
         if (!queueBadge || !window.OfflineStore) return;
         OfflineStore.getMutationCount().then(function (count) {
             if (count > 0) {
-                var msg = window.I18n ? I18n.t('offline.itemsQueued') : '{count} items queued';
+                const msg = window.I18n ? I18n.t('offline.itemsQueued') : '{count} items queued';
                 queueBadge.textContent = msg.replace('{count}', count);
             } else {
                 queueBadge.textContent = '';
@@ -133,7 +133,7 @@ window.OfflineUI = (function () {
 
         navigator.serviceWorker.ready.then(function (reg) {
             reg.addEventListener('updatefound', function () {
-                var newWorker = reg.installing;
+                const newWorker = reg.installing;
                 if (!newWorker) return;
                 newWorker.addEventListener('statechange', function () {
                     if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
@@ -146,13 +146,13 @@ window.OfflineUI = (function () {
 
     function showUpdateToast(registration) {
         if (!window.Auth || !Auth.showToast) return;
-        var msg = window.I18n ? I18n.t('offline.updateAvailable') : 'Update available — tap to refresh';
+        const msg = window.I18n ? I18n.t('offline.updateAvailable') : 'Update available — tap to refresh';
         Auth.showToast(msg, 'info', 0); // 0 = no auto-dismiss
 
         // On next tap of the toast, activate new SW + reload
         setTimeout(function () {
-            var toasts = document.querySelectorAll('.toast');
-            var lastToast = toasts[toasts.length - 1];
+            const toasts = document.querySelectorAll('.toast');
+            const lastToast = toasts[toasts.length - 1];
             if (lastToast) {
                 lastToast.style.cursor = 'pointer';
                 lastToast.addEventListener('click', function () {
@@ -192,7 +192,7 @@ window.OfflineUI = (function () {
                 banner.className = 'offline-banner offline-banner-synced';
                 bannerText.textContent = window.I18n ? I18n.t('offline.synced') : 'All synced';
                 queueBadge.textContent = '';
-                var syncBtn = document.getElementById('offline-sync-btn');
+                const syncBtn = document.getElementById('offline-sync-btn');
                 if (syncBtn) syncBtn.classList.add('hidden');
                 setTimeout(function () {
                     updateBannerState();

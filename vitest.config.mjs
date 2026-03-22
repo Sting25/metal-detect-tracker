@@ -7,5 +7,6 @@ export default defineConfig({
         sequence: { concurrent: false },
         fileParallelism: false,
         globals: true,
+        exclude: ['**/node_modules/**', '**/.claude/**'],
     },
 });

@@ -7,16 +7,16 @@
 window.SyncEngine = (function () {
     'use strict';
 
-    var MAX_RETRIES = 10;
-    var SYNC_INTERVAL = 60000; // 60s polling
-    var syncing = false;
-    var intervalId = null;
+    const MAX_RETRIES = 10;
+    const SYNC_INTERVAL = 60000; // 60s polling
+    let syncing = false;
+    let intervalId = null;
 
     /* ------------------------------------------------------------------ */
     /*  Backoff schedule                                                   */
     /* ------------------------------------------------------------------ */
     function getBackoffMs(retryCount) {
-        var delays = [0, 30000, 120000, 600000, 1800000]; // 0s, 30s, 2m, 10m, 30m
+        const delays = [0, 30000, 120000, 600000, 1800000]; // 0s, 30s, 2m, 10m, 30m
         return delays[Math.min(retryCount, delays.length - 1)];
     }
 
@@ -40,9 +40,9 @@ window.SyncEngine = (function () {
 
     function syncOneMutation(mutation) {
         // Check backoff
-        var backoff = getBackoffMs(mutation.retry_count);
+        const backoff = getBackoffMs(mutation.retry_count);
         if (backoff > 0 && mutation.retry_count > 0) {
-            var elapsed = Date.now() - (mutation.last_retry_at || mutation.created_at);
+            const elapsed = Date.now() - (mutation.last_retry_at || mutation.created_at);
             if (elapsed < backoff) return Promise.resolve(); // Not yet time to retry
         }
 
@@ -53,7 +53,7 @@ window.SyncEngine = (function () {
 
         // Mark syncing
         return OfflineStore.updateMutationStatus(mutation.id, 'syncing').then(function () {
-            var options = {
+            const options = {
                 method: mutation.method,
                 headers: {
                     'Content-Type': 'application/json',
@@ -61,7 +61,7 @@ window.SyncEngine = (function () {
                 }
             };
 
-            var token = window.Auth ? Auth.getToken() : null;
+            const token = window.Auth ? Auth.getToken() : null;
             if (token) {
                 options.headers['Authorization'] = 'Bearer ' + token;
             }
@@ -84,7 +84,7 @@ window.SyncEngine = (function () {
                 } else if (res.status >= 400 && res.status < 500) {
                     // Client error — don't retry bad data
                     return res.json().catch(function () { return {}; }).then(function (body) {
-                        var errorMsg = (body && body.error) || 'Client error ' + res.status;
+                        const errorMsg = (body && body.error) || 'Client error ' + res.status;
                         return OfflineStore.updateMutationStatus(mutation.id, 'failed', errorMsg);
                     });
                 } else {
@@ -117,8 +117,8 @@ window.SyncEngine = (function () {
 
     function syncOneTrackpointBatch(batch) {
         return OfflineStore.updateTrackpointStatus(batch.id, 'syncing').then(function () {
-            var token = window.Auth ? Auth.getToken() : null;
-            var options = {
+            const token = window.Auth ? Auth.getToken() : null;
+            const options = {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -130,7 +130,7 @@ window.SyncEngine = (function () {
                 options.headers['Authorization'] = 'Bearer ' + token;
             }
 
-            var url = '/api/hunts/' + batch.session_id + '/trackpoints';
+            const url = '/api/hunts/' + batch.session_id + '/trackpoints';
 
             return fetch(url, options).then(function (res) {
                 if (res.ok || res.status === 409) {

@@ -5,7 +5,7 @@
 (function () {
     'use strict';
 
-    var _t = (typeof I18n !== 'undefined') ? I18n.t : function(k) { return k; };
+    const _t = (typeof I18n !== 'undefined') ? I18n.t : function(k) { return k; };
 
     /* ------------------------------------------------------------------ */
     /*  Constants & State                                                  */
@@ -116,9 +116,9 @@
     /*  Map Setup                                                         */
     /* ------------------------------------------------------------------ */
     function initSitesMap() {
-        var mapDefaults = (window.AppConfig && AppConfig.getMapDefaults()) || { center: [39.8283, -98.5795], zoom: 4 };
-        var defaultCenter = mapDefaults.center;
-        var defaultZoom = mapDefaults.zoom;
+        const mapDefaults = (window.AppConfig && AppConfig.getMapDefaults()) || { center: [39.8283, -98.5795], zoom: 4 };
+        const defaultCenter = mapDefaults.center;
+        const defaultZoom = mapDefaults.zoom;
 
         if (window.MapModule) {
             sitesMap = window.MapModule.initMap('sites-map', {
@@ -128,10 +128,10 @@
         } else {
             sitesMap = L.map('sites-map').setView(defaultCenter, defaultZoom);
             // Only add layers if MapModule wasn't used (it already adds them)
-            var streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            const streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors'
             });
-            var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
                 attribution: '&copy; Esri'
             });
             streets.addTo(sitesMap);
@@ -297,15 +297,15 @@
     /*  URL Hash Navigation (#site-{id})                                  */
     /* ------------------------------------------------------------------ */
     function handleUrlHash() {
-        var hash = window.location.hash;
+        const hash = window.location.hash;
         if (!hash || !hash.startsWith('#site-')) return;
 
-        var siteId = hash.replace('#site-', '');
-        var site = allSites.find(function(s) { return String(s.id) === siteId; });
+        const siteId = hash.replace('#site-', '');
+        const site = allSites.find(function(s) { return String(s.id) === siteId; });
         if (!site) return;
 
         // Scroll the site card into view
-        var card = els.sitesList.querySelector('.site-card[data-id="' + siteId + '"]');
+        const card = els.sitesList.querySelector('.site-card[data-id="' + siteId + '"]');
         if (card) {
             // Small delay to let DOM settle
             setTimeout(function() {
@@ -443,7 +443,7 @@
         closeDetailExpansion();
 
         // Find the site card
-        var card = els.sitesList.querySelector('.site-card[data-id="' + site.id + '"]');
+        const card = els.sitesList.querySelector('.site-card[data-id="' + site.id + '"]');
         if (!card) return;
 
         const tags = Array.isArray(site.tags) ? site.tags : (site.tags ? site.tags.split(',') : []);
@@ -461,11 +461,11 @@
             contactHtml += '</div>';
         }
 
-        var expansion = document.createElement('div');
+        const expansion = document.createElement('div');
         expansion.className = 'card-detail-expansion';
 
         // Only show info NOT already on the card (card has: image, name, status, stars, tags, buttons)
-        var sections = '';
+        let sections = '';
         if (site.description) {
             sections += '<div class="detail-section"><h4>Description</h4><p>' + esc(site.description) + '</p></div>';
         }
@@ -479,7 +479,7 @@
         }
 
         // Coverage section placeholder (populated asynchronously)
-        var coverageSectionHtml = '<div class="coverage-section hidden" id="coverage-section-' + site.id + '"></div>';
+        const coverageSectionHtml = '<div class="coverage-section hidden" id="coverage-section-' + site.id + '"></div>';
 
         expansion.innerHTML =
             '<div class="card-detail-inner">' +
@@ -538,7 +538,7 @@
     }
 
     function closeDetailExpansion() {
-        var existing = els.sitesList.querySelector('.card-detail-expansion');
+        const existing = els.sitesList.querySelector('.card-detail-expansion');
         if (existing) {
             existing.classList.remove('open');
             // Remove after transition
@@ -562,23 +562,23 @@
     }
 
     async function loadSiteCoverage(siteId) {
-        var section = document.getElementById('coverage-section-' + siteId);
+        const section = document.getElementById('coverage-section-' + siteId);
         if (!section) return;
 
         try {
-            var res = await Auth.authedFetch('/api/sites/' + siteId + '/coverage');
+            const res = await Auth.authedFetch('/api/sites/' + siteId + '/coverage');
             if (!res.ok) return;
-            var json = await res.json();
+            const json = await res.json();
             if (!json.success) return;
 
-            var stats = json.data.stats;
-            var covGeoJSON = json.data.coverage;
+            const stats = json.data.stats;
+            const covGeoJSON = json.data.coverage;
 
             // Nothing to show?
             if (stats.total_points === 0) return;
 
             // Build coverage section
-            var html = '<h4>' + _t('sites.coverage.title') + '</h4>';
+            let html = '<h4>' + _t('sites.coverage.title') + '</h4>';
 
             // Badge: percentage or cell count
             if (stats.coverage_percentage !== undefined) {
@@ -589,7 +589,7 @@
 
             // Last hunted
             if (stats.last_hunted) {
-                var d = new Date(stats.last_hunted);
+                const d = new Date(stats.last_hunted);
                 html += '<div class="coverage-last-hunted">' + _t('sites.coverage.lastHunted') + ': ' + d.toLocaleDateString() + '</div>';
             }
 
@@ -606,8 +606,8 @@
             section.classList.remove('hidden');
 
             // Bind toggle
-            var toggle = document.getElementById('cov-toggle-' + siteId);
-            var opacitySlider = document.getElementById('cov-opacity-' + siteId);
+            const toggle = document.getElementById('cov-toggle-' + siteId);
+            const opacitySlider = document.getElementById('cov-opacity-' + siteId);
 
             toggle.addEventListener('change', function() {
                 if (toggle.checked) {
@@ -660,7 +660,7 @@
     /* ------------------------------------------------------------------ */
     function getSiteType(tags) {
         if (!tags) return 'general';
-        var t = (',' + (Array.isArray(tags) ? tags.join(',') : tags).toLowerCase() + ',');
+        const t = (',' + (Array.isArray(tags) ? tags.join(',') : tags).toLowerCase() + ',');
         if (t.indexOf(',stagecoach,') !== -1 || t.indexOf(',butterfield,') !== -1 || t.indexOf(',smoky-hill-trail,') !== -1) return 'stagecoach';
         if (t.indexOf(',ghost-town,') !== -1 || t.indexOf(',ghost_town,') !== -1) return 'ghost_town';
         if (t.indexOf(',homestead,') !== -1 || t.indexOf(',windbreak,') !== -1 || t.indexOf(',foundation,') !== -1 || t.indexOf(',old-ranch,') !== -1) return 'homestead';
@@ -671,10 +671,10 @@
     }
 
     function buildSiteTypeIcon(siteType, permissionStatus) {
-        var type = SITE_TYPES[siteType] || SITE_TYPES.general;
-        var borderColor = PERMISSION_COLORS[permissionStatus] || PERMISSION_COLORS.not_requested;
+        const type = SITE_TYPES[siteType] || SITE_TYPES.general;
+        const borderColor = PERMISSION_COLORS[permissionStatus] || PERMISSION_COLORS.not_requested;
 
-        var html = '<div class="site-type-marker" style="border-color:' + borderColor + ';">' +
+        const html = '<div class="site-type-marker" style="border-color:' + borderColor + ';">' +
             '<span class="site-type-emoji">' + type.emoji + '</span>' +
             '</div>';
 
@@ -697,11 +697,11 @@
             const lng = parseFloat(site.longitude);
             if (isNaN(lat) || isNaN(lng)) return;
 
-            var siteType = getSiteType(site.tags);
-            var icon = buildSiteTypeIcon(siteType, site.permission_status);
-            var typeInfo = SITE_TYPES[siteType] || SITE_TYPES.general;
-            var permLabel = (site.permission_status || 'not_requested').replace(/_/g, ' ');
-            var landLabel = (site.land_type || '').replace(/_/g, ' ');
+            const siteType = getSiteType(site.tags);
+            const icon = buildSiteTypeIcon(siteType, site.permission_status);
+            const typeInfo = SITE_TYPES[siteType] || SITE_TYPES.general;
+            const permLabel = (site.permission_status || 'not_requested').replace(/_/g, ' ');
+            const landLabel = (site.land_type || '').replace(/_/g, ' ');
 
             const popup = '<div class="map-popup">' +
                 '<strong>' + esc(site.name || 'Unnamed') + '</strong>' +
@@ -1097,11 +1097,11 @@
     /*  Share Modal                                                       */
     /* ------------------------------------------------------------------ */
     function openShareModal(site) {
-        var overlay = document.getElementById('share-modal-overlay');
-        var siteIdInput = document.getElementById('share-site-id');
-        var emailInput = document.getElementById('share-email');
-        var permSelect = document.getElementById('share-permission');
-        var title = document.getElementById('share-modal-title');
+        const overlay = document.getElementById('share-modal-overlay');
+        const siteIdInput = document.getElementById('share-site-id');
+        const emailInput = document.getElementById('share-email');
+        const permSelect = document.getElementById('share-permission');
+        const title = document.getElementById('share-modal-title');
 
         siteIdInput.value = site.id;
         emailInput.value = '';
@@ -1115,11 +1115,11 @@
         loadShareList(site.id);
 
         // Bind events (clear previous)
-        var closeBtn = document.getElementById('btn-share-modal-close');
-        var cancelBtn = document.getElementById('btn-cancel-share');
-        var submitBtn = document.getElementById('btn-submit-share');
+        const closeBtn = document.getElementById('btn-share-modal-close');
+        const cancelBtn = document.getElementById('btn-cancel-share');
+        const submitBtn = document.getElementById('btn-submit-share');
 
-        var closeShareModal = function () {
+        const closeShareModal = function () {
             overlay.classList.remove('open');
             document.body.style.overflow = '';
         };
@@ -1131,8 +1131,8 @@
         };
 
         submitBtn.onclick = async function () {
-            var email = emailInput.value.trim();
-            var perm = permSelect.value;
+            const email = emailInput.value.trim();
+            const perm = permSelect.value;
             if (!email) {
                 Auth.showToast(_t('sites.share.enterEmail'), 'warning');
                 return;
@@ -1140,12 +1140,12 @@
             try {
                 submitBtn.disabled = true;
                 submitBtn.textContent = _t('common.loading');
-                var res = await Auth.authedFetch('/api/sites/' + site.id + '/share', {
+                const res = await Auth.authedFetch('/api/sites/' + site.id + '/share', {
                     method: 'POST',
                     body: JSON.stringify({ email: email, permission_level: perm }),
                 });
                 if (!res.ok) {
-                    var errJson = await res.json().catch(function () { return {}; });
+                    const errJson = await res.json().catch(function () { return {}; });
                     throw new Error(errJson.error || 'Failed to share site');
                 }
                 emailInput.value = '';
@@ -1161,15 +1161,15 @@
     }
 
     async function loadShareList(siteId) {
-        var section = document.getElementById('share-list-section');
-        var list = document.getElementById('share-list');
-        var esc = window.MapModule ? window.MapModule.escapeHtml : escapeHtmlLocal;
+        const section = document.getElementById('share-list-section');
+        const list = document.getElementById('share-list');
+        const esc = window.MapModule ? window.MapModule.escapeHtml : escapeHtmlLocal;
 
         try {
-            var res = await Auth.authedFetch('/api/sites/' + siteId + '/shares');
+            const res = await Auth.authedFetch('/api/sites/' + siteId + '/shares');
             if (!res.ok) throw new Error('Failed');
-            var json = await res.json();
-            var shares = json.data || [];
+            const json = await res.json();
+            const shares = json.data || [];
 
             if (shares.length === 0) {
                 section.classList.add('hidden');
@@ -1177,7 +1177,7 @@
             }
 
             section.classList.remove('hidden');
-            var html = '';
+            let html = '';
             shares.forEach(function (s) {
                 html += '<div class="share-item">' +
                     '<span class="share-user">' + esc(s.display_name || s.email) + '</span>' +
@@ -1192,7 +1192,7 @@
                 btn.addEventListener('click', async function () {
                     if (!confirm(_t('sites.share.remove') + '?')) return;
                     try {
-                        var resp = await Auth.authedFetch(
+                        const resp = await Auth.authedFetch(
                             '/api/sites/' + btn.dataset.siteId + '/share/' + btn.dataset.userId,
                             { method: 'DELETE' }
                         );

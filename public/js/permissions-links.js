@@ -5,12 +5,12 @@
 (function (PP) {
     'use strict';
 
-    var _t = (typeof I18n !== 'undefined') ? I18n.t : function(k) { return k; };
+    const _t = (typeof I18n !== 'undefined') ? I18n.t : function(k) { return k; };
 
     /* ------------------------------------------------------------------ */
     /*  Permission Links                                                   */
     /* ------------------------------------------------------------------ */
-    var LINK_STATUS_CLASSES = {
+    const LINK_STATUS_CLASSES = {
         active: 'link-status-active',
         approved: 'link-status-approved',
         denied: 'link-status-denied',
@@ -24,12 +24,12 @@
         PP.els.btnCreateLink.textContent = _t('permissions.link.creating');
 
         try {
-            var res = await Auth.authedFetch('/api/permissions/' + PP.editingPermId + '/link', {
+            const res = await Auth.authedFetch('/api/permissions/' + PP.editingPermId + '/link', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ expires_in_days: 30 }),
             });
-            var data = await res.json();
+            const data = await res.json();
             if (!res.ok) {
                 Auth.showToast('Failed to create link. Please try again.');
                 return;
@@ -38,7 +38,7 @@
             PP.els.linkResult.classList.remove('hidden');
             PP.els.linkUrl.value = data.data.url;
             PP.els.linkQrImage.src = data.data.qr_code;
-            var expiresDate = new Date(data.data.expires_at).toLocaleDateString();
+            const expiresDate = new Date(data.data.expires_at).toLocaleDateString();
             PP.els.linkExpiresText.textContent = _t('permissions.link.expires') + ': ' + expiresDate;
 
             await PP.loadLinkHistory(PP.editingPermId);
@@ -66,9 +66,9 @@
 
     PP.loadLinkHistory = async function (permId) {
         try {
-            var res = await Auth.authedFetch('/api/permissions/' + permId + '/links');
+            const res = await Auth.authedFetch('/api/permissions/' + permId + '/links');
             if (!res.ok) return;
-            var data = await res.json();
+            const data = await res.json();
             renderLinkHistory(data.data || []);
         } catch (err) {
             console.error('Error loading links:', err);
@@ -81,15 +81,15 @@
             return;
         }
 
-        var esc = PP.escapeHtml;
-        var html = '<div class="link-history-list">';
-        for (var i = 0; i < links.length; i++) {
-            var link = links[i];
-            var statusClass = LINK_STATUS_CLASSES[link.status] || '';
-            var createdStr = link.created_at ? new Date(link.created_at).toLocaleDateString() : '';
-            var expiresStr = link.expires_at ? new Date(link.expires_at).toLocaleDateString() : '';
+        const esc = PP.escapeHtml;
+        let html = '<div class="link-history-list">';
+        for (let i = 0; i < links.length; i++) {
+            const link = links[i];
+            let statusClass = LINK_STATUS_CLASSES[link.status] || '';
+            const createdStr = link.created_at ? new Date(link.created_at).toLocaleDateString() : '';
+            const expiresStr = link.expires_at ? new Date(link.expires_at).toLocaleDateString() : '';
 
-            var displayStatus = link.status;
+            let displayStatus = link.status;
             if (link.status === 'active' && link.expires_at && new Date(link.expires_at) < new Date()) {
                 displayStatus = 'expired';
                 statusClass = LINK_STATUS_CLASSES.expired;
@@ -128,7 +128,7 @@
         if (!confirm(_t('permissions.link.revokeConfirm'))) return;
 
         try {
-            var res = await Auth.authedFetch('/api/permissions/' + PP.editingPermId + '/links/' + lid, {
+            const res = await Auth.authedFetch('/api/permissions/' + PP.editingPermId + '/links/' + lid, {
                 method: 'DELETE',
             });
             if (!res.ok) throw new Error('Failed to revoke link');
@@ -149,11 +149,11 @@
         PP.els.letterStatus.classList.add('hidden');
 
         try {
-            var res = await Auth.authedFetch('/api/permissions/' + PP.editingPermId + '/letter', {
+            const res = await Auth.authedFetch('/api/permissions/' + PP.editingPermId + '/letter', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
             });
-            var data = await res.json();
+            const data = await res.json();
             if (!res.ok) {
                 if (data.error && data.error.indexOf('letter preferences') !== -1) {
                     PP.els.letterStatus.textContent = _t('permissions.letter.needPrefs');
@@ -187,9 +187,9 @@
 
     PP.loadLetterHistory = async function (permId) {
         try {
-            var res = await Auth.authedFetch('/api/permissions/' + permId + '/letters');
+            const res = await Auth.authedFetch('/api/permissions/' + permId + '/letters');
             if (!res.ok) return;
-            var data = await res.json();
+            const data = await res.json();
             renderLetterHistory(data.data || []);
         } catch (err) {
             console.error('Error loading letter history:', err);
@@ -202,10 +202,10 @@
             return;
         }
 
-        var html = '<div class="letter-history-list">';
-        for (var i = 0; i < letters.length; i++) {
-            var letter = letters[i];
-            var dateStr = letter.created_at ? new Date(letter.created_at).toLocaleDateString() : '';
+        let html = '<div class="letter-history-list">';
+        for (let i = 0; i < letters.length; i++) {
+            const letter = letters[i];
+            const dateStr = letter.created_at ? new Date(letter.created_at).toLocaleDateString() : '';
             html += '<div class="letter-history-item">'
                 + '<span class="letter-history-icon">\uD83D\uDCC4</span>'
                 + '<span class="letter-history-name">' + PP.escapeHtml(letter.filename) + '</span>'

@@ -6,12 +6,12 @@
 (function () {
     'use strict';
 
-    var _t = (typeof I18n !== 'undefined') ? I18n.t : function(k) { return k; };
+    const _t = (typeof I18n !== 'undefined') ? I18n.t : function(k) { return k; };
 
     /* ------------------------------------------------------------------ */
     /*  Shared State (window.FP namespace)                                */
     /* ------------------------------------------------------------------ */
-    var FP = window.FP = window.FP || {};
+    const FP = window.FP = window.FP || {};
     FP.allFinds = [];
     FP.allSites = [];
     FP.currentTags = [];
@@ -31,7 +31,7 @@
     /*  DOM References                                                    */
     /* ------------------------------------------------------------------ */
     function cacheElements() {
-        var g = document.getElementById.bind(document);
+        const g = document.getElementById.bind(document);
         FP.els.findsGrid = g('finds-grid');
         FP.els.modalOverlay = g('find-modal-overlay');
         FP.els.modal = g('find-modal');
@@ -105,7 +105,7 @@
             FP.loadUserTags();
             if (window.AppConfig) {
                 AppConfig.onReady(function () {
-                    var depthLabel = document.querySelector('label[for="find-depth"]');
+                    const depthLabel = document.querySelector('label[for="find-depth"]');
                     if (depthLabel) depthLabel.textContent = AppConfig.depthLabel();
                 });
             }
@@ -169,9 +169,9 @@
         FP.els.quickLogOverlay.addEventListener('click', function (e) { if (e.target === FP.els.quickLogOverlay) FP.closeQuickLog(); });
         FP.els.quickLogUploadArea.addEventListener('click', function () { FP.els.quickLogPhoto.click(); });
         FP.els.quickLogPhoto.addEventListener('change', function () {
-            var file = FP.els.quickLogPhoto.files[0];
+            const file = FP.els.quickLogPhoto.files[0];
             if (file) {
-                var reader = new FileReader();
+                const reader = new FileReader();
                 reader.onload = function (e) {
                     FP.els.quickLogPreview.src = e.target.result;
                     FP.els.quickLogPreview.classList.remove('hidden');
@@ -270,7 +270,7 @@
     async function handleFormSubmit(e) {
         e.preventDefault();
 
-        var formData = new FormData();
+        const formData = new FormData();
         formData.append('site_id', FP.els.site.value);
         formData.append('date', FP.els.date.value);
         formData.append('latitude', FP.els.latitude.value);
@@ -278,7 +278,7 @@
         formData.append('description', FP.els.description.value.trim());
         formData.append('material', FP.els.material.value);
         formData.append('estimated_age', FP.els.estimatedAge.value.trim());
-        var depthVal = FP.els.depth.value;
+        const depthVal = FP.els.depth.value;
         if (window.AppConfig && depthVal) {
             formData.append('depth_cm', AppConfig.depthInputToCm(depthVal));
         } else if (depthVal) {
@@ -290,24 +290,24 @@
         formData.append('category', FP.els.category.value);
         formData.append('tags', FP.els.tagsHidden.value);
 
-        for (var pi = 0; pi < FP.newPhotoFiles.length; pi++) {
+        for (let pi = 0; pi < FP.newPhotoFiles.length; pi++) {
             formData.append('photos', FP.newPhotoFiles[pi]);
         }
 
-        var id = FP.els.findId.value;
-        var url = id ? '/api/finds/' + id : '/api/finds';
-        var method = id ? 'PUT' : 'POST';
+        const id = FP.els.findId.value;
+        const url = id ? '/api/finds/' + id : '/api/finds';
+        const method = id ? 'PUT' : 'POST';
 
         try {
             FP.els.btnSave.disabled = true;
             FP.els.btnSave.textContent = _t('finds.modal.saving');
-            var res = await Auth.authedFetch(url, { method: method, body: formData });
+            const res = await Auth.authedFetch(url, { method: method, body: formData });
             if (!res.ok) {
-                var errData = await res.json().catch(function () { return {}; });
+                const errData = await res.json().catch(function () { return {}; });
                 throw new Error(errData.message || 'Failed to save find');
             }
             if (id && FP.currentPhotos.length > 0) {
-                var photoIds = FP.currentPhotos.map(function (p) { return p.id; });
+                const photoIds = FP.currentPhotos.map(function (p) { return p.id; });
                 await Auth.authedFetch('/api/finds/' + id + '/photos/reorder', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -329,12 +329,12 @@
     /*  Delete                                                            */
     /* ------------------------------------------------------------------ */
     async function handleDelete() {
-        var id = FP.els.findId.value;
+        const id = FP.els.findId.value;
         if (!id) return;
         if (!confirm(_t('finds.confirmDelete'))) return;
 
         try {
-            var res = await Auth.authedFetch('/api/finds/' + id, { method: 'DELETE' });
+            const res = await Auth.authedFetch('/api/finds/' + id, { method: 'DELETE' });
             if (!res.ok) throw new Error('Failed to delete find');
             closeModal();
             await FP.loadFinds();

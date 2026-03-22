@@ -75,8 +75,8 @@
         var chevron = document.getElementById('settings-chevron');
         if (toggle) {
             toggle.addEventListener('click', function () {
-                var isOpen = !body.classList.contains('hidden');
-                body.classList.toggle('hidden');
+                var isOpen = body.style.display !== 'none';
+                body.style.display = isOpen ? 'none' : '';
                 chevron.textContent = isOpen ? '\u25B6' : '\u25BC';
             });
         }
@@ -252,27 +252,27 @@
         var introText = prefEls.intro.value || DEFAULTS.intro;
         var loc = locationDesc || '[property location / description]';
         introText = introText.replace(/\{name\}/g, name).replace(/\{location\}/g, loc);
-        document.getElementById('letter-intro').innerHTML = '<p>' + escapeHtml(introText) + '</p>';
+        document.getElementById('letter-intro').innerHTML = '<p>' + Auth.escapeHtml(introText) + '</p>';
 
         // Commitments — one per line → <ul><li>
         var commitText = prefEls.commitments.value || DEFAULTS.commitments;
         var commitLines = commitText.split('\n').filter(function (l) { return l.trim(); });
         var commitHtml = '<ul>';
         commitLines.forEach(function (line) {
-            commitHtml += '<li>' + escapeHtml(line.trim()) + '</li>';
+            commitHtml += '<li>' + Auth.escapeHtml(line.trim()) + '</li>';
         });
         commitHtml += '</ul>';
         document.getElementById('letter-commitments').innerHTML = commitHtml;
 
         // Insurance
         var insuranceText = prefEls.insurance.value || DEFAULTS.insurance;
-        document.getElementById('letter-insurance').innerHTML = '<p>' + escapeHtml(insuranceText) + '</p>';
+        document.getElementById('letter-insurance').innerHTML = '<p>' + Auth.escapeHtml(insuranceText) + '</p>';
 
         // Closing — support multi-paragraph via double newline
         var closingText = prefEls.closing.value || DEFAULTS.closing;
         var closingParagraphs = closingText.split(/\n\n+/).filter(function (p) { return p.trim(); });
         var closingHtml = closingParagraphs.map(function (p) {
-            return '<p>' + escapeHtml(p.trim()) + '</p>';
+            return '<p>' + Auth.escapeHtml(p.trim()) + '</p>';
         }).join('');
         document.getElementById('letter-closing').innerHTML = closingHtml;
 
@@ -284,9 +284,9 @@
         var sigTitleVal = prefEls.sigTitle.value || '';
         if (sigTitleVal) {
             sigTitleEl.textContent = sigTitleVal;
-            sigTitleEl.classList.remove('hidden');
+            sigTitleEl.style.display = '';
         } else {
-            sigTitleEl.classList.add('hidden');
+            sigTitleEl.style.display = 'none';
         }
     }
 
@@ -363,13 +363,4 @@
         }, 2500);
     }
 
-    /* ------------------------------------------------------------------ */
-    /*  Utility                                                            */
-    /* ------------------------------------------------------------------ */
-    function escapeHtml(str) {
-        if (!str) return '';
-        var div = document.createElement('div');
-        div.appendChild(document.createTextNode(str));
-        return div.innerHTML;
-    }
 })();

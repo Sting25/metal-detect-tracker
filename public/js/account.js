@@ -12,20 +12,14 @@
     function showToast(msg, duration) {
         var el = document.getElementById('account-toast');
         el.textContent = msg;
-        el.classList.remove('hidden');
-        setTimeout(function () { el.classList.add('hidden'); }, duration || 3000);
+        el.style.display = 'block';
+        setTimeout(function () { el.style.display = 'none'; }, duration || 3000);
     }
 
     function showError(msg) {
         showToast(msg, 5000);
     }
 
-    function escapeHtml(str) {
-        if (!str) return '';
-        var div = document.createElement('div');
-        div.appendChild(document.createTextNode(String(str)));
-        return div.innerHTML;
-    }
 
     // ----------------------------------------------------------------
     // Load account data
@@ -84,18 +78,14 @@
         if (accountData.has_google) {
             gStatus.textContent = _t('account.googleLinked');
             gStatus.className = 'auth-method-status status-ok';
-            btnLink.classList.add('hidden');
-            btnUnlink.classList.remove('hidden');
+            btnLink.style.display = 'none';
+            btnUnlink.style.display = '';
         } else {
             gStatus.textContent = _t('account.googleNotLinked');
             gStatus.className = 'auth-method-status status-muted';
-            btnUnlink.classList.add('hidden');
+            btnUnlink.style.display = 'none';
             // Only show link button if Google is configured
-            if (authConfig && authConfig.google_client_id) {
-                btnLink.classList.remove('hidden');
-            } else {
-                btnLink.classList.add('hidden');
-            }
+            btnLink.style.display = (authConfig && authConfig.google_client_id) ? '' : 'none';
         }
     }
 
@@ -105,13 +95,13 @@
         var passkeys = accountData.passkeys || [];
 
         if (passkeys.length === 0) {
-            noMsg.classList.remove('hidden');
+            noMsg.style.display = '';
             // Remove any existing passkey items
             list.querySelectorAll('.passkey-item').forEach(function (el) { el.remove(); });
             return;
         }
 
-        noMsg.classList.add('hidden');
+        noMsg.style.display = 'none';
         // Remove existing items
         list.querySelectorAll('.passkey-item').forEach(function (el) { el.remove(); });
 
@@ -126,12 +116,12 @@
 
             item.innerHTML =
                 '<div class="passkey-item-info">' +
-                    '<span class="passkey-item-name">&#128273; ' + escapeHtml(pk.display_name) + '</span>' +
-                    '<span class="passkey-item-meta">' + escapeHtml(lastUsed) + '</span>' +
+                    '<span class="passkey-item-name">&#128273; ' + Auth.escapeHtml(pk.display_name) + '</span>' +
+                    '<span class="passkey-item-meta">' + Auth.escapeHtml(lastUsed) + '</span>' +
                 '</div>' +
                 '<div class="passkey-item-actions">' +
-                    '<button class="btn btn-xs btn-secondary btn-rename-passkey" data-id="' + escapeHtml(pk.id) + '" title="Rename">&#9998;</button>' +
-                    '<button class="btn btn-xs btn-danger btn-delete-passkey" data-id="' + escapeHtml(pk.id) + '" title="Delete">&#128465;</button>' +
+                    '<button class="btn btn-xs btn-secondary btn-rename-passkey" data-id="' + Auth.escapeHtml(pk.id) + '" title="Rename">&#9998;</button>' +
+                    '<button class="btn btn-xs btn-danger btn-delete-passkey" data-id="' + Auth.escapeHtml(pk.id) + '" title="Delete">&#128465;</button>' +
                 '</div>';
 
             list.appendChild(item);
@@ -285,16 +275,16 @@
     // ----------------------------------------------------------------
     function showPasswordModal() {
         var modal = document.getElementById('password-modal');
-        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
 
         // Show/hide current password field
         var currentPwGroup = document.getElementById('current-password-group');
         var title = document.getElementById('password-modal-title');
         if (accountData.has_password) {
-            currentPwGroup.classList.remove('hidden');
+            currentPwGroup.style.display = '';
             title.textContent = _t('account.changePassword');
         } else {
-            currentPwGroup.classList.add('hidden');
+            currentPwGroup.style.display = 'none';
             title.textContent = _t('account.setPassword');
         }
 
@@ -304,7 +294,7 @@
     }
 
     function hidePasswordModal() {
-        document.getElementById('password-modal').classList.add('hidden');
+        document.getElementById('password-modal').style.display = 'none';
     }
 
     // ----------------------------------------------------------------
@@ -331,7 +321,7 @@
         // Show passkey section only if WebAuthn supported
         if (!window.PublicKeyCredential) {
             var pkSection = document.getElementById('passkeys-section');
-            if (pkSection) pkSection.classList.add('hidden');
+            if (pkSection) pkSection.style.display = 'none';
         }
 
         // Add Passkey

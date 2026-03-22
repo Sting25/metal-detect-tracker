@@ -6,16 +6,16 @@
 window.QuickAddSite = (function () {
     'use strict';
 
-    var _t = (typeof I18n !== 'undefined') ? I18n.t : function(k) { return k; };
+    const _t = (typeof I18n !== 'undefined') ? I18n.t : function(k) { return k; };
 
-    var overlay = null;
-    var form = null;
-    var gpsLat = null;
-    var gpsLng = null;
-    var gpsWatchId = null;
+    let overlay = null;
+    let form = null;
+    let gpsLat = null;
+    let gpsLng = null;
+    let gpsWatchId = null;
 
     // DOM refs (set during createOverlay)
-    var els = {};
+    const els = {};
 
     function createOverlay() {
         overlay = document.createElement('div');
@@ -95,7 +95,7 @@ window.QuickAddSite = (function () {
 
     function previewPhoto(file) {
         if (!file) return;
-        var reader = new FileReader();
+        const reader = new FileReader();
         reader.onload = function (e) {
             els.photoPreview.src = e.target.result;
             els.photoPreview.classList.remove('hidden');
@@ -159,7 +159,7 @@ window.QuickAddSite = (function () {
     async function handleSubmit(e) {
         e.preventDefault();
 
-        var name = els.name.value.trim();
+        const name = els.name.value.trim();
         if (!name) {
             Auth.showToast(_t('quickAdd.enterName'), 'warning');
             return;
@@ -170,7 +170,7 @@ window.QuickAddSite = (function () {
             return;
         }
 
-        var formData = new FormData();
+        const formData = new FormData();
         formData.append('name', name);
         formData.append('latitude', gpsLat);
         formData.append('longitude', gpsLng);
@@ -189,13 +189,13 @@ window.QuickAddSite = (function () {
             els.submitBtn.disabled = true;
             els.submitBtn.textContent = _t('quickAdd.saving');
 
-            var res = await Auth.authedFetch('/api/sites', {
+            const res = await Auth.authedFetch('/api/sites', {
                 method: 'POST',
                 body: formData
             });
 
             if (!res.ok) {
-                var errData = await res.json().catch(function () { return {}; });
+                const errData = await res.json().catch(function () { return {}; });
                 throw new Error(errData.error || 'Failed to save site');
             }
 

@@ -6,20 +6,20 @@
 (function () {
     'use strict';
 
-    var _t = (typeof I18n !== 'undefined') ? I18n.t : function(k) { return k; };
+    const _t = (typeof I18n !== 'undefined') ? I18n.t : function(k) { return k; };
 
     /* ------------------------------------------------------------------ */
     /*  Shared State (window.PP namespace)                                */
     /* ------------------------------------------------------------------ */
-    var PP = window.PP = window.PP || {};
+    const PP = window.PP = window.PP || {};
     PP.allPermissions = [];
     PP.allSites = [];
     PP.currentContacts = [];
     PP.editingPermId = null;
     PP.els = {};
 
-    var activeFilter = 'all';
-    var EXPIRY_WARNING_DAYS = 30;
+    let activeFilter = 'all';
+    const EXPIRY_WARNING_DAYS = 30;
 
     PP.escapeHtml = function (str) {
         return window.Auth ? Auth.escapeHtml(str) : (str ? String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : '');
@@ -29,7 +29,7 @@
     /*  DOM References                                                    */
     /* ------------------------------------------------------------------ */
     function cacheElements() {
-        var g = document.getElementById.bind(document);
+        const g = document.getElementById.bind(document);
         PP.els.permList = g('permissions-list');
         PP.els.filterTabs = g('filter-tabs');
         PP.els.modalOverlay = g('perm-modal-overlay');
@@ -158,12 +158,12 @@
     /* ------------------------------------------------------------------ */
     async function loadSitesDropdown() {
         try {
-            var res = await Auth.authedFetch('/api/sites');
+            const res = await Auth.authedFetch('/api/sites');
             if (!res.ok) throw new Error('Failed to fetch sites');
-            var json = await res.json();
+            const json = await res.json();
             PP.allSites = json.data || [];
-            var esc = PP.escapeHtml;
-            var options = '<option value="">' + _t('permissions.label.noSite') + '</option>';
+            const esc = PP.escapeHtml;
+            let options = '<option value="">' + _t('permissions.label.noSite') + '</option>';
             PP.allSites.forEach(function (s) {
                 options += '<option value="' + s.id + '">' + esc(s.name || 'Unnamed') + '</option>';
             });
@@ -175,9 +175,9 @@
 
     async function loadPermissions() {
         try {
-            var res = await Auth.authedFetch('/api/permissions');
+            const res = await Auth.authedFetch('/api/permissions');
             if (!res.ok) throw new Error('Failed to fetch permissions');
-            var json = await res.json();
+            const json = await res.json();
             PP.allPermissions = json.data || [];
             applyFilter();
         } catch (err) {
@@ -190,7 +190,7 @@
     /*  Filtering & Rendering                                             */
     /* ------------------------------------------------------------------ */
     function applyFilter() {
-        var filtered = PP.allPermissions.slice();
+        let filtered = PP.allPermissions.slice();
         if (activeFilter !== 'all') {
             filtered = filtered.filter(function (p) { return p.status === activeFilter; });
         }
@@ -208,21 +208,21 @@
             return;
         }
 
-        var esc = PP.escapeHtml;
-        var now = new Date();
-        var html = '';
+        const esc = PP.escapeHtml;
+        const now = new Date();
+        let html = '';
 
         permissions.forEach(function (perm) {
-            var statusClass = 'perm-status-' + (perm.status || 'pending');
-            var siteName = getSiteName(perm.site_id);
-            var dateRequested = perm.date_requested ? new Date(perm.date_requested).toLocaleDateString() : '';
-            var dateGranted = perm.date_granted ? new Date(perm.date_granted).toLocaleDateString() : '';
-            var expDate = perm.expiration_date ? new Date(perm.expiration_date) : null;
-            var expDateStr = expDate ? expDate.toLocaleDateString() : '';
+            const statusClass = 'perm-status-' + (perm.status || 'pending');
+            const siteName = getSiteName(perm.site_id);
+            const dateRequested = perm.date_requested ? new Date(perm.date_requested).toLocaleDateString() : '';
+            const dateGranted = perm.date_granted ? new Date(perm.date_granted).toLocaleDateString() : '';
+            const expDate = perm.expiration_date ? new Date(perm.expiration_date) : null;
+            const expDateStr = expDate ? expDate.toLocaleDateString() : '';
 
-            var expiryWarning = '';
+            let expiryWarning = '';
             if (expDate && perm.status === 'approved') {
-                var daysLeft = Math.ceil((expDate - now) / (1000 * 60 * 60 * 24));
+                const daysLeft = Math.ceil((expDate - now) / (1000 * 60 * 60 * 24));
                 if (daysLeft <= 0) {
                     expiryWarning = '<span class="badge badge-expired">EXPIRED</span>';
                 } else if (daysLeft <= EXPIRY_WARNING_DAYS) {
@@ -230,7 +230,7 @@
                 }
             }
 
-            var hasDoc = perm.document_url || false;
+            const hasDoc = perm.document_url || false;
 
             html += '<div class="perm-card" data-id="' + perm.id + '">' +
                 '<div class="perm-card-header">' +
@@ -261,8 +261,8 @@
         PP.els.permList.querySelectorAll('.perm-card').forEach(function (card) {
             card.addEventListener('click', function (e) {
                 if (e.target.closest('.perm-letter-link')) return;
-                var id = card.dataset.id;
-                var perm = PP.allPermissions.find(function (p) { return String(p.id) === String(id); });
+                const id = card.dataset.id;
+                const perm = PP.allPermissions.find(function (p) { return String(p.id) === String(id); });
                 if (perm) openModal(perm);
             });
         });
@@ -270,7 +270,7 @@
 
     function getSiteName(siteId) {
         if (!siteId) return 'No site';
-        var site = PP.allSites.find(function (s) { return String(s.id) === String(siteId); });
+        const site = PP.allSites.find(function (s) { return String(s.id) === String(siteId); });
         return site ? (site.name || 'Unnamed Site') : 'Site #' + siteId;
     }
 
@@ -355,7 +355,7 @@
     /* ------------------------------------------------------------------ */
     async function handleFormSubmit(e) {
         e.preventDefault();
-        var formData = new FormData();
+        const formData = new FormData();
         formData.append('site_id', PP.els.site.value);
         formData.append('land_type', PP.els.landType.value.trim());
         formData.append('agency_owner', PP.els.agency.value.trim());
@@ -370,16 +370,16 @@
         formData.append('notes', PP.els.notes.value.trim());
         if (PP.els.docInput.files.length > 0) formData.append('document', PP.els.docInput.files[0]);
 
-        var id = PP.els.permId.value;
-        var url = id ? '/api/permissions/' + id : '/api/permissions';
-        var method = id ? 'PUT' : 'POST';
+        const id = PP.els.permId.value;
+        const url = id ? '/api/permissions/' + id : '/api/permissions';
+        const method = id ? 'PUT' : 'POST';
 
         try {
             PP.els.btnSave.disabled = true;
             PP.els.btnSave.textContent = _t('permissions.modal.saving');
-            var res = await Auth.authedFetch(url, { method: method, body: formData });
+            const res = await Auth.authedFetch(url, { method: method, body: formData });
             if (!res.ok) {
-                var errData = await res.json().catch(function () { return {}; });
+                const errData = await res.json().catch(function () { return {}; });
                 throw new Error(errData.message || 'Failed to save permission');
             }
             closeModal();
@@ -394,11 +394,11 @@
     }
 
     async function handleDelete() {
-        var id = PP.els.permId.value;
+        const id = PP.els.permId.value;
         if (!id) return;
         if (!confirm(_t('permissions.confirmDelete'))) return;
         try {
-            var res = await Auth.authedFetch('/api/permissions/' + id, { method: 'DELETE' });
+            const res = await Auth.authedFetch('/api/permissions/' + id, { method: 'DELETE' });
             if (!res.ok) throw new Error('Failed to delete permission');
             closeModal();
             await loadPermissions();

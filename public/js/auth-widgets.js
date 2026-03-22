@@ -10,8 +10,8 @@
     /* ------------------------------------------------------------------ */
     function createFAB() {
         if (Auth.isDemo()) return;
-        var path = window.location.pathname;
-        var fabConfig = null;
+        const path = window.location.pathname;
+        let fabConfig = null;
 
         if (path === '/sites.html') {
             fabConfig = { icon: '+', label: 'Add Site', targetId: 'btn-add-site' };
@@ -25,7 +25,7 @@
 
         if (!fabConfig) return;
 
-        var fab = document.createElement('button');
+        const fab = document.createElement('button');
         fab.className = 'fab';
         fab.setAttribute('aria-label', fabConfig.label);
         fab.setAttribute('title', fabConfig.label);
@@ -34,7 +34,7 @@
             if (fabConfig.action === 'quick-add') {
                 if (window.QuickAddSite) window.QuickAddSite.open();
             } else {
-                var target = document.getElementById(fabConfig.targetId);
+                const target = document.getElementById(fabConfig.targetId);
                 if (target) target.click();
             }
         });
@@ -45,12 +45,12 @@
     /*  Quick Add Site Loader                                              */
     /* ------------------------------------------------------------------ */
     function loadQuickAdd() {
-        var path = window.location.pathname;
+        const path = window.location.pathname;
         if (path === '/login.html' || path === '/landing.html' ||
             path.indexOf('print-') !== -1 ||
             (path === '/legal.html' && !Auth.getToken())) return;
 
-        var script = document.createElement('script');
+        const script = document.createElement('script');
         script.src = '/js/quick-add.js';
         document.body.appendChild(script);
     }
@@ -60,12 +60,12 @@
     /* ------------------------------------------------------------------ */
     function createFeedbackWidget() {
         if (Auth.isDemo()) return;
-        var path = window.location.pathname;
+        const path = window.location.pathname;
         if (path === '/login.html' || path === '/landing.html' ||
             path.indexOf('print-') !== -1 ||
             (path === '/legal.html' && !Auth.getToken())) return;
 
-        var widget = document.createElement('div');
+        const widget = document.createElement('div');
         widget.className = 'feedback-widget';
         widget.innerHTML =
             '<button class="feedback-widget-btn" id="feedback-widget-btn" title="Send Feedback"><span class="feedback-btn-icon">&#128172;</span><span class="feedback-btn-label">Feedback</span></button>' +
@@ -102,11 +102,11 @@
 
         document.body.appendChild(widget);
 
-        var btn = document.getElementById('feedback-widget-btn');
-        var panel = document.getElementById('feedback-panel');
-        var closeBtn = document.getElementById('feedback-panel-close');
-        var form = document.getElementById('feedback-form');
-        var successEl = document.getElementById('feedback-success');
+        const btn = document.getElementById('feedback-widget-btn');
+        const panel = document.getElementById('feedback-panel');
+        const closeBtn = document.getElementById('feedback-panel-close');
+        const form = document.getElementById('feedback-form');
+        const successEl = document.getElementById('feedback-success');
 
         btn.addEventListener('click', function (e) {
             e.stopPropagation();
@@ -125,17 +125,17 @@
 
         form.addEventListener('submit', function (e) {
             e.preventDefault();
-            var formData = new FormData();
+            const formData = new FormData();
             formData.append('type', document.getElementById('feedback-type').value);
             formData.append('message', document.getElementById('feedback-message').value);
             formData.append('page_url', window.location.href);
             formData.append('user_agent', navigator.userAgent);
-            var screenshotInput = document.getElementById('feedback-screenshot');
+            const screenshotInput = document.getElementById('feedback-screenshot');
             if (screenshotInput.files.length > 0) {
                 formData.append('screenshot', screenshotInput.files[0]);
             }
 
-            var submitBtn = form.querySelector('.feedback-submit-btn');
+            const submitBtn = form.querySelector('.feedback-submit-btn');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Sending...';
 
@@ -169,7 +169,7 @@
     function createDemoBanner() {
         if (!Auth.isDemo()) return;
 
-        var banner = document.createElement('div');
+        const banner = document.createElement('div');
         banner.className = 'demo-banner';
         banner.innerHTML =
             '<span class="demo-banner-text">' +

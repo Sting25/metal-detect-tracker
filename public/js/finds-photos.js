@@ -5,14 +5,14 @@
 (function (FP) {
     'use strict';
 
-    var _t = (typeof I18n !== 'undefined') ? I18n.t : function(k) { return k; };
+    const _t = (typeof I18n !== 'undefined') ? I18n.t : function(k) { return k; };
 
     /* ------------------------------------------------------------------ */
     /*  Multi-Photo Gallery                                               */
     /* ------------------------------------------------------------------ */
     FP.addNewPhotoFiles = function (fileList) {
-        var totalCount = FP.currentPhotos.length + FP.newPhotoFiles.length;
-        for (var i = 0; i < fileList.length; i++) {
+        let totalCount = FP.currentPhotos.length + FP.newPhotoFiles.length;
+        for (let i = 0; i < fileList.length; i++) {
             if (totalCount + i >= 10) {
                 Auth.showToast(_t('finds.photo.maxReached'), 'warning');
                 break;
@@ -23,12 +23,12 @@
     };
 
     FP.renderPhotoGallery = function () {
-        var esc = FP.escapeHtml;
-        var html = '';
+        const esc = FP.escapeHtml;
+        let html = '';
 
         // Existing server photos
-        for (var i = 0; i < FP.currentPhotos.length; i++) {
-            var p = FP.currentPhotos[i];
+        for (let i = 0; i < FP.currentPhotos.length; i++) {
+            const p = FP.currentPhotos[i];
             html += '<div class="photo-gallery-item" data-index="' + i + '" data-type="server" data-photo-id="' + p.id + '">' +
                 '<img src="' + esc(Auth.secureUrl(p.photo_url)) + '" alt="Photo" class="photo-gallery-thumb">' +
                 '<div class="photo-gallery-actions">' +
@@ -40,8 +40,8 @@
         }
 
         // New pending photos (previews)
-        for (var j = 0; j < FP.newPhotoFiles.length; j++) {
-            var idx = FP.currentPhotos.length + j;
+        for (let j = 0; j < FP.newPhotoFiles.length; j++) {
+            const idx = FP.currentPhotos.length + j;
             html += '<div class="photo-gallery-item photo-gallery-item--pending" data-index="' + idx + '" data-type="new" data-new-index="' + j + '">' +
                 '<img src="" alt="New photo" class="photo-gallery-thumb photo-preview-thumb" data-file-index="' + j + '">' +
                 '<div class="photo-gallery-actions">' +
@@ -54,10 +54,10 @@
 
         // Generate previews for new files
         FP.els.photoGallery.querySelectorAll('.photo-preview-thumb').forEach(function (img) {
-            var fileIdx = parseInt(img.dataset.fileIndex, 10);
-            var file = FP.newPhotoFiles[fileIdx];
+            const fileIdx = parseInt(img.dataset.fileIndex, 10);
+            const file = FP.newPhotoFiles[fileIdx];
             if (file) {
-                var reader = new FileReader();
+                const reader = new FileReader();
                 reader.onload = function (e) { img.src = e.target.result; };
                 reader.readAsDataURL(file);
             }
@@ -67,7 +67,7 @@
         FP.els.photoGallery.querySelectorAll('.photo-gallery-thumb').forEach(function (img) {
             img.addEventListener('click', function (e) {
                 e.stopPropagation();
-                var item = img.closest('.photo-gallery-item');
+                const item = img.closest('.photo-gallery-item');
                 FP.openLightbox(parseInt(item.dataset.index, 10));
             });
         });
@@ -76,7 +76,7 @@
         FP.els.photoGallery.querySelectorAll('.photo-delete-btn').forEach(function (btn) {
             btn.addEventListener('click', function (e) {
                 e.stopPropagation();
-                var item = btn.closest('.photo-gallery-item');
+                const item = btn.closest('.photo-gallery-item');
                 if (item.dataset.type === 'server') {
                     FP.handlePhotoDelete(parseInt(item.dataset.photoId, 10));
                 } else {
@@ -90,9 +90,9 @@
         FP.els.photoGallery.querySelectorAll('.photo-move-up').forEach(function (btn) {
             btn.addEventListener('click', function (e) {
                 e.stopPropagation();
-                var idx = parseInt(btn.closest('.photo-gallery-item').dataset.index, 10);
+                const idx = parseInt(btn.closest('.photo-gallery-item').dataset.index, 10);
                 if (idx > 0) {
-                    var temp = FP.currentPhotos[idx];
+                    const temp = FP.currentPhotos[idx];
                     FP.currentPhotos[idx] = FP.currentPhotos[idx - 1];
                     FP.currentPhotos[idx - 1] = temp;
                     FP.renderPhotoGallery();
@@ -103,9 +103,9 @@
         FP.els.photoGallery.querySelectorAll('.photo-move-down').forEach(function (btn) {
             btn.addEventListener('click', function (e) {
                 e.stopPropagation();
-                var idx = parseInt(btn.closest('.photo-gallery-item').dataset.index, 10);
+                const idx = parseInt(btn.closest('.photo-gallery-item').dataset.index, 10);
                 if (idx < FP.currentPhotos.length - 1) {
-                    var temp = FP.currentPhotos[idx];
+                    const temp = FP.currentPhotos[idx];
                     FP.currentPhotos[idx] = FP.currentPhotos[idx + 1];
                     FP.currentPhotos[idx + 1] = temp;
                     FP.renderPhotoGallery();
@@ -125,7 +125,7 @@
         if (!FP.editingFindId || !photoId) return;
         if (!confirm(_t('finds.photo.deleteConfirm'))) return;
         try {
-            var res = await Auth.authedFetch('/api/finds/' + FP.editingFindId + '/photos/' + photoId, { method: 'DELETE' });
+            const res = await Auth.authedFetch('/api/finds/' + FP.editingFindId + '/photos/' + photoId, { method: 'DELETE' });
             if (!res.ok) throw new Error('Failed to delete photo');
             FP.currentPhotos = FP.currentPhotos.filter(function (p) { return p.id !== photoId; });
             FP.renderPhotoGallery();
@@ -140,10 +140,10 @@
     /* ------------------------------------------------------------------ */
     FP.openLightbox = function (index) {
         FP.lightboxPhotos = [];
-        for (var i = 0; i < FP.currentPhotos.length; i++) {
+        for (let i = 0; i < FP.currentPhotos.length; i++) {
             FP.lightboxPhotos.push(Auth.secureUrl(FP.currentPhotos[i].photo_url));
         }
-        for (var j = 0; j < FP.newPhotoFiles.length; j++) {
+        for (let j = 0; j < FP.newPhotoFiles.length; j++) {
             FP.lightboxPhotos.push(URL.createObjectURL(FP.newPhotoFiles[j]));
         }
         if (FP.lightboxPhotos.length === 0) return;
@@ -182,10 +182,10 @@
         FP.els.quickLogUploadPlaceholder.classList.remove('hidden');
         FP.els.quickLogLocationStatus.textContent = '';
 
-        var lastCategory = localStorage.getItem('sb_lastCategory') || '';
+        const lastCategory = localStorage.getItem('sb_lastCategory') || '';
         FP.els.quickLogCategory.value = lastCategory;
 
-        var lastSiteId = localStorage.getItem('sb_lastSiteId') || '';
+        const lastSiteId = localStorage.getItem('sb_lastSiteId') || '';
         if (lastSiteId) FP.els.quickLogSiteId.value = lastSiteId;
 
         if (navigator.geolocation) {
@@ -213,9 +213,9 @@
 
     FP.handleQuickLogSubmit = async function (e) {
         e.preventDefault();
-        var formData = new FormData();
+        const formData = new FormData();
 
-        var siteId = FP.els.quickLogSiteId.value;
+        let siteId = FP.els.quickLogSiteId.value;
         if (!siteId && FP.allSites.length > 0) siteId = FP.allSites[0].id;
         if (!siteId) {
             Auth.showToast(_t('finds.errorSaving') + ' No site available');
@@ -224,7 +224,7 @@
         formData.append('site_id', siteId);
         formData.append('date', new Date().toISOString().split('T')[0]);
         formData.append('description', FP.els.quickLogDescription.value.trim());
-        var cat = FP.els.quickLogCategory.value;
+        const cat = FP.els.quickLogCategory.value;
         if (cat) formData.append('category', cat);
         if (FP.els.quickLogLatitude.value) formData.append('latitude', FP.els.quickLogLatitude.value);
         if (FP.els.quickLogLongitude.value) formData.append('longitude', FP.els.quickLogLongitude.value);
@@ -235,9 +235,9 @@
         try {
             FP.els.btnQuickLogSave.disabled = true;
             FP.els.btnQuickLogSave.textContent = _t('finds.modal.saving');
-            var res = await Auth.authedFetch('/api/finds', { method: 'POST', body: formData });
+            const res = await Auth.authedFetch('/api/finds', { method: 'POST', body: formData });
             if (!res.ok) {
-                var errData = await res.json().catch(function () { return {}; });
+                const errData = await res.json().catch(function () { return {}; });
                 throw new Error(errData.message || 'Failed to save find');
             }
             localStorage.setItem('sb_lastCategory', cat);
@@ -255,12 +255,12 @@
     };
 
     FP.quickLogToFullModal = function () {
-        var description = FP.els.quickLogDescription.value;
-        var category = FP.els.quickLogCategory.value;
-        var lat = FP.els.quickLogLatitude.value;
-        var lng = FP.els.quickLogLongitude.value;
-        var siteId = FP.els.quickLogSiteId.value;
-        var photoFile = FP.els.quickLogPhoto.files.length > 0 ? FP.els.quickLogPhoto.files[0] : null;
+        const description = FP.els.quickLogDescription.value;
+        const category = FP.els.quickLogCategory.value;
+        const lat = FP.els.quickLogLatitude.value;
+        const lng = FP.els.quickLogLongitude.value;
+        const siteId = FP.els.quickLogSiteId.value;
+        const photoFile = FP.els.quickLogPhoto.files.length > 0 ? FP.els.quickLogPhoto.files[0] : null;
 
         FP.closeQuickLog();
         FP.openModal();

@@ -10,10 +10,10 @@
  *
  * Requires `verifyToken` to have run first (needs `req.user.id`).
  */
-var db = require('../database');
+const db = require('../database');
 
 function idempotent(req, res, next) {
-    var key = req.headers['x-idempotency-key'];
+    const key = req.headers['x-idempotency-key'];
     if (!key) return next(); // No key = normal request
 
     db.queryOne(
@@ -26,7 +26,7 @@ function idempotent(req, res, next) {
         }
 
         // Wrap res.json to capture the response for storage
-        var originalJson = res.json.bind(res);
+        const originalJson = res.json.bind(res);
         res.json = function (body) {
             // Store idempotency key (fire-and-forget, ON CONFLICT to handle races)
             db.query(

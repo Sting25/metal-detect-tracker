@@ -5,12 +5,12 @@
 (function () {
     'use strict';
 
-    var LP = window.LegalPage;
+    const LP = window.LegalPage;
     if (!LP) return;
 
-    var _loadedSections = [];
+    let _loadedSections = [];
 
-    var SUGGESTION_STATUS_COLORS = {
+    const SUGGESTION_STATUS_COLORS = {
         pending: 'var(--color-warning, #f59e0b)',
         approved: 'var(--color-primary, #6b4f36)',
         rejected: 'var(--color-status-red, #ef4444)',
@@ -18,12 +18,12 @@
     };
 
     function populateSectionDropdown() {
-        var sectionRef = document.getElementById('legal-suggest-section-ref');
+        const sectionRef = document.getElementById('legal-suggest-section-ref');
         if (!sectionRef) return;
 
         sectionRef.innerHTML = '<option value="">(None / General)</option>';
         _loadedSections.forEach(function (s) {
-            var opt = document.createElement('option');
+            const opt = document.createElement('option');
             opt.value = s.id;
             opt.textContent = s.section_title;
             sectionRef.appendChild(opt);
@@ -31,18 +31,18 @@
     }
 
     // Wrap loadContent to capture sections for the suggest dropdown
-    var _origLoadContent = LP.loadContent;
+    const _origLoadContent = LP.loadContent;
     LP.loadContent = async function (country, region) {
-        var lang = (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : 'en';
-        var url = '/api/legal?country=' + encodeURIComponent(country) + '&lang=' + encodeURIComponent(lang);
+        const lang = (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : 'en';
+        let url = '/api/legal?country=' + encodeURIComponent(country) + '&lang=' + encodeURIComponent(lang);
         if (region) url += '&region=' + encodeURIComponent(region);
 
         LP.nationalContainer.innerHTML = '<p class="text-muted">' + LP.escapeHtml(LP._t('common.loading')) + '</p>';
         LP.regionalContainer.innerHTML = '';
 
         try {
-            var res = await Auth.authedFetch(url);
-            var body = await res.json();
+            const res = await Auth.authedFetch(url);
+            const body = await res.json();
             if (!body.success) throw new Error('API error');
 
             // Capture sections for suggest dropdown
@@ -51,10 +51,10 @@
 
             LP.renderSections(LP.nationalContainer, body.data.national, country);
             if (region && body.data.regional && body.data.regional.length > 0) {
-                var regionLabel = LP.REGION_LABELS[region] || region;
+                const regionLabel = LP.REGION_LABELS[region] || region;
                 LP.regionalContainer.innerHTML = '<h2 style="margin-top:2rem;margin-bottom:1rem;">' +
                     LP.escapeHtml(regionLabel) + '</h2>';
-                var regionAccordion = document.createElement('div');
+                const regionAccordion = document.createElement('div');
                 LP.regionalContainer.appendChild(regionAccordion);
                 LP.renderSections(regionAccordion, body.data.regional, country);
             } else if (region) {
@@ -69,8 +69,8 @@
     };
 
     function renderMySuggestions(suggestions) {
-        var list = document.getElementById('legal-my-suggestions-list');
-        var container = document.getElementById('legal-my-suggestions');
+        const list = document.getElementById('legal-my-suggestions-list');
+        const container = document.getElementById('legal-my-suggestions');
         if (!list || !container) return;
 
         if (!suggestions || suggestions.length === 0) {
@@ -79,14 +79,14 @@
         }
 
         container.classList.remove('hidden');
-        var html = '';
+        let html = '';
         suggestions.forEach(function (s) {
-            var typeLabel = s.suggestion_type || 'correction';
+            let typeLabel = s.suggestion_type || 'correction';
             typeLabel = typeLabel.replace('_', ' ');
             typeLabel = typeLabel.charAt(0).toUpperCase() + typeLabel.slice(1);
 
-            var statusColor = SUGGESTION_STATUS_COLORS[s.status] || '#888';
-            var date = s.created_at ? new Date(s.created_at).toLocaleDateString() : '';
+            const statusColor = SUGGESTION_STATUS_COLORS[s.status] || '#888';
+            const date = s.created_at ? new Date(s.created_at).toLocaleDateString() : '';
 
             html += '<div class="suggestion-item" style="padding:0.75rem;border:1px solid var(--color-border, #e0e0e0);border-radius:var(--radius-sm, 6px);margin-bottom:0.5rem;background:var(--color-surface, #fff);">';
             html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.35rem;">';
@@ -106,8 +106,8 @@
     async function loadMySuggestions() {
         if (!window.Auth || !Auth.getToken()) return;
         try {
-            var res = await Auth.authedFetch('/api/legal/suggestions');
-            var body = await res.json();
+            const res = await Auth.authedFetch('/api/legal/suggestions');
+            const body = await res.json();
             if (body.success) renderMySuggestions(body.data);
         } catch (err) {
             console.error('Error loading suggestions:', err);
@@ -115,13 +115,13 @@
     }
 
     function initSuggest() {
-        var suggestSection = document.getElementById('legal-suggest-section');
-        var suggestBtn = document.getElementById('btn-suggest-legal');
-        var suggestText = document.getElementById('legal-suggest-text');
-        var suggestReason = document.getElementById('legal-suggest-reason');
-        var suggestType = document.getElementById('legal-suggest-type');
-        var suggestSectionRef = document.getElementById('legal-suggest-section-ref');
-        var suggestStatus = document.getElementById('legal-suggest-status');
+        const suggestSection = document.getElementById('legal-suggest-section');
+        const suggestBtn = document.getElementById('btn-suggest-legal');
+        const suggestText = document.getElementById('legal-suggest-text');
+        const suggestReason = document.getElementById('legal-suggest-reason');
+        const suggestType = document.getElementById('legal-suggest-type');
+        const suggestSectionRef = document.getElementById('legal-suggest-section-ref');
+        const suggestStatus = document.getElementById('legal-suggest-status');
 
         if (!suggestSection || !suggestBtn) return;
 
@@ -131,24 +131,24 @@
         loadMySuggestions();
 
         suggestBtn.addEventListener('click', async function () {
-            var message = (suggestText.value || '').trim();
+            const message = (suggestText.value || '').trim();
             if (!message) {
                 suggestStatus.textContent = window.I18n ? I18n.t('legal.suggest.error') : 'Please enter a suggestion.';
                 suggestStatus.style.color = 'var(--color-status-red, #ef4444)';
                 return;
             }
 
-            var country = LP.countrySelect.value || 'US';
-            var region = LP.regionSelect.value || '';
-            var type = suggestType ? suggestType.value : 'correction';
-            var sectionId = suggestSectionRef ? suggestSectionRef.value : '';
-            var reason = suggestReason ? (suggestReason.value || '').trim() : '';
+            const country = LP.countrySelect.value || 'US';
+            const region = LP.regionSelect.value || '';
+            const type = suggestType ? suggestType.value : 'correction';
+            const sectionId = suggestSectionRef ? suggestSectionRef.value : '';
+            const reason = suggestReason ? (suggestReason.value || '').trim() : '';
 
             suggestBtn.disabled = true;
             suggestBtn.textContent = window.I18n ? I18n.t('legal.suggest.submitting') : 'Submitting...';
             suggestStatus.textContent = '';
 
-            var payload = {
+            const payload = {
                 country_code: country,
                 suggestion_type: type,
                 suggested_text: message,
@@ -158,12 +158,12 @@
             if (reason) payload.reason = reason;
 
             try {
-                var res = await Auth.authedFetch('/api/legal/suggestions', {
+                const res = await Auth.authedFetch('/api/legal/suggestions', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                var body = await res.json();
+                const body = await res.json();
                 if (body.success) {
                     suggestStatus.textContent = window.I18n ? I18n.t('legal.suggest.success') : 'Thank you! Your suggestion has been submitted for review.';
                     suggestStatus.style.color = 'var(--color-status-green, #22c55e)';

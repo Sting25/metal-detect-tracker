@@ -174,7 +174,7 @@
 
                 var siteType = getSiteType(site.tags);
                 var icon = buildSiteTypeIcon(siteType, site.permission_status);
-                const esc = window.MapModule ? window.MapModule.escapeHtml : escapeHtmlLocal;
+                const esc = Auth.escapeHtml;
 
                 const typeInfo = SITE_TYPES[siteType] || SITE_TYPES.general;
                 const permLabel = (site.permission_status || 'not_requested').replace(/_/g, ' ');
@@ -234,7 +234,7 @@
                 return;
             }
 
-            const esc = window.MapModule ? window.MapModule.escapeHtml : escapeHtmlLocal;
+            const esc = Auth.escapeHtml;
             let html = '';
             sites.forEach(site => {
                 const date = site.created_at ? new Date(site.created_at).toLocaleDateString() : '';
@@ -298,13 +298,13 @@
             var reminders = json.data || [];
 
             if (reminders.length === 0) {
-                widget.classList.add('hidden');
+                widget.style.display = 'none';
                 return;
             }
 
-            widget.classList.remove('hidden');
+            widget.style.display = '';
             var now = new Date();
-            var esc = escapeHtmlLocal;
+            var esc = Auth.escapeHtml;
             var html = '';
 
             reminders.forEach(function (r) {
@@ -363,13 +363,4 @@
         }
     }
 
-    /* ------------------------------------------------------------------ */
-    /*  Utility                                                           */
-    /* ------------------------------------------------------------------ */
-    function escapeHtmlLocal(str) {
-        if (!str) return '';
-        const div = document.createElement('div');
-        div.appendChild(document.createTextNode(str));
-        return div.innerHTML;
-    }
 })();

@@ -33,12 +33,12 @@ app.use(helmet({
 // ---------------------------------------------------------------------------
 // Rate limiting
 // ---------------------------------------------------------------------------
-var isTest = function () {
+const isTest = function () {
     return process.env.NODE_ENV === 'test' || !!process.env.TEST_DB_PATH;
 };
 
 // Strict limit for auth endpoints (login, register, etc.)
-var authLimiter = rateLimit({
+const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 15,
     standardHeaders: true,
@@ -48,7 +48,7 @@ var authLimiter = rateLimit({
 });
 
 // General API limit
-var apiLimiter = rateLimit({
+const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 1000,
     standardHeaders: true,
@@ -72,7 +72,7 @@ app.use('/api/auth/passkey/login-verify', authLimiter);
 app.use('/api/auth/demo', authLimiter);
 
 // Strict limit for data exports (expensive operation)
-var exportLimiter = rateLimit({
+const exportLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 hour
     max: 5,
     standardHeaders: true,
@@ -175,15 +175,15 @@ async function start() {
 
     // Hard-delete job: permanently remove accounts deleted > 30 days ago
     if (process.env.NODE_ENV !== 'test') {
-        var s3 = require('./services/s3');
+        const s3 = require('./services/s3');
         async function runHardDeleteJob() {
-            var rows = (await db.query(
+            const rows = (await db.query(
                 "SELECT id FROM users WHERE deleted_at IS NOT NULL AND deleted_at < NOW() - INTERVAL '30 days'"
             )).rows;
-            for (var i = 0; i < rows.length; i++) {
+            for (let i = 0; i < rows.length; i++) {
                 try {
-                    var s3Keys = await db.hardDeleteUser(rows[i].id);
-                    for (var j = 0; j < s3Keys.length; j++) {
+                    const s3Keys = await db.hardDeleteUser(rows[i].id);
+                    for (let j = 0; j < s3Keys.length; j++) {
                         await s3.deleteFromS3(s3Keys[j]);
                     }
                     console.log('Hard-deleted user', rows[i].id);
@@ -197,7 +197,7 @@ async function start() {
 
         // Idempotency key cleanup: delete keys older than 7 days
         async function cleanIdempotencyKeys() {
-            var result = await db.query("DELETE FROM idempotency_keys WHERE created_at < NOW() - INTERVAL '7 days'");
+            const result = await db.query("DELETE FROM idempotency_keys WHERE created_at < NOW() - INTERVAL '7 days'");
             if (result.rowCount > 0) {
                 console.log('Cleaned', result.rowCount, 'expired idempotency keys');
             }

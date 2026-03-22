@@ -9,11 +9,11 @@ const path = require('path');
 // ---------------------------------------------------------------------------
 // Client setup
 // ---------------------------------------------------------------------------
-var endpoint = process.env.DO_SPACES_ENDPOINT || 'https://nyc3.digitaloceanspaces.com';
-var region = process.env.DO_SPACES_REGION || 'nyc3';
-var bucket = process.env.DO_SPACES_BUCKET || '';
+const endpoint = process.env.DO_SPACES_ENDPOINT || 'https://nyc3.digitaloceanspaces.com';
+const region = process.env.DO_SPACES_REGION || 'nyc3';
+const bucket = process.env.DO_SPACES_BUCKET || '';
 
-var client = null;
+let client = null;
 
 function getClient() {
     if (client) return client;
@@ -40,7 +40,7 @@ function getClient() {
  * @returns {string} S3 key like "sites/1708531234-567890.jpg"
  */
 function generateKey(subdir, originalName) {
-    var ext = path.extname(originalName).toLowerCase();
+    const ext = path.extname(originalName).toLowerCase();
     return subdir + '/' + Date.now() + '-' + Math.round(Math.random() * 1e6) + ext;
 }
 
@@ -85,7 +85,7 @@ async function deleteFromS3(key) {
  * @returns {Promise<string>} Presigned URL
  */
 async function getPresignedUrl(key, expiresIn) {
-    var command = new GetObjectCommand({
+    const command = new GetObjectCommand({
         Bucket: bucket,
         Key: key,
     });
@@ -98,17 +98,17 @@ async function getPresignedUrl(key, expiresIn) {
  * @returns {Promise<Buffer>} File contents
  */
 async function getObjectBuffer(key) {
-    var command = new GetObjectCommand({ Bucket: bucket, Key: key });
-    var response = await getClient().send(command);
-    var chunks = [];
-    for await (var chunk of response.Body) { chunks.push(chunk); }
+    const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+    const response = await getClient().send(command);
+    const chunks = [];
+    for await (const chunk of response.Body) { chunks.push(chunk); }
     return Buffer.concat(chunks);
 }
 
 // ---------------------------------------------------------------------------
 // Mock support for tests
 // ---------------------------------------------------------------------------
-var mockStore = null;
+let mockStore = null;
 
 /**
  * Enable mock mode for tests. All S3 operations use in-memory storage.
@@ -132,7 +132,7 @@ function getMockStore() {
 }
 
 // Wrap exports to support mocking
-var s3 = {
+const s3 = {
     generateKey: generateKey,
 
     uploadToS3: async function (buffer, key, contentType) {
@@ -160,7 +160,7 @@ var s3 = {
 
     getObjectBuffer: async function (key) {
         if (mockStore) {
-            var entry = mockStore.get(key);
+            const entry = mockStore.get(key);
             return entry ? entry.buffer : null;
         }
         return getObjectBuffer(key);

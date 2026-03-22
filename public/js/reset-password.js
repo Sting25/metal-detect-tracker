@@ -11,11 +11,11 @@
     // Initialize i18n for unauthenticated page
     if (typeof I18n !== 'undefined') { I18n.autoInit(); }
 
-    var currentEmail = '';
-    var currentChannel = 'email';
+    let currentEmail = '';
+    let currentChannel = 'email';
 
     function showError(msg) {
-        var el = document.getElementById('reset-error');
+        const el = document.getElementById('reset-error');
         el.textContent = msg;
         el.classList.remove('hidden');
         setTimeout(function () { el.classList.add('hidden'); }, 5000);
@@ -29,13 +29,13 @@
     }
 
     function getSelectedChannel() {
-        var checked = document.querySelector('input[name="reset-channel"]:checked');
+        const checked = document.querySelector('input[name="reset-channel"]:checked');
         return checked ? checked.value : 'email';
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        var params = new URLSearchParams(window.location.search);
-        var token = params.get('token');
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
 
         if (token) {
             // Admin token flow
@@ -56,7 +56,7 @@
             sendResetCode();
         });
 
-        var resendBtn = document.getElementById('btn-resend');
+        const resendBtn = document.getElementById('btn-resend');
         if (resendBtn) {
             resendBtn.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -66,23 +66,23 @@
     }
 
     async function sendResetCode() {
-        var email = document.getElementById('reset-email').value.trim();
+        const email = document.getElementById('reset-email').value.trim();
         if (!email) { showError('Please enter your email'); return; }
 
         currentEmail = email;
         currentChannel = getSelectedChannel();
 
-        var btn = document.getElementById('btn-send-code');
+        const btn = document.getElementById('btn-send-code');
         btn.disabled = true;
         btn.textContent = 'Sending...';
 
         try {
-            var res = await fetch('/api/auth/forgot-password', {
+            const res = await fetch('/api/auth/forgot-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: email, channel: currentChannel }),
             });
-            var json = await res.json();
+            const json = await res.json();
 
             if (!res.ok || !json.success) {
                 showError(json.error || 'Failed to send reset code');
@@ -95,7 +95,7 @@
             hideAll();
             document.getElementById('code-section').classList.remove('hidden');
 
-            var msgEl = document.getElementById('code-sent-msg');
+            const msgEl = document.getElementById('code-sent-msg');
             if (json.data && json.data.channel === 'phone' && json.data.maskedPhone) {
                 msgEl.innerHTML = 'A 6-digit code was sent to <strong>' + escapeHtml(json.data.maskedPhone) + '</strong>. Enter it below with your new password.';
             } else if (json.data && json.data.channel === 'email' && json.data.maskedEmail) {
@@ -116,23 +116,23 @@
         document.getElementById('reset-form').addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            var code = document.getElementById('reset-code').value.trim();
-            var pw = document.getElementById('reset-password').value;
-            var pw2 = document.getElementById('reset-password2').value;
+            const code = document.getElementById('reset-code').value.trim();
+            const pw = document.getElementById('reset-password').value;
+            const pw2 = document.getElementById('reset-password2').value;
 
             if (pw !== pw2) { showError('Passwords do not match'); return; }
 
-            var btn = document.getElementById('btn-reset');
+            const btn = document.getElementById('btn-reset');
             btn.disabled = true;
             btn.textContent = 'Resetting...';
 
             try {
-                var res = await fetch('/api/auth/reset-password', {
+                const res = await fetch('/api/auth/reset-password', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ code: code, email: currentEmail, password: pw, channel: currentChannel }),
                 });
-                var json = await res.json();
+                const json = await res.json();
 
                 if (!res.ok || !json.success) {
                     showError(json.error || 'Reset failed');
@@ -157,22 +157,22 @@
         document.getElementById('token-form').addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            var pw = document.getElementById('token-password').value;
-            var pw2 = document.getElementById('token-password2').value;
+            const pw = document.getElementById('token-password').value;
+            const pw2 = document.getElementById('token-password2').value;
 
             if (pw !== pw2) { showError('Passwords do not match'); return; }
 
-            var btn = document.getElementById('btn-token-reset');
+            const btn = document.getElementById('btn-token-reset');
             btn.disabled = true;
             btn.textContent = 'Resetting...';
 
             try {
-                var res = await fetch('/api/auth/reset-password', {
+                const res = await fetch('/api/auth/reset-password', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ token: token, password: pw }),
                 });
-                var json = await res.json();
+                const json = await res.json();
 
                 if (!res.ok || !json.success) {
                     showError(json.error || 'Reset failed');

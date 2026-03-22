@@ -15,10 +15,10 @@
   // ---------------------------------------------------------------------------
 
   /** @type {L.LayerGroup|null} Layer group that holds all site markers. */
-  var _markersLayer = null;
+  let _markersLayer = null;
 
   /** @type {Function|null} Click handler reference used during pin placement. */
-  var _pinClickHandler = null;
+  let _pinClickHandler = null;
 
   // ---------------------------------------------------------------------------
   // Helpers
@@ -32,8 +32,8 @@
    */
   function escapeHtml(str) {
     if (str === null || str === undefined) return "";
-    var text = String(str);
-    var div = document.createElement("div");
+    const text = String(str);
+    const div = document.createElement("div");
     div.appendChild(document.createTextNode(text));
     return div.innerHTML;
   }
@@ -45,7 +45,7 @@
    * @returns {string} Hex color.
    */
   function statusColor(status) {
-    var colors = {
+    const colors = {
       granted: "#22c55e",
       not_required: "#3b82f6",
       requested: "#eab308",
@@ -62,11 +62,11 @@
    * @returns {string} HTML string of stars.
    */
   function renderStars(priority) {
-    var count = parseInt(priority, 10) || 0;
+    let count = parseInt(priority, 10) || 0;
     if (count < 0) count = 0;
     if (count > 5) count = 5;
-    var html = "";
-    for (var i = 1; i <= 5; i++) {
+    let html = "";
+    for (let i = 1; i <= 5; i++) {
       if (i <= count) {
         html += '<span class="priority-stars__star priority-stars__star--filled">&#9733;</span>';
       } else {
@@ -91,15 +91,15 @@
    * @returns {L.Map} The Leaflet map instance.
    */
   function initMap(containerId, options) {
-    var opts = options || {};
+    const opts = options || {};
     // Support center as [lat, lng] array or separate lat/lng
-    var defaults = (window.AppConfig && AppConfig.getMapDefaults()) || { center: [39.8283, -98.5795], zoom: 4 };
-    var center = opts.center || [opts.lat, opts.lng];
-    var lat = (center && center[0] != null) ? center[0] : defaults.center[0];
-    var lng = (center && center[1] != null) ? center[1] : defaults.center[1];
-    var zoom = opts.zoom !== undefined ? opts.zoom : defaults.zoom;
+    const defaults = (window.AppConfig && AppConfig.getMapDefaults()) || { center: [39.8283, -98.5795], zoom: 4 };
+    const center = opts.center || [opts.lat, opts.lng];
+    const lat = (center && center[0] != null) ? center[0] : defaults.center[0];
+    const lng = (center && center[1] != null) ? center[1] : defaults.center[1];
+    const zoom = opts.zoom !== undefined ? opts.zoom : defaults.zoom;
 
-    var map = L.map(containerId, {
+    const map = L.map(containerId, {
       center: [lat, lng],
       zoom: zoom,
       zoomControl: true,
@@ -107,7 +107,7 @@
 
     // --- Tile Layers ---
 
-    var osmStreet = L.tileLayer(
+    const osmStreet = L.tileLayer(
       "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       {
         attribution:
@@ -116,7 +116,7 @@
       }
     );
 
-    var esriSatellite = L.tileLayer(
+    const esriSatellite = L.tileLayer(
       "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
       {
         attribution:
@@ -129,7 +129,7 @@
     osmStreet.addTo(map);
 
     // Layer control
-    var baseLayers = {
+    const baseLayers = {
       Street: osmStreet,
       Satellite: esriSatellite,
     };
@@ -151,7 +151,7 @@
    * @param {Function} callback - Called as callback(lat, lng) on click.
    */
   function enablePinPlacement(map, callback) {
-    var container = map.getContainer();
+    const container = map.getContainer();
 
     // Clean up any previous handler that was never completed.
     disablePinPlacement(map);
@@ -159,8 +159,8 @@
     container.classList.add("map-container--crosshair");
 
     _pinClickHandler = function (e) {
-      var lat = e.latlng.lat;
-      var lng = e.latlng.lng;
+      const lat = e.latlng.lat;
+      const lng = e.latlng.lng;
 
       // Exit crosshair mode.
       disablePinPlacement(map);
@@ -179,7 +179,7 @@
    * @param {L.Map} map
    */
   function disablePinPlacement(map) {
-    var container = map.getContainer();
+    const container = map.getContainer();
     container.classList.remove("map-container--crosshair");
 
     if (_pinClickHandler) {
@@ -204,9 +204,9 @@
    * @returns {L.CircleMarker}
    */
   function createSiteMarker(site) {
-    var color = statusColor(site.permission_status);
+    const color = statusColor(site.permission_status);
 
-    var marker = L.circleMarker([site.latitude, site.longitude], {
+    const marker = L.circleMarker([site.latitude, site.longitude], {
       radius: 8,
       fillColor: color,
       color: "#ffffff",
@@ -216,10 +216,10 @@
     });
 
     // Build popup HTML
-    var statusLabel = escapeHtml(
+    const statusLabel = escapeHtml(
       (site.permission_status || "unknown").replace(/_/g, " ")
     );
-    var popupHtml =
+    const popupHtml =
       '<div class="popup-title">' +
       escapeHtml(site.name) +
       "</div>" +
@@ -265,14 +265,14 @@
 
     if (!Array.isArray(sites)) return;
 
-    for (var i = 0; i < sites.length; i++) {
-      var site = sites[i];
+    for (let i = 0; i < sites.length; i++) {
+      const site = sites[i];
       if (
         site &&
         typeof site.latitude === "number" &&
         typeof site.longitude === "number"
       ) {
-        var marker = createSiteMarker(site);
+        const marker = createSiteMarker(site);
         _markersLayer.addLayer(marker);
       }
     }
@@ -288,9 +288,9 @@
   function fitBoundsToSites(map, sites) {
     if (!Array.isArray(sites) || sites.length === 0) return;
 
-    var validPoints = [];
-    for (var i = 0; i < sites.length; i++) {
-      var s = sites[i];
+    const validPoints = [];
+    for (let i = 0; i < sites.length; i++) {
+      const s = sites[i];
       if (
         s &&
         typeof s.latitude === "number" &&
@@ -305,7 +305,7 @@
     if (validPoints.length === 1) {
       map.setView(validPoints[0], 14);
     } else {
-      var bounds = L.latLngBounds(validPoints);
+      const bounds = L.latLngBounds(validPoints);
       map.fitBounds(bounds, { padding: [40, 40], maxZoom: 16 });
     }
   }

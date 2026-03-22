@@ -10,20 +10,20 @@
 window.AppConfig = (function () {
     'use strict';
 
-    var _t = (typeof I18n !== 'undefined') ? I18n.t : function(k) { return k; };
+    let _t = (typeof I18n !== 'undefined') ? I18n.t : function(k) { return k; };
 
     // ------------------------------------------------------------------
     // State
     // ------------------------------------------------------------------
-    var _user = null;
-    var _landTypes = null;
-    var _ready = false;
-    var _readyCallbacks = [];
+    let _user = null;
+    let _landTypes = null;
+    let _ready = false;
+    let _readyCallbacks = [];
 
     // ------------------------------------------------------------------
     // Map defaults by country
     // ------------------------------------------------------------------
-    var MAP_DEFAULTS = {
+    const MAP_DEFAULTS = {
         US: { center: [39.8283, -98.5795], zoom: 4 },
         GB: { center: [54.0, -2.0], zoom: 6 },
         AU: { center: [-25.2744, 133.7751], zoom: 4 },
@@ -36,7 +36,7 @@ window.AppConfig = (function () {
     function init() {
         if (typeof Auth === 'undefined' || !Auth.getToken()) {
             // No auth — still init i18n for unauthenticated pages (legal, etc.)
-            var i18nReady = (typeof I18n !== 'undefined')
+            const i18nReady = (typeof I18n !== 'undefined')
                 ? I18n.autoInit()
                 : Promise.resolve();
             i18nReady.then(function () {
@@ -112,7 +112,7 @@ window.AppConfig = (function () {
 
     /** Return {center, zoom} for the user's country */
     function getMapDefaults() {
-        var cc = _user ? _user.country_code : 'US';
+        const cc = _user ? _user.country_code : 'US';
         return MAP_DEFAULTS[cc] || MAP_DEFAULTS._default;
     }
 
@@ -122,7 +122,7 @@ window.AppConfig = (function () {
         if (_user && _user.unit_preference === 'metric') {
             return parseFloat(cm).toFixed(1) + ' cm';
         }
-        var inches = cm / 2.54;
+        const inches = cm / 2.54;
         return inches.toFixed(1) + '"';
     }
 
@@ -139,7 +139,7 @@ window.AppConfig = (function () {
     /** Convert user-entered depth input to cm for storage */
     function depthInputToCm(value) {
         if (value == null || value === '') return null;
-        var num = parseFloat(value);
+        const num = parseFloat(value);
         if (isNaN(num)) return null;
         if (isMetric()) return num;
         return +(num * 2.54).toFixed(1);
@@ -181,17 +181,17 @@ window.AppConfig = (function () {
      */
     function populateLandTypeSelect(selectEl, currentValue) {
         if (!selectEl) return;
-        var types = _landTypes || [];
+        const types = _landTypes || [];
 
         // Keep the first "Select..." placeholder if it exists
         selectEl.innerHTML = '';
-        var placeholder = document.createElement('option');
+        const placeholder = document.createElement('option');
         placeholder.value = '';
         placeholder.textContent = _t('common.select');
         selectEl.appendChild(placeholder);
 
         types.forEach(function (lt) {
-            var opt = document.createElement('option');
+            const opt = document.createElement('option');
             opt.value = lt.code;
             opt.textContent = lt.label;
             if (currentValue && lt.code === currentValue) {
@@ -201,7 +201,7 @@ window.AppConfig = (function () {
         });
 
         // Custom option
-        var customOpt = document.createElement('option');
+        const customOpt = document.createElement('option');
         customOpt.value = '__custom__';
         customOpt.textContent = 'Custom...';
         selectEl.appendChild(customOpt);
@@ -209,10 +209,10 @@ window.AppConfig = (function () {
         // Handle custom selection
         selectEl.addEventListener('change', function () {
             if (selectEl.value === '__custom__') {
-                var label = prompt('Enter custom land type:');
+                const label = prompt('Enter custom land type:');
                 if (label && label.trim()) {
-                    var code = label.trim().toLowerCase().replace(/\s+/g, '_');
-                    var opt = document.createElement('option');
+                    const code = label.trim().toLowerCase().replace(/\s+/g, '_');
+                    const opt = document.createElement('option');
                     opt.value = code;
                     opt.textContent = label.trim();
                     opt.selected = true;
@@ -230,8 +230,8 @@ window.AppConfig = (function () {
      */
     function landTypeLabel(code) {
         if (!code) return 'Unknown';
-        var types = _landTypes || [];
-        for (var i = 0; i < types.length; i++) {
+        const types = _landTypes || [];
+        for (let i = 0; i < types.length; i++) {
             if (types[i].code === code) return types[i].label;
         }
         // Fallback: title-case the code
@@ -242,7 +242,7 @@ window.AppConfig = (function () {
     // Toggle units (called by auth.js user dropdown)
     // ------------------------------------------------------------------
     function toggleUnits() {
-        var newPref = isMetric() ? 'imperial' : 'metric';
+        const newPref = isMetric() ? 'imperial' : 'metric';
         return updatePreferences({ unit_preference: newPref }).then(function () {
             window.location.reload();
         });
@@ -256,7 +256,7 @@ window.AppConfig = (function () {
     // ------------------------------------------------------------------
     // Language dropdown in navbar (authenticated pages)
     // ------------------------------------------------------------------
-    var SUPPORTED_LANGS = (typeof I18n !== 'undefined' && I18n.SUPPORTED_LANGS)
+    const SUPPORTED_LANGS = (typeof I18n !== 'undefined' && I18n.SUPPORTED_LANGS)
         ? I18n.SUPPORTED_LANGS
         : [
             { code: 'en', label: 'EN', name: 'English' },
@@ -265,35 +265,35 @@ window.AppConfig = (function () {
           ];
 
     function injectLanguageSelector() {
-        var navLinks = document.querySelector('.nav-links');
+        const navLinks = document.querySelector('.nav-links');
         if (!navLinks) return;
 
-        var currentLang = (_user && _user.language_preference) || 'en';
-        var currentLabel = 'EN';
+        const currentLang = (_user && _user.language_preference) || 'en';
+        let currentLabel = 'EN';
         SUPPORTED_LANGS.forEach(function (l) {
             if (l.code === currentLang) currentLabel = l.label;
         });
 
-        var wrapper = document.createElement('div');
+        const wrapper = document.createElement('div');
         wrapper.className = 'nav-dropdown';
 
-        var toggle = document.createElement('button');
+        const toggle = document.createElement('button');
         toggle.type = 'button';
         toggle.className = 'nav-dropdown-toggle';
         toggle.innerHTML = '&#127760; ' + currentLabel + ' <span class="nav-dropdown-chevron">&#9662;</span>';
         toggle.setAttribute('aria-expanded', 'false');
         toggle.setAttribute('aria-haspopup', 'true');
 
-        var menu = document.createElement('div');
+        const menu = document.createElement('div');
         menu.className = 'nav-dropdown-menu';
         menu.setAttribute('role', 'menu');
 
         SUPPORTED_LANGS.forEach(function (lang) {
-            var item = document.createElement('button');
+            const item = document.createElement('button');
             item.type = 'button';
             item.className = 'nav-dropdown-item' + (lang.code === currentLang ? ' active' : '');
             item.setAttribute('role', 'menuitem');
-            var checkMark = lang.code === currentLang ? '&#10003;' : '&nbsp;';
+            const checkMark = lang.code === currentLang ? '&#10003;' : '&nbsp;';
             item.innerHTML = '<span class="nav-dropdown-item-check">' + checkMark + '</span> ' +
                              lang.name;
             item.addEventListener('click', function () {
@@ -314,7 +314,7 @@ window.AppConfig = (function () {
             document.querySelectorAll('.nav-dropdown.open').forEach(function (dd) {
                 if (dd !== wrapper) dd.classList.remove('open');
             });
-            var isOpen = wrapper.classList.toggle('open');
+            const isOpen = wrapper.classList.toggle('open');
             toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         });
 

@@ -5,14 +5,14 @@
 (function () {
     'use strict';
 
-    var token = null;
-    var permissionData = null;
-    var signaturePad = null;
+    let token = null;
+    let permissionData = null;
+    let signaturePad = null;
 
     /* ------------------------------------------------------------------ */
     /*  DOM References                                                     */
     /* ------------------------------------------------------------------ */
-    var els = {};
+    const els = {};
     function cacheElements() {
         els.loadingState = document.getElementById('loading-state');
         els.errorState = document.getElementById('error-state');
@@ -53,7 +53,7 @@
         cacheElements();
 
         // Parse token from URL
-        var params = new URLSearchParams(window.location.search);
+        const params = new URLSearchParams(window.location.search);
         token = params.get('token');
 
         if (!token) {
@@ -77,8 +77,8 @@
 
     function resizeCanvas() {
         if (!els.signatureCanvas || !signaturePad) return;
-        var ratio = Math.max(window.devicePixelRatio || 1, 1);
-        var wrapper = els.signatureCanvas.parentElement;
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        const wrapper = els.signatureCanvas.parentElement;
         els.signatureCanvas.width = wrapper.offsetWidth * ratio;
         els.signatureCanvas.height = 150 * ratio;
         els.signatureCanvas.style.width = wrapper.offsetWidth + 'px';
@@ -127,8 +127,8 @@
     /* ------------------------------------------------------------------ */
     async function loadPermissionDetails() {
         try {
-            var res = await fetch('/api/p/' + token);
-            var data = await res.json();
+            const res = await fetch('/api/p/' + token);
+            const data = await res.json();
 
             if (!res.ok) {
                 showError('Link Unavailable', data.error || 'This permission link is no longer valid.');
@@ -178,7 +178,7 @@
         if (data.permission.site_latitude && data.permission.site_longitude) {
             els.mapContainer.classList.remove('hidden');
             setTimeout(function () {
-                var map = L.map('approval-map').setView(
+                const map = L.map('approval-map').setView(
                     [data.permission.site_latitude, data.permission.site_longitude], 14
                 );
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -194,7 +194,7 @@
     /*  Approve                                                            */
     /* ------------------------------------------------------------------ */
     async function handleApprove() {
-        var signedName = els.signedName.value.trim();
+        const signedName = els.signedName.value.trim();
         if (!signedName) {
             els.signedName.focus();
             els.signedName.classList.add('input-error');
@@ -202,7 +202,7 @@
         }
         els.signedName.classList.remove('input-error');
 
-        var body = { signed_name: signedName };
+        const body = { signed_name: signedName };
 
         // Add signature image if drawn
         if (signaturePad && !signaturePad.isEmpty()) {
@@ -210,7 +210,7 @@
         }
 
         // Add landowner conditions if provided
-        var conditions = els.landownerConditions.value.trim();
+        const conditions = els.landownerConditions.value.trim();
         if (conditions) {
             body.conditions_text = conditions;
         }
@@ -219,12 +219,12 @@
         els.btnApprove.textContent = 'Processing...';
 
         try {
-            var res = await fetch('/api/p/' + token + '/approve', {
+            const res = await fetch('/api/p/' + token + '/approve', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body),
             });
-            var data = await res.json();
+            const data = await res.json();
 
             if (!res.ok) {
                 showError('Error', data.error || 'Failed to process approval.');
@@ -245,20 +245,20 @@
     /*  Deny                                                               */
     /* ------------------------------------------------------------------ */
     async function handleDeny() {
-        var body = {};
-        var reason = els.denyReason.value.trim();
+        const body = {};
+        const reason = els.denyReason.value.trim();
         if (reason) body.reason = reason;
 
         els.btnConfirmDeny.disabled = true;
         els.btnConfirmDeny.textContent = 'Processing...';
 
         try {
-            var res = await fetch('/api/p/' + token + '/deny', {
+            const res = await fetch('/api/p/' + token + '/deny', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body),
             });
-            var data = await res.json();
+            const data = await res.json();
 
             if (!res.ok) {
                 showError('Error', data.error || 'Failed to process denial.');

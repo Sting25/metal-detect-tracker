@@ -27,14 +27,14 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
  * @returns {multer.Multer}
  */
 function createUpload(subdir, opts) {
-    var options = opts || {};
-    var allowedTypes = options.allowDocuments ? ALLOWED_DOCUMENT_TYPES : ALLOWED_IMAGE_TYPES;
+    const options = opts || {};
+    const allowedTypes = options.allowDocuments ? ALLOWED_DOCUMENT_TYPES : ALLOWED_IMAGE_TYPES;
 
-    var fileFilter = function (_req, file, cb) {
+    const fileFilter = function (_req, file, cb) {
         if (allowedTypes.indexOf(file.mimetype) !== -1) {
             cb(null, true);
         } else {
-            var err = new Error('Invalid file type. Allowed: ' + allowedTypes.join(', '));
+            const err = new Error('Invalid file type. Allowed: ' + allowedTypes.join(', '));
             err.code = 'INVALID_FILE_TYPE';
             cb(err);
         }
@@ -51,8 +51,8 @@ function createUpload(subdir, opts) {
 // ZIP import upload
 // ---------------------------------------------------------------------------
 
-var ALLOWED_ZIP_TYPES = ['application/zip', 'application/x-zip-compressed'];
-var MAX_IMPORT_SIZE = 100 * 1024 * 1024; // 100 MB
+const ALLOWED_ZIP_TYPES = ['application/zip', 'application/x-zip-compressed'];
+const MAX_IMPORT_SIZE = 100 * 1024 * 1024; // 100 MB
 
 /**
  * Create a configured multer instance for ZIP file imports.
@@ -66,7 +66,7 @@ function createImportUpload() {
             if (ALLOWED_ZIP_TYPES.indexOf(file.mimetype) !== -1) {
                 cb(null, true);
             } else {
-                var err = new Error('Invalid file type. Only ZIP files are allowed.');
+                const err = new Error('Invalid file type. Only ZIP files are allowed.');
                 err.code = 'INVALID_FILE_TYPE';
                 cb(err);
             }

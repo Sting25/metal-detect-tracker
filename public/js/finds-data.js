@@ -5,21 +5,21 @@
 (function (FP) {
     'use strict';
 
-    var _t = (typeof I18n !== 'undefined') ? I18n.t : function(k) { return k; };
+    const _t = (typeof I18n !== 'undefined') ? I18n.t : function(k) { return k; };
 
     /* ------------------------------------------------------------------ */
     /*  Data Loading                                                      */
     /* ------------------------------------------------------------------ */
     FP.loadSitesDropdown = async function () {
         try {
-            var res = await Auth.authedFetch('/api/sites');
+            const res = await Auth.authedFetch('/api/sites');
             if (!res.ok) throw new Error('Failed to fetch sites');
-            var json = await res.json();
+            const json = await res.json();
             FP.allSites = json.data || [];
-            var esc = FP.escapeHtml;
+            const esc = FP.escapeHtml;
 
             // Populate modal dropdown
-            var options = '<option value="">' + _t('finds.placeholder.selectSite') + '</option>';
+            let options = '<option value="">' + _t('finds.placeholder.selectSite') + '</option>';
             FP.allSites.forEach(function (s) {
                 options += '<option value="' + s.id + '">' + esc(s.name || 'Unnamed') + '</option>';
             });
@@ -27,7 +27,7 @@
             FP.els.site.innerHTML = options;
 
             // Populate filter dropdown
-            var filterOpts = '<option value="">' + _t('finds.filter.allSites') + '</option>';
+            let filterOpts = '<option value="">' + _t('finds.filter.allSites') + '</option>';
             FP.allSites.forEach(function (s) {
                 filterOpts += '<option value="' + s.id + '">' + esc(s.name || 'Unnamed') + '</option>';
             });
@@ -40,10 +40,10 @@
     };
 
     FP.setupQuickSiteCreate = function () {
-        var quickRow = document.getElementById('quick-site-create');
-        var nameInput = document.getElementById('quick-site-name');
-        var saveBtn = document.getElementById('quick-site-save');
-        var cancelBtn = document.getElementById('quick-site-cancel');
+        const quickRow = document.getElementById('quick-site-create');
+        const nameInput = document.getElementById('quick-site-name');
+        const saveBtn = document.getElementById('quick-site-save');
+        const cancelBtn = document.getElementById('quick-site-cancel');
         if (!quickRow || !nameInput || !saveBtn || !cancelBtn) return;
 
         FP.els.site.addEventListener('change', function () {
@@ -62,21 +62,21 @@
         });
 
         saveBtn.addEventListener('click', async function () {
-            var name = nameInput.value.trim();
+            const name = nameInput.value.trim();
             if (!name) { nameInput.focus(); return; }
 
             saveBtn.disabled = true;
             saveBtn.textContent = '...';
 
             try {
-                var res = await Auth.authedFetch('/api/sites', {
+                const res = await Auth.authedFetch('/api/sites', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name: name })
                 });
                 if (!res.ok) throw new Error('Failed to create site');
-                var json = await res.json();
-                var newSiteId = json.data ? json.data.id : null;
+                const json = await res.json();
+                const newSiteId = json.data ? json.data.id : null;
 
                 await FP.loadSitesDropdown();
                 if (newSiteId) FP.els.site.value = newSiteId;
@@ -99,9 +99,9 @@
 
     FP.loadFinds = async function () {
         try {
-            var res = await Auth.authedFetch('/api/finds');
+            const res = await Auth.authedFetch('/api/finds');
             if (!res.ok) throw new Error('Failed to fetch finds');
-            var json = await res.json();
+            const json = await res.json();
             FP.allFinds = json.data || [];
             FP.applyFilters();
         } catch (err) {
@@ -112,9 +112,9 @@
 
     FP.loadUserTags = async function () {
         try {
-            var res = await Auth.authedFetch('/api/finds/tags');
+            const res = await Auth.authedFetch('/api/finds/tags');
             if (!res.ok) return;
-            var json = await res.json();
+            const json = await res.json();
             FP.allUserTags = json.data || [];
             FP.renderTagSuggestions();
         } catch (err) {
@@ -138,7 +138,7 @@
     };
 
     FP.renderTags = function () {
-        var esc = FP.escapeHtml;
+        const esc = FP.escapeHtml;
         FP.els.tagsDisplay.innerHTML = FP.currentTags.map(function (t) {
             return '<span class="tag-chip">' + esc(t) + ' <button type="button" class="tag-remove" data-tag="' + esc(t) + '">&times;</button></span>';
         }).join('');
@@ -154,7 +154,7 @@
 
     FP.renderTagSuggestions = function () {
         if (!FP.els.tagSuggestions || FP.allUserTags.length === 0) return;
-        var esc = FP.escapeHtml;
+        const esc = FP.escapeHtml;
         FP.els.tagSuggestions.innerHTML = FP.allUserTags.map(function (t) {
             return '<span class="tag-suggestion-chip" data-tag="' + esc(t) + '">' + esc(t) + '</span>';
         }).join('');
@@ -167,21 +167,21 @@
     /*  Filtering                                                         */
     /* ------------------------------------------------------------------ */
     FP.applyFilters = function () {
-        var filtered = FP.allFinds.slice();
+        let filtered = FP.allFinds.slice();
 
-        var siteVal = FP.els.filterSite.value;
+        const siteVal = FP.els.filterSite.value;
         if (siteVal) filtered = filtered.filter(function (f) { return String(f.site_id) === String(siteVal); });
 
-        var matVal = FP.els.filterMaterial.value;
+        const matVal = FP.els.filterMaterial.value;
         if (matVal) filtered = filtered.filter(function (f) { return f.material === matVal; });
 
-        var catVal = FP.els.filterCategory.value;
+        const catVal = FP.els.filterCategory.value;
         if (catVal) filtered = filtered.filter(function (f) { return f.category === catVal; });
 
-        var fromVal = FP.els.filterDateFrom.value;
+        const fromVal = FP.els.filterDateFrom.value;
         if (fromVal) filtered = filtered.filter(function (f) { return f.date >= fromVal; });
 
-        var toVal = FP.els.filterDateTo.value;
+        const toVal = FP.els.filterDateTo.value;
         if (toVal) filtered = filtered.filter(function (f) { return f.date <= toVal; });
 
         FP.renderFindsGrid(filtered);
@@ -201,18 +201,18 @@
             return;
         }
 
-        var esc = FP.escapeHtml;
-        var html = '';
+        const esc = FP.escapeHtml;
+        let html = '';
         finds.forEach(function (find) {
-            var siteName = FP.getSiteName(find.site_id);
-            var dateStr = find.date ? new Date(find.date).toLocaleDateString() : '';
-            var materialClass = find.material ? 'material-' + find.material : '';
-            var thumbUrl = (find.photos && find.photos.length > 0) ? find.photos[0].photo_url : find.photo_url;
-            var photo = thumbUrl
+            const siteName = FP.getSiteName(find.site_id);
+            const dateStr = find.date ? new Date(find.date).toLocaleDateString() : '';
+            const materialClass = find.material ? 'material-' + find.material : '';
+            const thumbUrl = (find.photos && find.photos.length > 0) ? find.photos[0].photo_url : find.photo_url;
+            const photo = thumbUrl
                 ? '<img src="' + esc(Auth.secureUrl(thumbUrl)) + '" class="find-card-photo" alt="Find photo">'
                 + (find.photos && find.photos.length > 1 ? '<span class="find-card-photo-count">' + find.photos.length + '</span>' : '')
                 : '<div class="find-card-photo-placeholder">&#129689;</div>';
-            var valueStr = find.value_estimate ? '$' + parseFloat(find.value_estimate).toFixed(2) : '';
+            const valueStr = find.value_estimate ? '$' + parseFloat(find.value_estimate).toFixed(2) : '';
 
             html += '<div class="find-card" data-id="' + find.id + '">' +
                 '<div class="find-card-image">' + photo + '</div>' +
@@ -236,8 +236,8 @@
 
         FP.els.findsGrid.querySelectorAll('.find-card').forEach(function (card) {
             card.addEventListener('click', function () {
-                var id = card.dataset.id;
-                var find = FP.allFinds.find(function (f) { return String(f.id) === String(id); });
+                const id = card.dataset.id;
+                const find = FP.allFinds.find(function (f) { return String(f.id) === String(id); });
                 if (find) FP.openModal(find);
             });
         });
@@ -245,7 +245,7 @@
 
     FP.getSiteName = function (siteId) {
         if (!siteId) return 'No site';
-        var site = FP.allSites.find(function (s) { return String(s.id) === String(siteId); });
+        const site = FP.allSites.find(function (s) { return String(s.id) === String(siteId); });
         return site ? (site.name || 'Unnamed Site') : 'Site #' + siteId;
     };
 

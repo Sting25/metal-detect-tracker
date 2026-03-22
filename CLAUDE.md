@@ -60,7 +60,7 @@ These rules MUST be followed for all development work on this project.
 - Frontend CSS goes in `public/css/style.css` (single file)
 - HTML pages go in `public/` (10 pages)
 - Database schema and helpers are in `database.js`
-- Tests go in `tests/` (8 test files + setup.js + helpers.js)
+- Tests go in `tests/` (29 test files + setup.js + helpers.js)
 
 ## Tech Stack
 
@@ -70,7 +70,7 @@ These rules MUST be followed for all development work on this project.
 - **File uploads**: Multer (sites, finds, permissions, feedback screenshots)
 - **Email**: SendGrid (@sendgrid/mail)
 - **SMS**: Twilio Verify (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_VERIFY_SID)
-- **Testing**: Vitest v4 + Supertest (121 tests, ~3s runtime)
+- **Testing**: Vitest v4 + Supertest (585 tests across 29 files, ~25s runtime)
 - **Frontend**: Vanilla JS, Leaflet.js maps, no build step
 
 ## API Route Structure
@@ -101,11 +101,11 @@ Watch mode: `npm run test:watch`
 Coverage: `npm run test:coverage`
 
 Test infrastructure:
-- `vitest.config.mjs` — ESM config, globals: true, fileParallelism: false (PostgreSQL single-writer safety)
+- `vitest.config.mjs` — ESM config, globals: true, fileParallelism: false (PostgreSQL single-writer safety), excludes `.claude/` worktree dirs
 - `tests/setup.js` — Sets DATABASE_URL + JWT_SECRET env vars, truncates all tables beforeEach
 - `tests/helpers.js` — createUser(), createAdmin(), createSite(), createFind(), createPermission(), createInviteCode(), shareSite(), request()
 - Tests use a separate PostgreSQL database (auto-truncated between tests)
-- All tests run sequentially in ~3 seconds
+- All tests run sequentially in ~25 seconds
 
 ## Common Workflows
 
@@ -129,7 +129,7 @@ The app was originally Colorado-focused. Full internationalization has been impl
 - **Finds routes updated**: Store depth as cm internally, return both depth_cm and depth_inches in responses, accept either on create/update
 - **Seed sites region-aware**: `insertSeedSites(userId, countryCode)` — US gets Colorado sites, GB gets rally/beach templates, AU gets prospecting templates, others get a generic template
 - **middleware/auth.js**: User SELECT includes country_code, region, unit_preference
-- **Tests (Phase 2D)**: 15 new tests for auth country capture, preferences endpoint, finds depth_cm conversion (121 total)
+- **Tests (Phase 2D)**: Tests for auth country capture, preferences endpoint, finds depth_cm conversion
 - **config.js (Phase 3A)**: Shared frontend module — `AppConfig` provides user profile, land types, map defaults, depth formatting, unit-aware helpers, land type dropdown population, unit toggle in navbar
 - **Dynamic maps (Phase 3B)**: sites.js, dashboard.js, map.js use `AppConfig.getMapDefaults()` for country-aware map centering (US, GB, AU, world fallback)
 - **Dynamic land types (Phase 3C)**: sites.html select and permissions.html select populated from API via `AppConfig.populateLandTypeSelect()` instead of hardcoded options. print-site.js uses `AppConfig.landTypeLabel()`. Custom type creation supported via "Custom..." option.

@@ -99,7 +99,7 @@
         });
         // Hide Web Share button if API not available
         if (!navigator.share) {
-            els.btnShare.classList.add('hidden');
+            els.btnShare.style.display = 'none';
         }
         // Settings toggle
         els.toggleNotifyRegister.addEventListener('change', toggleNotifyRegister);
@@ -113,7 +113,7 @@
         if (legalEditForm) legalEditForm.addEventListener('submit', saveLegalSection);
         var legalModalCancel = document.getElementById('legal-modal-cancel');
         if (legalModalCancel) legalModalCancel.addEventListener('click', function () {
-            document.getElementById('legal-modal').classList.remove('is-open');
+            document.getElementById('legal-modal').style.display = 'none';
         });
         // Legal suggestion filters + pagination
         if (els.suggestionStatusFilter) els.suggestionStatusFilter.addEventListener('change', function () { suggestionsPage = 1; loadLegalSuggestions(); });
@@ -121,7 +121,7 @@
         if (els.suggestionsNext) els.suggestionsNext.addEventListener('click', function () { suggestionsPage++; loadLegalSuggestions(); });
         var suggestionModalClose = document.getElementById('suggestion-modal-close');
         if (suggestionModalClose) suggestionModalClose.addEventListener('click', function () {
-            document.getElementById('suggestion-modal').classList.remove('is-open');
+            document.getElementById('suggestion-modal').style.display = 'none';
         });
         // Audit log filters
         if (els.auditActionFilter) els.auditActionFilter.addEventListener('change', function () { auditPage = 1; loadAuditLog(); });
@@ -204,7 +204,7 @@
             console.error('Error updating setting:', err);
             // Revert the toggle on failure
             els.toggleNotifyRegister.checked = !els.toggleNotifyRegister.checked;
-            Auth.showToast(_t('admin.errorLoadingStats'));
+            Auth.showToast(_t('admin.errorLoadingStats') + ' ' + err.message);
         }
     }
 
@@ -230,7 +230,7 @@
             return;
         }
 
-        const esc = escapeHtml;
+        const esc = Auth.escapeHtml;
         const currentUser = Auth.getUser();
         let html = '';
 
@@ -309,7 +309,7 @@
             await loadStats();
         } catch (err) {
             console.error('Error changing user role:', err);
-            Auth.showToast(_t('admin.errorChangingRole'));
+            Auth.showToast(_t('admin.errorChangingRole') + ' ' + err.message);
             await loadUsers();
         }
     }
@@ -326,7 +326,7 @@
             await loadUsers();
         } catch (err) {
             console.error('Error toggling user disabled state:', err);
-            Auth.showToast('Failed to update user status. Please try again.');
+            Auth.showToast('Error: ' + err.message);
         }
     }
 
@@ -342,7 +342,7 @@
             await loadStats();
         } catch (err) {
             console.error('Error deleting user:', err);
-            Auth.showToast(_t('admin.errorDeletingUser'));
+            Auth.showToast(_t('admin.errorDeletingUser') + ' ' + err.message);
         }
     }
 
@@ -366,7 +366,7 @@
             prompt('Send this link to ' + userName + '. It expires in 24 hours:', resetUrl);
         } catch (err) {
             console.error('Error generating reset link:', err);
-            Auth.showToast(_t('admin.errorGeneratingResetLink'));
+            Auth.showToast(_t('admin.errorGeneratingResetLink') + ' ' + err.message);
         }
     }
 
@@ -392,7 +392,7 @@
             return;
         }
 
-        const esc = escapeHtml;
+        const esc = Auth.escapeHtml;
         let html = '';
 
         codes.forEach(c => {
@@ -462,13 +462,13 @@
 
             // Show the generated code
             els.generatedCode.textContent = code;
-            els.inviteDisplay.classList.remove('hidden');
+            els.inviteDisplay.style.display = 'flex';
 
             await loadInviteCodes();
             await loadStats();
         } catch (err) {
             console.error('Error generating invite code:', err);
-            Auth.showToast(_t('admin.errorGeneratingInvite'));
+            Auth.showToast(_t('admin.errorGeneratingInvite') + ' ' + err.message);
         } finally {
             els.btnGenerate.disabled = false;
             els.btnGenerate.textContent = _t('admin.invites.generate');
@@ -507,7 +507,7 @@
             await loadStats();
         } catch (err) {
             console.error('Error deleting invite code:', err);
-            Auth.showToast(_t('admin.errorDeletingInvite'));
+            Auth.showToast(_t('admin.errorDeletingInvite') + ' ' + err.message);
         }
     }
 
@@ -572,7 +572,7 @@
             return;
         }
 
-        var esc2 = escapeHtml;
+        var esc2 = Auth.escapeHtml;
         var html = '';
 
         feedbackList.forEach(function (f) {
@@ -627,7 +627,7 @@
             loadFeedbackStats();
         } catch (err) {
             console.error('Error updating feedback:', err);
-            Auth.showToast(_t('admin.errorUpdatingFeedback'));
+            Auth.showToast(_t('admin.errorUpdatingFeedback') + ' ' + err.message);
             loadFeedback();
         }
     }
@@ -641,7 +641,7 @@
             loadFeedbackStats();
         } catch (err) {
             console.error('Error deleting feedback:', err);
-            Auth.showToast(_t('admin.errorDeletingFeedback'));
+            Auth.showToast(_t('admin.errorDeletingFeedback') + ' ' + err.message);
         }
     }
 
@@ -668,9 +668,9 @@
             if (els.legalStaleBanner) {
                 if (staleCount > 0) {
                     els.legalStaleBanner.textContent = staleCount + ' section' + (staleCount === 1 ? '' : 's') + ' not verified in 6+ months.';
-                    els.legalStaleBanner.classList.remove('hidden');
+                    els.legalStaleBanner.style.display = '';
                 } else {
-                    els.legalStaleBanner.classList.add('hidden');
+                    els.legalStaleBanner.style.display = 'none';
                 }
             }
         } catch (err) {
@@ -688,7 +688,7 @@
             return;
         }
 
-        var esc = escapeHtml;
+        var esc = Auth.escapeHtml;
         var html = '';
         var now = new Date();
         var sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate()).toISOString().split('T')[0];
@@ -768,7 +768,7 @@
                 document.getElementById('legal-edit-html').value = '';
                 document.getElementById('legal-modal-title').textContent = 'Add Legal Section';
             }
-            document.getElementById('legal-modal').classList.add('is-open');
+            document.getElementById('legal-modal').style.display = 'flex';
 
             // Load revision history for existing sections
             if (id) {
@@ -821,11 +821,11 @@
                 var err = await res.json().catch(function () { return {}; });
                 throw new Error(err.error || 'Failed to save');
             }
-            document.getElementById('legal-modal').classList.remove('is-open');
+            document.getElementById('legal-modal').style.display = 'none';
             await loadLegalContent();
         } catch (err) {
             console.error('Error saving legal section:', err);
-            Auth.showToast('Failed to save legal section. Please try again.');
+            Auth.showToast('Error: ' + err.message);
         }
     }
 
@@ -889,7 +889,7 @@
             return;
         }
 
-        var esc = escapeHtml;
+        var esc = Auth.escapeHtml;
         var html = '';
 
         suggestions.forEach(function (s) {
@@ -938,7 +938,7 @@
             var json = await res.json();
             var s = json.data;
 
-            var esc = escapeHtml;
+            var esc = Auth.escapeHtml;
             var typeLabel = (s.suggestion_type || 'correction').replace('_', ' ');
             typeLabel = typeLabel.charAt(0).toUpperCase() + typeLabel.slice(1);
             var statusLabel = (s.status || 'pending').charAt(0).toUpperCase() + (s.status || 'pending').slice(1);
@@ -1012,7 +1012,7 @@
             html += '</div>';
 
             document.getElementById('suggestion-modal-body').innerHTML = html;
-            document.getElementById('suggestion-modal').classList.add('is-open');
+            document.getElementById('suggestion-modal').style.display = 'flex';
 
             // Bind action buttons
             var approveBtn = document.getElementById('btn-approve-suggestion');
@@ -1042,18 +1042,18 @@
                 var err = await res.json().catch(function () { return {}; });
                 throw new Error(err.error || 'Failed to update');
             }
-            document.getElementById('suggestion-modal').classList.remove('is-open');
+            document.getElementById('suggestion-modal').style.display = 'none';
             await loadLegalSuggestions();
             Auth.showToast('Suggestion ' + status + '.');
         } catch (err) {
             console.error('Error reviewing suggestion:', err);
-            Auth.showToast('Failed to review suggestion. Please try again.');
+            Auth.showToast('Error: ' + err.message);
         }
     }
 
     function openApplySuggestion(suggestion) {
         // Close suggestion modal
-        document.getElementById('suggestion-modal').classList.remove('is-open');
+        document.getElementById('suggestion-modal').style.display = 'none';
 
         // Build apply modal content
         var applyModal = document.getElementById('apply-modal');
@@ -1062,7 +1062,7 @@
             applyModal = document.createElement('div');
             applyModal.id = 'apply-modal';
             applyModal.className = 'modal-overlay';
-            applyModal.innerHTML = '<div class="modal-content modal-content--narrow">' +
+            applyModal.innerHTML = '<div class="modal-content" style="max-width:640px;">' +
                 '<h3>Apply Suggestion to Content</h3>' +
                 '<form id="apply-suggestion-form">' +
                 '<input type="hidden" id="apply-suggestion-id">' +
@@ -1078,17 +1078,17 @@
                 '<option value="danger">Danger (Red)</option>' +
                 '</select></div>' +
                 '<div class="form-group"><label for="apply-content-html">Content HTML</label>' +
-                '<textarea id="apply-content-html" class="form-control textarea-code" rows="10" required></textarea></div>' +
+                '<textarea id="apply-content-html" class="form-control" rows="10" required style="font-family:monospace;font-size:0.85rem;"></textarea></div>' +
                 '<div class="form-group"><label for="apply-change-summary">Change Summary (optional)</label>' +
                 '<input type="text" id="apply-change-summary" class="form-control" placeholder="Brief description of what changed"></div>' +
-                '<div class="modal-actions">' +
+                '<div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1rem;">' +
                 '<button type="button" class="btn btn-secondary" id="apply-modal-cancel">Cancel</button>' +
                 '<button type="submit" class="btn btn-primary">Apply</button>' +
                 '</div></form></div>';
             document.body.appendChild(applyModal);
 
             document.getElementById('apply-modal-cancel').addEventListener('click', function () {
-                applyModal.classList.remove('is-open');
+                applyModal.style.display = 'none';
             });
             document.getElementById('apply-suggestion-form').addEventListener('submit', submitApplySuggestion);
         }
@@ -1117,7 +1117,7 @@
                 .catch(function () {});
         }
 
-        applyModal.classList.add('is-open');
+        applyModal.style.display = 'flex';
     }
 
     async function submitApplySuggestion(e) {
@@ -1143,13 +1143,13 @@
                 var err = await res.json().catch(function () { return {}; });
                 throw new Error(err.error || 'Failed to apply');
             }
-            document.getElementById('apply-modal').classList.remove('is-open');
+            document.getElementById('apply-modal').style.display = 'none';
             await loadLegalSuggestions();
             await loadLegalContent();
             Auth.showToast('Suggestion applied to content.');
         } catch (err) {
             console.error('Error applying suggestion:', err);
-            Auth.showToast('Failed to apply suggestion. Please try again.');
+            Auth.showToast('Error: ' + err.message);
         }
     }
 
@@ -1164,7 +1164,7 @@
             var revisions = json.data || [];
             if (revisions.length === 0) return '<p class="text-muted" style="font-size:0.85rem;">No revision history.</p>';
 
-            var esc = escapeHtml;
+            var esc = Auth.escapeHtml;
             var html = '<div class="revision-timeline">';
             revisions.forEach(function (r) {
                 var date = r.created_at ? new Date(r.created_at).toLocaleString() : '-';
@@ -1211,7 +1211,7 @@
             var actions = json.data || [];
             var html = '<option value="">' + _t('admin.audit.allActions') + '</option>';
             actions.forEach(function (a) {
-                html += '<option value="' + escapeHtml(a) + '">' + escapeHtml(formatActionLabel(a)) + '</option>';
+                html += '<option value="' + Auth.escapeHtml(a) + '">' + Auth.escapeHtml(formatActionLabel(a)) + '</option>';
             });
             if (els.auditActionFilter) els.auditActionFilter.innerHTML = html;
         } catch (err) {
@@ -1251,7 +1251,7 @@
             return;
         }
 
-        var esc = escapeHtml;
+        var esc = Auth.escapeHtml;
         var html = '';
         events.forEach(function (e) {
             var ts = e.created_at ? new Date(e.created_at).toLocaleString() : '-';
@@ -1279,7 +1279,7 @@
     }
 
     function renderActionBadge(action) {
-        var esc = escapeHtml;
+        var esc = Auth.escapeHtml;
         var cls = 'badge ';
         if (!action) { cls += 'badge-audit-default'; }
         else if (action.indexOf('delete') !== -1 || action.indexOf('remove') !== -1) cls += 'badge-audit-delete';
@@ -1296,10 +1296,4 @@
         return action.replace(/[._]/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
     }
 
-    /* ------------------------------------------------------------------ */
-    /*  Utility                                                           */
-    /* ------------------------------------------------------------------ */
-    function escapeHtml(str) {
-        return window.Auth ? Auth.escapeHtml(str) : (str ? String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : '');
-    }
 })();

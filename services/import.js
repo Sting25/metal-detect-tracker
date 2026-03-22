@@ -4,12 +4,12 @@
  *
  * Best-effort: valid items are imported, invalid items are skipped with errors reported.
  */
-var AdmZip = require('adm-zip');
-var path = require('path');
-var db = require('../database');
-var s3 = require('./s3');
+const AdmZip = require('adm-zip');
+const path = require('path');
+const db = require('../database');
+const s3 = require('./s3');
 
-var PREFIX = 'signal-bouncer-export/';
+const PREFIX = 'signal-bouncer-export/';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -21,7 +21,7 @@ var PREFIX = 'signal-bouncer-export/';
  */
 function readJsonEntry(zip, name) {
     try {
-        var text = zip.readAsText(PREFIX + name);
+        const text = zip.readAsText(PREFIX + name);
         if (!text) return null;
         return JSON.parse(text);
     } catch (_e) {
@@ -33,8 +33,8 @@ function readJsonEntry(zip, name) {
  * Guess MIME type from a filename extension.
  */
 function guessMime(filename) {
-    var ext = path.extname(filename).toLowerCase();
-    var map = {
+    const ext = path.extname(filename).toLowerCase();
+    const map = {
         '.jpg': 'image/jpeg',
         '.jpeg': 'image/jpeg',
         '.png': 'image/png',
@@ -51,11 +51,11 @@ function guessMime(filename) {
  */
 async function uploadZipFileToS3(zip, zipPath, s3Subdir, filename) {
     try {
-        var entry = zip.getEntry(zipPath);
+        const entry = zip.getEntry(zipPath);
         if (!entry) return null;
-        var buf = entry.getData();
+        const buf = entry.getData();
         if (!buf || buf.length === 0) return null;
-        var key = s3.generateKey(s3Subdir, filename);
+        const key = s3.generateKey(s3Subdir, filename);
         await s3.uploadToS3(buf, key, guessMime(filename));
         return key;
     } catch (_e) {
@@ -67,11 +67,11 @@ async function uploadZipFileToS3(zip, zipPath, s3Subdir, filename) {
 // Validation helpers
 // ---------------------------------------------------------------------------
 
-var VALID_LAND_TYPES = ['blm', 'usfs', 'state', 'county', 'city', 'private', 'other'];
-var VALID_SITE_STATUSES = ['identified', 'scouted', 'detecting', 'exhausted'];
-var VALID_MATERIALS = ['iron', 'copper', 'brass', 'silver', 'gold', 'lead', 'zinc', 'nickel', 'aluminum', 'tin', 'unknown', 'other'];
-var VALID_CONDITIONS = ['excellent', 'good', 'fair', 'poor', 'fragment'];
-var VALID_PERM_STATUSES = ['not_requested', 'pending', 'approved', 'denied', 'expired'];
+const VALID_LAND_TYPES = ['blm', 'usfs', 'state', 'county', 'city', 'private', 'other'];
+const VALID_SITE_STATUSES = ['identified', 'scouted', 'detecting', 'exhausted'];
+const VALID_MATERIALS = ['iron', 'copper', 'brass', 'silver', 'gold', 'lead', 'zinc', 'nickel', 'aluminum', 'tin', 'unknown', 'other'];
+const VALID_CONDITIONS = ['excellent', 'good', 'fair', 'poor', 'fragment'];
+const VALID_PERM_STATUSES = ['not_requested', 'pending', 'approved', 'denied', 'expired'];
 
 function isValidSite(site) {
     return site && typeof site.name === 'string' && site.name.trim().length > 0;
@@ -104,8 +104,8 @@ function isValidPermission(perm, siteIdMap) {
  * @returns {Promise<{sites_imported: number, finds_imported: number, permissions_imported: number, letter_preferences_imported: boolean, errors: string[]}>}
  */
 async function processImportZip(buffer, userId) {
-    var errors = [];
-    var zip;
+    const errors = [];
+    let zip;
 
     try {
         zip = new AdmZip(buffer);
@@ -114,7 +114,7 @@ async function processImportZip(buffer, userId) {
     }
 
     // --- Read and validate manifest ---
-    var manifest = readJsonEntry(zip, 'manifest.json');
+    const manifest = readJsonEntry(zip, 'manifest.json');
     if (!manifest) {
         throw new Error('ZIP is missing manifest.json');
     }
@@ -123,41 +123,41 @@ async function processImportZip(buffer, userId) {
     }
 
     // --- Parse data files ---
-    var sites = readJsonEntry(zip, 'sites.json') || [];
-    var finds = readJsonEntry(zip, 'finds.json') || [];
-    var permissions = readJsonEntry(zip, 'permissions.json') || [];
-    var letterPrefs = readJsonEntry(zip, 'letter_preferences.json');
+    let sites = readJsonEntry(zip, 'sites.json') || [];
+    let finds = readJsonEntry(zip, 'finds.json') || [];
+    let permissions = readJsonEntry(zip, 'permissions.json') || [];
+    const letterPrefs = readJsonEntry(zip, 'letter_preferences.json');
 
     if (!Array.isArray(sites)) sites = [];
     if (!Array.isArray(finds)) finds = [];
     if (!Array.isArray(permissions)) permissions = [];
 
     // --- Check for duplicate site names ---
-    var existingSites = (await db.query('SELECT name FROM sites WHERE user_id = $1', [userId])).rows;
-    var existingNames = {};
-    for (var en = 0; en < existingSites.length; en++) {
+    const existingSites = (await db.query('SELECT name FROM sites WHERE user_id = $1', [userId])).rows;
+    const existingNames = {};
+    for (let en = 0; en < existingSites.length; en++) {
         existingNames[existingSites[en].name] = true;
     }
 
     // --- Import sites (build old→new ID map) ---
-    var siteIdMap = {};
-    var sitesImported = 0;
+    const siteIdMap = {};
+    let sitesImported = 0;
 
-    for (var si = 0; si < sites.length; si++) {
-        var site = sites[si];
+    for (let si = 0; si < sites.length; si++) {
+        const site = sites[si];
         if (!isValidSite(site)) {
             errors.push('Skipped invalid site at index ' + si + ': missing name');
             continue;
         }
 
-        var siteName = site.name.trim();
+        let siteName = site.name.trim();
         if (existingNames[siteName]) {
             siteName = siteName + ' (imported)';
         }
         existingNames[siteName] = true;
 
         try {
-            var siteResult = await db.query(
+            const siteResult = await db.query(
                 'INSERT INTO sites (user_id, name, description, latitude, longitude, land_type, site_status, priority, notes, tags, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW()) RETURNING id',
                 [
                     userId,
@@ -172,12 +172,12 @@ async function processImportZip(buffer, userId) {
                     site.tags || null,
                 ]
             );
-            var newSiteId = siteResult.rows[0].id;
+            const newSiteId = siteResult.rows[0].id;
             siteIdMap[site.id] = newSiteId;
 
             // Upload site image if referenced
             if (site._image_file) {
-                var siteImageKey = await uploadZipFileToS3(
+                const siteImageKey = await uploadZipFileToS3(
                     zip,
                     PREFIX + 'photos/sites/' + site._image_file,
                     'sites',
@@ -195,19 +195,19 @@ async function processImportZip(buffer, userId) {
     }
 
     // --- Import finds (remap site_id) ---
-    var findsImported = 0;
+    let findsImported = 0;
 
-    for (var fi = 0; fi < finds.length; fi++) {
-        var find = finds[fi];
+    for (let fi = 0; fi < finds.length; fi++) {
+        const find = finds[fi];
         if (!isValidFind(find, siteIdMap)) {
             errors.push('Skipped invalid find at index ' + fi + ': unmapped site_id');
             continue;
         }
 
-        var findSiteId = find.site_id != null ? siteIdMap[find.site_id] : null;
+        const findSiteId = find.site_id != null ? siteIdMap[find.site_id] : null;
 
         try {
-            var findResult = await db.query(
+            const findResult = await db.query(
                 'INSERT INTO finds (user_id, site_id, description, date_found, material, estimated_age, depth_inches, depth_cm, latitude, longitude, condition, value_estimate, notes, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW(), NOW()) RETURNING id',
                 [
                     userId,
@@ -228,7 +228,7 @@ async function processImportZip(buffer, userId) {
 
             // Upload find photo if referenced
             if (find._photo_file) {
-                var findPhotoKey = await uploadZipFileToS3(
+                const findPhotoKey = await uploadZipFileToS3(
                     zip,
                     PREFIX + 'photos/finds/' + find._photo_file,
                     'finds',
@@ -246,19 +246,19 @@ async function processImportZip(buffer, userId) {
     }
 
     // --- Import permissions (remap site_id) ---
-    var permissionsImported = 0;
+    let permissionsImported = 0;
 
-    for (var pi = 0; pi < permissions.length; pi++) {
-        var perm = permissions[pi];
+    for (let pi = 0; pi < permissions.length; pi++) {
+        const perm = permissions[pi];
         if (!isValidPermission(perm, siteIdMap)) {
             errors.push('Skipped invalid permission at index ' + pi + ': missing agency_or_owner or unmapped site_id');
             continue;
         }
 
-        var permSiteId = perm.site_id != null ? siteIdMap[perm.site_id] : null;
+        const permSiteId = perm.site_id != null ? siteIdMap[perm.site_id] : null;
 
         try {
-            var permResult = await db.query(
+            const permResult = await db.query(
                 'INSERT INTO permissions (user_id, site_id, land_type, agency_or_owner, contact_name, contact_phone, contact_email, contact_address, date_requested, status, date_granted, expiration_date, notes, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW(), NOW()) RETURNING id',
                 [
                     userId,
@@ -279,7 +279,7 @@ async function processImportZip(buffer, userId) {
 
             // Upload permission document if referenced
             if (perm._document_file) {
-                var docKey = await uploadZipFileToS3(
+                const docKey = await uploadZipFileToS3(
                     zip,
                     PREFIX + 'documents/permissions/' + perm._document_file,
                     'permissions',
@@ -297,10 +297,10 @@ async function processImportZip(buffer, userId) {
     }
 
     // --- Upsert letter preferences ---
-    var letterPrefsImported = false;
+    let letterPrefsImported = false;
     if (letterPrefs && typeof letterPrefs === 'object' && Object.keys(letterPrefs).length > 0) {
         try {
-            var existing = await db.queryOne('SELECT id FROM letter_preferences WHERE user_id = $1', [userId]);
+            const existing = await db.queryOne('SELECT id FROM letter_preferences WHERE user_id = $1', [userId]);
             if (existing) {
                 await db.query(
                     'UPDATE letter_preferences SET full_name = $1, address = $2, phone = $3, email = $4, signature_name = $5, signature_title = $6, intro_text = $7, commitments_html = $8, closing_text = $9, insurance_text = $10, updated_at = NOW() WHERE user_id = $11',

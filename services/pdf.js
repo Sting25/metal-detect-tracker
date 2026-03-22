@@ -3,8 +3,8 @@
  * Builds a permission request letter from letter_preferences + permission + site data.
  * Returns a Buffer containing the PDF.
  */
-var PDFDocument = require('pdfkit');
-var { PassThrough } = require('stream');
+const PDFDocument = require('pdfkit');
+const { PassThrough } = require('stream');
 
 /**
  * Generate a permission letter PDF.
@@ -16,19 +16,19 @@ var { PassThrough } = require('stream');
 async function generatePermissionLetter(letterPrefs, permission, site) {
     return new Promise(function (resolve, reject) {
         try {
-            var doc = new PDFDocument({
+            const doc = new PDFDocument({
                 size: 'LETTER',
                 margins: { top: 72, bottom: 72, left: 72, right: 72 },
             });
 
-            var buffers = [];
-            var passThrough = new PassThrough();
+            const buffers = [];
+            const passThrough = new PassThrough();
             passThrough.on('data', function (chunk) { buffers.push(chunk); });
             passThrough.on('end', function () { resolve(Buffer.concat(buffers)); });
             passThrough.on('error', reject);
             doc.pipe(passThrough);
 
-            var pageWidth = 468; // 612 - 72 - 72
+            const pageWidth = 468; // 612 - 72 - 72
 
             // ---------------------------------------------------------------
             // Header: sender info
@@ -36,7 +36,7 @@ async function generatePermissionLetter(letterPrefs, permission, site) {
             if (letterPrefs.full_name) {
                 doc.fontSize(14).font('Helvetica-Bold').text(letterPrefs.full_name, { align: 'left' });
             }
-            var headerLines = [letterPrefs.address, letterPrefs.phone, letterPrefs.email].filter(Boolean);
+            const headerLines = [letterPrefs.address, letterPrefs.phone, letterPrefs.email].filter(Boolean);
             if (headerLines.length > 0) {
                 doc.fontSize(10).font('Helvetica');
                 headerLines.forEach(function (line) {
@@ -49,14 +49,14 @@ async function generatePermissionLetter(letterPrefs, permission, site) {
             // ---------------------------------------------------------------
             // Date line
             // ---------------------------------------------------------------
-            var dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
             doc.fontSize(10).font('Helvetica').text(dateStr, { align: 'left' });
             doc.moveDown(1);
 
             // ---------------------------------------------------------------
             // Recipient
             // ---------------------------------------------------------------
-            var recipientLines = [
+            const recipientLines = [
                 permission.agency_or_owner,
                 permission.contact_name,
                 permission.contact_address,
@@ -72,17 +72,17 @@ async function generatePermissionLetter(letterPrefs, permission, site) {
             // ---------------------------------------------------------------
             // Salutation
             // ---------------------------------------------------------------
-            var salutationName = permission.contact_name || permission.agency_or_owner || 'Sir/Madam';
+            const salutationName = permission.contact_name || permission.agency_or_owner || 'Sir/Madam';
             doc.fontSize(10).font('Helvetica').text('Dear ' + salutationName + ',');
             doc.moveDown(0.5);
 
             // ---------------------------------------------------------------
             // Introduction paragraph
             // ---------------------------------------------------------------
-            var introText = letterPrefs.intro_text || 'I am writing to request permission to use a metal detector on your property.';
+            let introText = letterPrefs.intro_text || 'I am writing to request permission to use a metal detector on your property.';
             // Substitute {name} and {location} placeholders
-            var siteName = (site && site.name) ? site.name : 'the property';
-            var siteLocation = '';
+            const siteName = (site && site.name) ? site.name : 'the property';
+            let siteLocation = '';
             if (site) {
                 if (site.latitude && site.longitude) {
                     siteLocation = site.latitude.toFixed(4) + ', ' + site.longitude.toFixed(4);
@@ -112,11 +112,11 @@ async function generatePermissionLetter(letterPrefs, permission, site) {
             // ---------------------------------------------------------------
             // Commitments
             // ---------------------------------------------------------------
-            var commitmentsText = letterPrefs.commitments_html || '';
+            const commitmentsText = letterPrefs.commitments_html || '';
             if (commitmentsText) {
                 doc.fontSize(11).font('Helvetica-Bold').text('My Commitments');
                 doc.fontSize(10).font('Helvetica');
-                var commitments = commitmentsText.split('\n').filter(function (line) { return line.trim(); });
+                const commitments = commitmentsText.split('\n').filter(function (line) { return line.trim(); });
                 commitments.forEach(function (c) {
                     doc.text('\u2022 ' + c.trim(), { indent: 10, lineGap: 2 });
                 });
@@ -135,7 +135,7 @@ async function generatePermissionLetter(letterPrefs, permission, site) {
             // ---------------------------------------------------------------
             // Closing paragraph
             // ---------------------------------------------------------------
-            var closingText = letterPrefs.closing_text || 'Thank you for considering my request. I look forward to hearing from you.';
+            const closingText = letterPrefs.closing_text || 'Thank you for considering my request. I look forward to hearing from you.';
             doc.fontSize(10).font('Helvetica').text(closingText, { align: 'left', lineGap: 2 });
             doc.moveDown(1.5);
 
@@ -152,7 +152,7 @@ async function generatePermissionLetter(letterPrefs, permission, site) {
             }
 
             // Contact info in signature
-            var sigContact = [letterPrefs.phone, letterPrefs.email].filter(Boolean);
+            const sigContact = [letterPrefs.phone, letterPrefs.email].filter(Boolean);
             if (sigContact.length > 0) {
                 doc.fontSize(9).font('Helvetica').text(sigContact.join(' | '));
             }
@@ -175,13 +175,13 @@ async function generatePermissionLetter(letterPrefs, permission, site) {
 async function generateSignedPermissionPDF(link, permission, letterPrefs) {
     return new Promise(function (resolve, reject) {
         try {
-            var doc = new PDFDocument({
+            const doc = new PDFDocument({
                 size: 'LETTER',
                 margins: { top: 72, bottom: 72, left: 72, right: 72 },
             });
 
-            var buffers = [];
-            var passThrough = new PassThrough();
+            const buffers = [];
+            const passThrough = new PassThrough();
             passThrough.on('data', function (chunk) { buffers.push(chunk); });
             passThrough.on('end', function () { resolve(Buffer.concat(buffers)); });
             passThrough.on('error', reject);
@@ -260,7 +260,7 @@ async function generateSignedPermissionPDF(link, permission, letterPrefs) {
             doc.moveDown(0.3);
             doc.fontSize(10).font('Helvetica');
             doc.text('Approved by: ' + (link.signed_name || 'Unknown'));
-            var approvedDate = link.approved_at
+            const approvedDate = link.approved_at
                 ? new Date(link.approved_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
                 : new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
             doc.text('Date: ' + approvedDate);

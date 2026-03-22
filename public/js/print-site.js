@@ -46,12 +46,12 @@
         } catch (err) {
             console.error('Error loading site report:', err);
             document.getElementById('report-content').innerHTML =
-                '<p class="error-text">Failed to load site data. Please try again.</p>';
+                '<p class="error-text">Failed to load site data: ' + Auth.escapeHtml(err.message) + '</p>';
         }
     }
 
     function renderReport(site, finds) {
-        const esc = escapeHtml;
+        const esc = Auth.escapeHtml;
 
         // Title
         document.getElementById('report-title').textContent = site.name || 'Site Report';
@@ -71,7 +71,7 @@
         // Image
         if (site.image_url) {
             document.getElementById('rpt-image').src = Auth.secureUrl(site.image_url);
-            document.getElementById('section-image').classList.remove('hidden');
+            document.getElementById('section-image').style.display = '';
         }
 
         // Map
@@ -101,7 +101,7 @@
                 setTimeout(() => map.invalidateSize(), 200);
             }, 100);
         } else {
-            document.getElementById('section-map').classList.add('hidden');
+            document.getElementById('section-map').style.display = 'none';
         }
 
         // Description
@@ -110,13 +110,13 @@
         // Notes
         if (site.notes) {
             document.getElementById('rpt-notes').textContent = site.notes;
-            document.getElementById('section-notes').classList.remove('hidden');
+            document.getElementById('section-notes').style.display = '';
         }
 
         // Legal notes
         if (site.legal_notes) {
             document.getElementById('rpt-legal-notes').textContent = site.legal_notes;
-            document.getElementById('section-legal').classList.remove('hidden');
+            document.getElementById('section-legal').style.display = '';
         }
 
         // Contact info
@@ -130,7 +130,7 @@
                 site.contact_phone || site.permission_contact_phone || '-';
             document.getElementById('rpt-contact-email').textContent =
                 site.contact_email || site.permission_contact_email || '-';
-            document.getElementById('section-contact').classList.remove('hidden');
+            document.getElementById('section-contact').style.display = '';
         }
 
         // Tags
@@ -140,7 +140,7 @@
                 document.getElementById('rpt-tags').innerHTML = tagsArr
                     .map(t => '<span class="badge">' + esc(t) + '</span>')
                     .join(' ');
-                document.getElementById('section-tags').classList.remove('hidden');
+                document.getElementById('section-tags').style.display = '';
             }
         }
 
@@ -150,7 +150,7 @@
 
     function renderFinds(finds) {
         const container = document.getElementById('rpt-finds-list');
-        const esc = escapeHtml;
+        const esc = Auth.escapeHtml;
 
         if (!finds || finds.length === 0) {
             container.innerHTML = '<p class="empty-text">No finds recorded at this site.</p>';
@@ -229,10 +229,4 @@
         return map[status] || status || '-';
     }
 
-    function escapeHtml(str) {
-        if (!str) return '';
-        var div = document.createElement('div');
-        div.appendChild(document.createTextNode(String(str)));
-        return div.innerHTML;
-    }
 })();

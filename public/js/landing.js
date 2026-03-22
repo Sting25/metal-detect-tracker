@@ -8,10 +8,10 @@
     // Initialize i18n for unauthenticated page
     if (typeof I18n !== 'undefined') { I18n.autoInit(); }
 
-    var _t = (typeof I18n !== 'undefined') ? I18n.t : function(k) { return k; };
+    const _t = (typeof I18n !== 'undefined') ? I18n.t : function(k) { return k; };
 
-    var token = localStorage.getItem('mdt_token');
-    var user;
+    const token = localStorage.getItem('mdt_token');
+    let user;
     try {
         user = JSON.parse(localStorage.getItem('mdt_user'));
     } catch (e) {
@@ -20,11 +20,11 @@
 
     function applyLoggedInState() {
         if (token && user) {
-            var isDemo = user && user.is_demo;
+            const isDemo = user && user.is_demo;
 
             // Swap sign-up / login links for dashboard link
-            var loginLink = document.getElementById('nav-login');
-            var registerLink = document.getElementById('nav-register');
+            const loginLink = document.getElementById('nav-login');
+            const registerLink = document.getElementById('nav-register');
 
             if (loginLink) {
                 loginLink.href = '/index.html';
@@ -43,13 +43,13 @@
             }
 
             // Hide demo buttons when already logged in
-            var heroDemo = document.getElementById('hero-demo');
+            const heroDemo = document.getElementById('hero-demo');
             if (heroDemo) heroDemo.classList.add('hidden');
-            var ctaDemo = document.getElementById('cta-demo');
+            const ctaDemo = document.getElementById('cta-demo');
             if (ctaDemo) ctaDemo.classList.add('hidden');
 
             // Update hero CTA
-            var heroCta = document.getElementById('hero-signup');
+            const heroCta = document.getElementById('hero-signup');
             if (heroCta) {
                 if (isDemo) {
                     heroCta.href = '/login.html#register';
@@ -60,7 +60,7 @@
                 }
             }
 
-            var bottomCta = document.getElementById('cta-signup');
+            const bottomCta = document.getElementById('cta-signup');
             if (bottomCta) {
                 if (isDemo) {
                     bottomCta.href = '/login.html#register';
@@ -79,7 +79,7 @@
     }
 
     function startDemo(redirectTo) {
-        var target = redirectTo || '/index.html';
+        const target = redirectTo || '/index.html';
         fetch('/api/auth/demo', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -99,19 +99,19 @@
         });
     }
 
-    var heroDemo = document.getElementById('hero-demo');
+    const heroDemo = document.getElementById('hero-demo');
     if (heroDemo) heroDemo.addEventListener('click', function () { startDemo(); });
 
-    var ctaDemo = document.getElementById('cta-demo');
+    const ctaDemo = document.getElementById('cta-demo');
     if (ctaDemo) ctaDemo.addEventListener('click', function () { startDemo(); });
 
     // Feature cards: if logged in go directly, otherwise start demo then redirect
-    var featureCards = document.querySelectorAll('.landing-feature-card--link[data-page]');
+    const featureCards = document.querySelectorAll('.landing-feature-card--link[data-page]');
     featureCards.forEach(function (card) {
         card.style.cursor = 'pointer';
         card.addEventListener('click', function (e) {
             e.preventDefault();
-            var page = card.getAttribute('data-page');
+            const page = card.getAttribute('data-page');
             if (token && user) {
                 window.location.href = page;
             } else {

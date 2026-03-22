@@ -102,9 +102,9 @@ async function assignOrphanedDataToUser(userId) {
  * Region-aware: seeds different example sites based on country code.
  */
 async function insertSeedSites(userId, countryCode) {
-    var cc = (countryCode || 'US').toUpperCase();
+    const cc = (countryCode || 'US').toUpperCase();
 
-    var seedsByCountry = {
+    const seedsByCountry = {
         US: [
             {
                 name: 'Pawnee National Grassland - Crow Creek Area',
@@ -197,7 +197,7 @@ async function insertSeedSites(userId, countryCode) {
         ]
     };
 
-    var defaultSeed = [
+    const defaultSeed = [
         {
             name: 'My First Detecting Site (Template)',
             description: 'This is a template site to get you started. Edit it with a real location, or create a new site from scratch. Always research local laws and get permission before detecting.',
@@ -212,11 +212,11 @@ async function insertSeedSites(userId, countryCode) {
         }
     ];
 
-    var seedSites = seedsByCountry[cc] || defaultSeed;
+    const seedSites = seedsByCountry[cc] || defaultSeed;
 
     await transaction(async function (client) {
-        for (var i = 0; i < seedSites.length; i++) {
-            var s = seedSites[i];
+        for (let i = 0; i < seedSites.length; i++) {
+            const s = seedSites[i];
             await client.query(
                 `INSERT INTO sites (name, description, latitude, longitude, land_type,
                     permission_status, site_status, priority, notes, tags, user_id)
@@ -254,33 +254,33 @@ async function logAuditEvent(opts) {
  * @returns {string[]} S3 keys to delete
  */
 async function hardDeleteUser(userId) {
-    var s3Keys = [];
+    const s3Keys = [];
 
     return await transaction(async function (client) {
         // Collect S3 keys before deleting rows
         // — finds.photo_path (legacy single-photo field)
-        var findPhotos = (await client.query('SELECT photo_path FROM finds WHERE user_id = $1 AND photo_path IS NOT NULL', [userId])).rows;
+        const findPhotos = (await client.query('SELECT photo_path FROM finds WHERE user_id = $1 AND photo_path IS NOT NULL', [userId])).rows;
         findPhotos.forEach(function (r) { s3Keys.push(r.photo_path); });
         // — find_photos.photo_path (multi-photo, cascades from finds so collect first)
-        var findPhotoRows = (await client.query(
+        const findPhotoRows = (await client.query(
             'SELECT fp.photo_path FROM find_photos fp JOIN finds f ON fp.find_id = f.id WHERE f.user_id = $1 AND fp.photo_path IS NOT NULL',
             [userId]
         )).rows;
         findPhotoRows.forEach(function (r) { s3Keys.push(r.photo_path); });
 
-        var siteImages = (await client.query('SELECT image_path FROM sites WHERE user_id = $1 AND image_path IS NOT NULL', [userId])).rows;
+        const siteImages = (await client.query('SELECT image_path FROM sites WHERE user_id = $1 AND image_path IS NOT NULL', [userId])).rows;
         siteImages.forEach(function (r) { s3Keys.push(r.image_path); });
 
-        var feedbackScreenshots = (await client.query('SELECT screenshot_path FROM feedback WHERE user_id = $1 AND screenshot_path IS NOT NULL', [userId])).rows;
+        const feedbackScreenshots = (await client.query('SELECT screenshot_path FROM feedback WHERE user_id = $1 AND screenshot_path IS NOT NULL', [userId])).rows;
         feedbackScreenshots.forEach(function (r) { s3Keys.push(r.screenshot_path); });
 
-        var permDocs = (await client.query('SELECT document_path FROM permissions WHERE user_id = $1 AND document_path IS NOT NULL', [userId])).rows;
+        const permDocs = (await client.query('SELECT document_path FROM permissions WHERE user_id = $1 AND document_path IS NOT NULL', [userId])).rows;
         permDocs.forEach(function (r) { s3Keys.push(r.document_path); });
         // — generated_letters.s3_path (cascades from permissions+users, collect first)
-        var letterPaths = (await client.query('SELECT s3_path FROM generated_letters WHERE user_id = $1 AND s3_path IS NOT NULL', [userId])).rows;
+        const letterPaths = (await client.query('SELECT s3_path FROM generated_letters WHERE user_id = $1 AND s3_path IS NOT NULL', [userId])).rows;
         letterPaths.forEach(function (r) { s3Keys.push(r.s3_path); });
         // — permission_links signature/pdf paths (cascades from permissions, collect first)
-        var linkPaths = (await client.query(
+        const linkPaths = (await client.query(
             'SELECT pl.signature_image_path, pl.signed_pdf_path FROM permission_links pl JOIN permissions p ON pl.permission_id = p.id WHERE p.user_id = $1',
             [userId]
         )).rows;
@@ -348,14 +348,14 @@ async function initialize() {
 /**
  * Close the connection pool. Used by test teardown. Idempotent.
  */
-var _closed = false;
+let _closed = false;
 async function close() {
     if (_closed) return;
     _closed = true;
     await pool.end();
 }
 
-var db = {
+const db = {
     pool: pool,
     query: query,
     queryOne: queryOne,

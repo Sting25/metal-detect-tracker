@@ -5,9 +5,9 @@
 (function (PP) {
     'use strict';
 
-    var _t = (typeof I18n !== 'undefined') ? I18n.t : function(k) { return k; };
+    const _t = (typeof I18n !== 'undefined') ? I18n.t : function(k) { return k; };
 
-    var CONTACT_TYPE_ICONS = {
+    const CONTACT_TYPE_ICONS = {
         phone_call: '\u260E',
         email: '\u2709',
         in_person: '\uD83E\uDD1D',
@@ -16,7 +16,7 @@
         other: '\uD83D\uDCCC',
     };
 
-    var OUTCOME_CLASSES = {
+    const OUTCOME_CLASSES = {
         positive: 'outcome-positive',
         neutral: 'outcome-neutral',
         negative: 'outcome-negative',
@@ -26,9 +26,9 @@
 
     PP.loadContacts = async function (permId) {
         try {
-            var res = await Auth.authedFetch('/api/permissions/' + permId + '/contacts');
+            const res = await Auth.authedFetch('/api/permissions/' + permId + '/contacts');
             if (!res.ok) throw new Error('Failed to load contacts');
-            var json = await res.json();
+            const json = await res.json();
             PP.currentContacts = json.data || [];
             renderContactTimeline(PP.currentContacts);
         } catch (err) {
@@ -43,18 +43,18 @@
             return;
         }
 
-        var esc = PP.escapeHtml;
-        var html = '';
+        const esc = PP.escapeHtml;
+        let html = '';
         contacts.forEach(function (c) {
-            var icon = CONTACT_TYPE_ICONS[c.contact_type] || '\uD83D\uDCCC';
-            var typeLabel = _t('contact_type.' + c.contact_type) || c.contact_type;
-            var outcomeHtml = '';
+            const icon = CONTACT_TYPE_ICONS[c.contact_type] || '\uD83D\uDCCC';
+            const typeLabel = _t('contact_type.' + c.contact_type) || c.contact_type;
+            let outcomeHtml = '';
             if (c.outcome) {
-                var outcomeClass = OUTCOME_CLASSES[c.outcome] || '';
-                var outcomeLabel = _t('outcome.' + c.outcome) || c.outcome;
+                const outcomeClass = OUTCOME_CLASSES[c.outcome] || '';
+                const outcomeLabel = _t('outcome.' + c.outcome) || c.outcome;
                 outcomeHtml = '<span class="contact-outcome-badge ' + outcomeClass + '">' + esc(outcomeLabel) + '</span>';
             }
-            var dateStr = c.contact_date ? new Date(c.contact_date).toLocaleDateString() : '';
+            const dateStr = c.contact_date ? new Date(c.contact_date).toLocaleDateString() : '';
 
             html += '<div class="contact-item" data-contact-id="' + c.id + '">' +
                 '<div class="contact-item-icon">' + icon + '</div>' +
@@ -81,7 +81,7 @@
     }
 
     PP.showContactForm = function () {
-        var today = new Date().toISOString().split('T')[0];
+        const today = new Date().toISOString().split('T')[0];
         PP.els.contactType.value = 'phone_call';
         PP.els.contactOutcome.value = '';
         PP.els.contactDate.value = today;
@@ -97,7 +97,7 @@
 
     PP.handleContactSubmit = async function () {
         if (!PP.editingPermId) return;
-        var body = {
+        const body = {
             contact_type: PP.els.contactType.value,
             outcome: PP.els.contactOutcome.value || undefined,
             notes: PP.els.contactNotes.value.trim() || undefined,
@@ -106,13 +106,13 @@
 
         try {
             PP.els.btnSaveContact.disabled = true;
-            var res = await Auth.authedFetch('/api/permissions/' + PP.editingPermId + '/contacts', {
+            const res = await Auth.authedFetch('/api/permissions/' + PP.editingPermId + '/contacts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body),
             });
             if (!res.ok) {
-                var errData = await res.json().catch(function () { return {}; });
+                const errData = await res.json().catch(function () { return {}; });
                 throw new Error(errData.error || 'Failed to save contact');
             }
             PP.hideContactForm();
@@ -133,17 +133,17 @@
         if (!PP.editingPermId) return;
         if (!confirm(_t('reminders.setReminder') + '?')) return;
 
-        var perm = PP.allPermissions.find(function (p) { return p.id === PP.editingPermId; });
-        var defaultTitle = 'Follow up: ' + (perm ? (perm.agency_owner || '') : '');
-        var title = prompt(_t('reminders.setReminder'), defaultTitle);
+        const perm = PP.allPermissions.find(function (p) { return p.id === PP.editingPermId; });
+        const defaultTitle = 'Follow up: ' + (perm ? (perm.agency_owner || '') : '');
+        const title = prompt(_t('reminders.setReminder'), defaultTitle);
         if (!title) return;
 
-        var dueDate = new Date();
+        const dueDate = new Date();
         dueDate.setDate(dueDate.getDate() + 7);
-        var dueDateStr = dueDate.toISOString().split('T')[0];
+        const dueDateStr = dueDate.toISOString().split('T')[0];
 
         try {
-            var res = await Auth.authedFetch('/api/reminders', {
+            const res = await Auth.authedFetch('/api/reminders', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -165,7 +165,7 @@
         if (!confirm(_t('permissions.contacts.deleteConfirm'))) return;
 
         try {
-            var res = await Auth.authedFetch('/api/permissions/' + PP.editingPermId + '/contacts/' + cid, {
+            const res = await Auth.authedFetch('/api/permissions/' + PP.editingPermId + '/contacts/' + cid, {
                 method: 'DELETE',
             });
             if (!res.ok) throw new Error('Failed to delete contact');

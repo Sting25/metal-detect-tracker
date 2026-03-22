@@ -14,7 +14,7 @@
     // ---------------------------------------------------------------------------
     // State
     // ---------------------------------------------------------------------------
-    var state = {
+    const state = {
         view: 'list',           // 'list' | 'active' | 'detail'
         sessions: [],
         page: 1,
@@ -41,54 +41,54 @@
     // ---------------------------------------------------------------------------
     // Config
     // ---------------------------------------------------------------------------
-    var GPS_ACCURACY_THRESHOLD = 50;    // meters
-    var MIN_DISTANCE_M = 2;             // meters — skip points closer
-    var MIN_INTERVAL_MS = 3000;         // 3 seconds between points
-    var BATCH_INTERVAL_MS = 30000;      // flush every 30s
-    var BATCH_MAX_SIZE = 20;            // flush when buffer reaches 20
+    const GPS_ACCURACY_THRESHOLD = 50;    // meters
+    const MIN_DISTANCE_M = 2;             // meters — skip points closer
+    const MIN_INTERVAL_MS = 3000;         // 3 seconds between points
+    const BATCH_INTERVAL_MS = 30000;      // flush every 30s
+    const BATCH_MAX_SIZE = 20;            // flush when buffer reaches 20
 
     // Segment colors for detail view
-    var SEGMENT_COLORS = ['#5c4033', '#2d5016', '#3b82f6', '#ef4444', '#eab308', '#8B7355'];
+    const SEGMENT_COLORS = ['#5c4033', '#2d5016', '#3b82f6', '#ef4444', '#eab308', '#8B7355'];
 
     // ---------------------------------------------------------------------------
     // DOM refs
     // ---------------------------------------------------------------------------
-    var listView = document.getElementById('hunt-list-view');
-    var activeView = document.getElementById('active-hunt-view');
-    var detailView = document.getElementById('hunt-detail-view');
+    const listView = document.getElementById('hunt-list-view');
+    const activeView = document.getElementById('active-hunt-view');
+    const detailView = document.getElementById('hunt-detail-view');
 
-    var huntsContainer = document.getElementById('hunts-container');
-    var huntsEmpty = document.getElementById('hunts-empty');
-    var huntsPagination = document.getElementById('hunts-pagination');
-    var filterStatus = document.getElementById('filter-status');
-    var filterSite = document.getElementById('filter-site');
+    const huntsContainer = document.getElementById('hunts-container');
+    const huntsEmpty = document.getElementById('hunts-empty');
+    const huntsPagination = document.getElementById('hunts-pagination');
+    const filterStatus = document.getElementById('filter-status');
+    const filterSite = document.getElementById('filter-site');
 
-    var btnStartHunt = document.getElementById('btn-start-hunt');
-    var btnPauseHunt = document.getElementById('btn-pause-hunt');
-    var btnEndHunt = document.getElementById('btn-end-hunt');
-    var btnBackToList = document.getElementById('btn-back-to-list');
+    const btnStartHunt = document.getElementById('btn-start-hunt');
+    const btnPauseHunt = document.getElementById('btn-pause-hunt');
+    const btnEndHunt = document.getElementById('btn-end-hunt');
+    const btnBackToList = document.getElementById('btn-back-to-list');
 
-    var huntDurationEl = document.getElementById('hunt-duration');
-    var huntDistanceEl = document.getElementById('hunt-distance');
-    var huntPointsEl = document.getElementById('hunt-points');
-    var gpsIndicator = document.getElementById('gps-indicator');
+    const huntDurationEl = document.getElementById('hunt-duration');
+    const huntDistanceEl = document.getElementById('hunt-distance');
+    const huntPointsEl = document.getElementById('hunt-points');
+    const gpsIndicator = document.getElementById('gps-indicator');
 
-    var startModal = document.getElementById('start-hunt-modal');
-    var startHuntSite = document.getElementById('start-hunt-site');
-    var startHuntNotes = document.getElementById('start-hunt-notes');
-    var btnConfirmStart = document.getElementById('btn-confirm-start');
-    var btnCancelStart = document.getElementById('btn-cancel-start');
-    var btnStartModalClose = document.getElementById('btn-start-modal-close');
-    var startErrorMsg = document.getElementById('start-error-msg');
+    const startModal = document.getElementById('start-hunt-modal');
+    const startHuntSite = document.getElementById('start-hunt-site');
+    const startHuntNotes = document.getElementById('start-hunt-notes');
+    const btnConfirmStart = document.getElementById('btn-confirm-start');
+    const btnCancelStart = document.getElementById('btn-cancel-start');
+    const btnStartModalClose = document.getElementById('btn-start-modal-close');
+    const startErrorMsg = document.getElementById('start-error-msg');
 
     // Detail view refs
-    var detailStats = document.getElementById('detail-stats');
-    var detailNotes = document.getElementById('detail-notes');
-    var btnSaveNotes = document.getElementById('btn-save-notes');
-    var notesMsg = document.getElementById('notes-msg');
-    var btnDeleteHunt = document.getElementById('btn-delete-hunt');
-    var detailFindsList = document.getElementById('detail-finds-list');
-    var detailFindsSection = document.getElementById('detail-finds-section');
+    const detailStats = document.getElementById('detail-stats');
+    const detailNotes = document.getElementById('detail-notes');
+    const btnSaveNotes = document.getElementById('btn-save-notes');
+    const notesMsg = document.getElementById('notes-msg');
+    const btnDeleteHunt = document.getElementById('btn-delete-hunt');
+    const detailFindsList = document.getElementById('detail-finds-list');
+    const detailFindsSection = document.getElementById('detail-finds-section');
 
     // ---------------------------------------------------------------------------
     // Helpers
@@ -99,9 +99,9 @@
     }
 
     function formatDuration(seconds) {
-        var h = Math.floor(seconds / 3600);
-        var m = Math.floor((seconds % 3600) / 60);
-        var s = seconds % 60;
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
         return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
     }
 
@@ -114,15 +114,15 @@
 
     function formatDate(dateStr) {
         if (!dateStr) return '-';
-        var d = new Date(dateStr);
+        const d = new Date(dateStr);
         return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
 
     function haversineMeters(lat1, lng1, lat2, lng2) {
-        var R = 6371000;
-        var dLat = (lat2 - lat1) * Math.PI / 180;
-        var dLng = (lng2 - lng1) * Math.PI / 180;
-        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        const R = 6371000;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLng = (lng2 - lng1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
             Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
             Math.sin(dLng / 2) * Math.sin(dLng / 2);
         return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
@@ -130,7 +130,7 @@
 
     function generateUUID() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            var r = Math.random() * 16 | 0;
+            const r = Math.random() * 16 | 0;
             return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
         });
     }
@@ -158,8 +158,8 @@
 
     async function loadSites() {
         try {
-            var res = await Auth.authedFetch('/api/sites?limit=200');
-            var json = await res.json();
+            const res = await Auth.authedFetch('/api/sites?limit=200');
+            const json = await res.json();
             if (json.success) {
                 state.sites = json.data || [];
                 populateSiteSelects();
@@ -170,14 +170,14 @@
     }
 
     function populateSiteSelects() {
-        var selects = [filterSite, startHuntSite];
-        for (var s = 0; s < selects.length; s++) {
-            var sel = selects[s];
+        const selects = [filterSite, startHuntSite];
+        for (let s = 0; s < selects.length; s++) {
+            const sel = selects[s];
             if (!sel) continue;
             // Keep first option (placeholder)
             while (sel.options.length > 1) sel.remove(1);
-            for (var i = 0; i < state.sites.length; i++) {
-                var opt = document.createElement('option');
+            for (let i = 0; i < state.sites.length; i++) {
+                const opt = document.createElement('option');
                 opt.value = state.sites[i].id;
                 opt.textContent = state.sites[i].name;
                 sel.appendChild(opt);
@@ -191,12 +191,12 @@
 
     async function loadHunts() {
         try {
-            var params = '?page=' + state.page + '&limit=20';
+            let params = '?page=' + state.page + '&limit=20';
             if (filterStatus && filterStatus.value) params += '&status=' + filterStatus.value;
             if (filterSite && filterSite.value) params += '&site_id=' + filterSite.value;
 
-            var res = await Auth.authedFetch('/api/hunts' + params);
-            var json = await res.json();
+            const res = await Auth.authedFetch('/api/hunts' + params);
+            const json = await res.json();
             if (json.success) {
                 state.sessions = json.data;
                 state.totalPages = json.pagination.pages;
@@ -218,18 +218,18 @@
         }
         if (huntsEmpty) huntsEmpty.classList.add('hidden');
 
-        for (var i = 0; i < state.sessions.length; i++) {
-            var s = state.sessions[i];
-            var card = document.createElement('div');
+        for (let i = 0; i < state.sessions.length; i++) {
+            const s = state.sessions[i];
+            const card = document.createElement('div');
             card.className = 'card hunt-card';
             card.style.cursor = 'pointer';
             card.dataset.id = s.id;
 
-            var statusBadge = '<span class="' + statusBadgeClass(s.status) + '">' + s.status + '</span>';
-            var siteName = s.site_name || t('hunts.noSite');
-            var duration = formatDuration(s.duration_seconds || 0);
-            var distance = formatDistance(s.distance_meters || 0);
-            var findCount = s.find_count || 0;
+            const statusBadge = '<span class="' + statusBadgeClass(s.status) + '">' + s.status + '</span>';
+            const siteName = s.site_name || t('hunts.noSite');
+            const duration = formatDuration(s.duration_seconds || 0);
+            const distance = formatDistance(s.distance_meters || 0);
+            const findCount = s.find_count || 0;
 
             card.innerHTML =
                 '<div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">' +
@@ -266,8 +266,8 @@
         huntsPagination.innerHTML = '';
         if (state.totalPages <= 1) return;
 
-        for (var p = 1; p <= state.totalPages; p++) {
-            var btn = document.createElement('button');
+        for (let p = 1; p <= state.totalPages; p++) {
+            const btn = document.createElement('button');
             btn.className = 'btn btn-sm' + (p === state.page ? ' btn-primary' : '');
             btn.textContent = p;
             btn.addEventListener('click', (function (page) {
@@ -297,16 +297,16 @@
         if (startErrorMsg) startErrorMsg.textContent = '';
 
         try {
-            var payload = {};
+            const payload = {};
             if (startHuntSite && startHuntSite.value) payload.site_id = parseInt(startHuntSite.value);
             if (startHuntNotes && startHuntNotes.value.trim()) payload.notes = startHuntNotes.value.trim();
 
-            var res = await Auth.authedFetch('/api/hunts', {
+            const res = await Auth.authedFetch('/api/hunts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
             });
-            var json = await res.json();
+            const json = await res.json();
             if (!json.success) throw new Error(json.error);
 
             closeStartModal();
@@ -350,7 +350,7 @@
 
     function updateActiveUI() {
         if (!state.activeSession) return;
-        var isPaused = state.activeSession.status === 'paused';
+        const isPaused = state.activeSession.status === 'paused';
         if (btnPauseHunt) {
             btnPauseHunt.textContent = isPaused ? t('hunts.resume') : t('hunts.pause');
             btnPauseHunt.className = isPaused ? 'btn btn-primary' : 'btn';
@@ -362,7 +362,7 @@
             state.map.remove();
             state.map = null;
         }
-        var mapEl = document.getElementById('hunt-map');
+        const mapEl = document.getElementById('hunt-map');
         if (!mapEl) return;
 
         state.map = L.map(mapEl).setView([39.7392, -104.9903], 14);
@@ -377,8 +377,8 @@
     async function loadExistingTrackpoints() {
         if (!state.activeSession) return;
         try {
-            var res = await Auth.authedFetch('/api/hunts/' + state.activeSession.id + '/trackpoints');
-            var json = await res.json();
+            const res = await Auth.authedFetch('/api/hunts/' + state.activeSession.id + '/trackpoints');
+            const json = await res.json();
             if (json.success && json.data.segments) {
                 renderTrackOnMap(json.data.segments, state.trackLayer, state.map);
             }
@@ -390,12 +390,12 @@
     function renderTrackOnMap(segments, layer, map) {
         if (!layer || !map) return;
         layer.clearLayers();
-        var allLatLngs = [];
-        for (var i = 0; i < segments.length; i++) {
-            var seg = segments[i];
+        let allLatLngs = [];
+        for (let i = 0; i < segments.length; i++) {
+            const seg = segments[i];
             if (seg.points.length === 0) continue;
-            var color = SEGMENT_COLORS[i % SEGMENT_COLORS.length];
-            var latlngs = seg.points.map(function (p) { return [p[0], p[1]]; });
+            const color = SEGMENT_COLORS[i % SEGMENT_COLORS.length];
+            const latlngs = seg.points.map(function (p) { return [p[0], p[1]]; });
             L.polyline(latlngs, { color: color, weight: 3, opacity: 0.8 }).addTo(layer);
             allLatLngs = allLatLngs.concat(latlngs);
         }
@@ -442,7 +442,7 @@
     }
 
     function onPosition(pos) {
-        var accuracy = pos.coords.accuracy;
+        const accuracy = pos.coords.accuracy;
 
         // Update GPS indicator
         if (accuracy <= 10) setGPSStatus('good');
@@ -452,20 +452,20 @@
         // Filter: skip low accuracy
         if (accuracy > GPS_ACCURACY_THRESHOLD) return;
 
-        var lat = pos.coords.latitude;
-        var lng = pos.coords.longitude;
-        var now = Date.now();
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        const now = Date.now();
 
         // Min interval
         if (now - state.lastAcceptedTime < MIN_INTERVAL_MS) return;
 
         // Min distance
         if (state.lastAcceptedPoint) {
-            var dist = haversineMeters(state.lastAcceptedPoint.lat, state.lastAcceptedPoint.lng, lat, lng);
+            const dist = haversineMeters(state.lastAcceptedPoint.lat, state.lastAcceptedPoint.lng, lat, lng);
             if (dist < MIN_DISTANCE_M) return;
         }
 
-        var point = {
+        const point = {
             lat: lat,
             lng: lng,
             accuracy_m: accuracy,
@@ -481,7 +481,7 @@
         addPointToMap(lat, lng);
 
         // Update point count display
-        var currentCount = parseInt(huntPointsEl.textContent) || 0;
+        const currentCount = parseInt(huntPointsEl.textContent) || 0;
         if (huntPointsEl) huntPointsEl.textContent = currentCount + 1;
 
         // Flush if buffer full
@@ -503,9 +503,9 @@
     function addPointToMap(lat, lng) {
         if (!state.map || !state.trackLayer) return;
         // Get or create current polyline
-        var layers = state.trackLayer.getLayers();
-        var currentPoly = null;
-        for (var i = layers.length - 1; i >= 0; i--) {
+        const layers = state.trackLayer.getLayers();
+        let currentPoly = null;
+        for (let i = layers.length - 1; i >= 0; i--) {
             if (layers[i] instanceof L.Polyline) {
                 currentPoly = layers[i];
                 break;
@@ -522,11 +522,11 @@
         if (state.pointBuffer.length === 0) return;
         if (!state.activeSession) return;
 
-        var points = state.pointBuffer.slice();
+        const points = state.pointBuffer.slice();
         state.pointBuffer = [];
 
         try {
-            var res = await Auth.authedFetch('/api/hunts/' + state.activeSession.id + '/trackpoints', {
+            const res = await Auth.authedFetch('/api/hunts/' + state.activeSession.id + '/trackpoints', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -534,7 +534,7 @@
                     points: points,
                 }),
             });
-            var json = await res.json();
+            const json = await res.json();
             if (!json.success && !json.duplicate) {
                 // Re-add points to buffer for retry
                 state.pointBuffer = points.concat(state.pointBuffer);
@@ -576,18 +576,18 @@
 
     async function fetchCurrentDuration(sessionId) {
         try {
-            var res = await Auth.authedFetch('/api/hunts/' + sessionId);
-            var json = await res.json();
+            const res = await Auth.authedFetch('/api/hunts/' + sessionId);
+            const json = await res.json();
             if (json.success) {
-                var session = json.data;
-                var baseDuration = session.duration_seconds || 0;
+                const session = json.data;
+                let baseDuration = session.duration_seconds || 0;
 
                 // Find open segment and add elapsed time
                 if (session.segments) {
-                    for (var i = 0; i < session.segments.length; i++) {
-                        var seg = session.segments[i];
+                    for (let i = 0; i < session.segments.length; i++) {
+                        const seg = session.segments[i];
                         if (!seg.ended_at && seg.started_at) {
-                            var elapsed = Math.floor((Date.now() - new Date(seg.started_at).getTime()) / 1000);
+                            const elapsed = Math.floor((Date.now() - new Date(seg.started_at).getTime()) / 1000);
                             baseDuration += Math.max(0, elapsed);
                         }
                     }
@@ -638,8 +638,8 @@
     async function pauseOrResume() {
         if (!state.activeSession) return;
 
-        var isPaused = state.activeSession.status === 'paused';
-        var endpoint = isPaused ? '/resume' : '/pause';
+        const isPaused = state.activeSession.status === 'paused';
+        const endpoint = isPaused ? '/resume' : '/pause';
 
         try {
             if (btnPauseHunt) btnPauseHunt.disabled = true;
@@ -649,10 +649,10 @@
                 await flushPointBuffer();
             }
 
-            var res = await Auth.authedFetch('/api/hunts/' + state.activeSession.id + endpoint, {
+            const res = await Auth.authedFetch('/api/hunts/' + state.activeSession.id + endpoint, {
                 method: 'POST',
             });
-            var json = await res.json();
+            const json = await res.json();
             if (!json.success) throw new Error(json.error);
 
             state.activeSession = json.data;
@@ -681,10 +681,10 @@
             // Flush remaining points
             await flushPointBuffer();
 
-            var res = await Auth.authedFetch('/api/hunts/' + state.activeSession.id + '/end', {
+            const res = await Auth.authedFetch('/api/hunts/' + state.activeSession.id + '/end', {
                 method: 'POST',
             });
-            var json = await res.json();
+            const json = await res.json();
             if (!json.success) throw new Error(json.error);
 
             // Cleanup
@@ -709,8 +709,8 @@
 
     async function showSessionDetail(sessionId) {
         try {
-            var res = await Auth.authedFetch('/api/hunts/' + sessionId);
-            var json = await res.json();
+            const res = await Auth.authedFetch('/api/hunts/' + sessionId);
+            const json = await res.json();
             if (!json.success) return;
 
             state.detailSession = json.data;
@@ -728,10 +728,10 @@
     }
 
     function renderDetailView() {
-        var s = state.detailSession;
+        const s = state.detailSession;
         if (!s || !detailStats) return;
 
-        var avgSpeed = (s.duration_seconds > 0 && s.distance_meters > 0)
+        const avgSpeed = (s.duration_seconds > 0 && s.distance_meters > 0)
             ? ((s.distance_meters / s.duration_seconds) * 3.6).toFixed(1) + ' km/h'
             : '-';
 
@@ -753,9 +753,9 @@
         if (s.finds && s.finds.length > 0 && detailFindsList && detailFindsSection) {
             detailFindsSection.classList.remove('hidden');
             detailFindsList.innerHTML = '';
-            for (var i = 0; i < s.finds.length; i++) {
-                var f = s.finds[i];
-                var div = document.createElement('div');
+            for (let i = 0; i < s.finds.length; i++) {
+                const f = s.finds[i];
+                const div = document.createElement('div');
                 div.className = 'text-muted';
                 div.style.padding = 'var(--space-xs) 0';
                 div.textContent = (f.description || 'Find #' + f.id) + ' (' + (f.date_found || '') + ')';
@@ -775,7 +775,7 @@
 
     function renderCoverageControls(session) {
         // Get or create the coverage container
-        var container = document.getElementById('hunt-coverage-controls');
+        const container = document.getElementById('hunt-coverage-controls');
         if (!container) return;
         container.innerHTML = '';
 
@@ -798,9 +798,9 @@
             '</div>' +
             '</div>';
 
-        var cbThis = document.getElementById('cov-this-session');
-        var cbAll = document.getElementById('cov-all-sessions');
-        var slider = document.getElementById('cov-hunt-opacity');
+        const cbThis = document.getElementById('cov-this-session');
+        const cbAll = document.getElementById('cov-all-sessions');
+        const slider = document.getElementById('cov-hunt-opacity');
 
         cbThis.addEventListener('change', function () {
             if (cbThis.checked) {
@@ -827,14 +827,14 @@
 
     async function loadHuntCoverage(siteId, sessionId, which) {
         try {
-            var url = '/api/sites/' + siteId + '/coverage';
+            let url = '/api/sites/' + siteId + '/coverage';
             if (sessionId) url += '?session_id=' + sessionId;
-            var res = await Auth.authedFetch(url);
+            const res = await Auth.authedFetch(url);
             if (!res.ok) return;
-            var json = await res.json();
+            const json = await res.json();
             if (!json.success || !json.data.coverage) return;
 
-            var geoJSON = json.data.coverage;
+            const geoJSON = json.data.coverage;
             if (!geoJSON.features || geoJSON.features.length === 0) return;
 
             if (which === 'session') {
@@ -869,7 +869,7 @@
             state.detailMap.remove();
             state.detailMap = null;
         }
-        var mapEl = document.getElementById('detail-map');
+        const mapEl = document.getElementById('detail-map');
         if (!mapEl) return;
 
         state.detailMap = L.map(mapEl).setView([39.7392, -104.9903], 14);
@@ -881,10 +881,10 @@
 
     async function loadDetailTrackpoints(sessionId) {
         try {
-            var res = await Auth.authedFetch('/api/hunts/' + sessionId + '/trackpoints');
-            var json = await res.json();
+            const res = await Auth.authedFetch('/api/hunts/' + sessionId + '/trackpoints');
+            const json = await res.json();
             if (json.success && json.data.segments && state.detailMap) {
-                var layer = L.layerGroup().addTo(state.detailMap);
+                const layer = L.layerGroup().addTo(state.detailMap);
                 renderTrackOnMap(json.data.segments, layer, state.detailMap);
             }
         } catch (err) {
@@ -896,12 +896,12 @@
         if (!state.detailSession) return;
         try {
             if (btnSaveNotes) btnSaveNotes.disabled = true;
-            var res = await Auth.authedFetch('/api/hunts/' + state.detailSession.id, {
+            const res = await Auth.authedFetch('/api/hunts/' + state.detailSession.id, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ notes: detailNotes.value }),
             });
-            var json = await res.json();
+            const json = await res.json();
             if (json.success) {
                 if (notesMsg) {
                     notesMsg.textContent = t('hunts.updateSuccess');
@@ -921,10 +921,10 @@
         if (!confirm(t('hunts.confirmDelete'))) return;
 
         try {
-            var res = await Auth.authedFetch('/api/hunts/' + state.detailSession.id, {
+            const res = await Auth.authedFetch('/api/hunts/' + state.detailSession.id, {
                 method: 'DELETE',
             });
-            var json = await res.json();
+            const json = await res.json();
             if (json.success) {
                 state.detailSession = null;
                 showView('list');
@@ -941,16 +941,16 @@
 
     async function checkActiveSession() {
         try {
-            var res = await Auth.authedFetch('/api/hunts?status=active&limit=1');
-            var json = await res.json();
+            const res = await Auth.authedFetch('/api/hunts?status=active&limit=1');
+            const json = await res.json();
             if (json.success && json.data.length > 0) {
                 enterActiveView(json.data[0]);
                 return;
             }
 
             // Check paused
-            var res2 = await Auth.authedFetch('/api/hunts?status=paused&limit=1');
-            var json2 = await res2.json();
+            const res2 = await Auth.authedFetch('/api/hunts?status=paused&limit=1');
+            const json2 = await res2.json();
             if (json2.success && json2.data.length > 0) {
                 enterActiveView(json2.data[0]);
                 return;

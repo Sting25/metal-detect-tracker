@@ -68,8 +68,8 @@
     }
 
     // --- Export Data ---
-    var btnExport = document.getElementById('btn-export');
-    var exportMsg = document.getElementById('export-msg');
+    const btnExport = document.getElementById('btn-export');
+    const exportMsg = document.getElementById('export-msg');
 
     async function exportData() {
         if (btnExport) btnExport.disabled = true;
@@ -77,14 +77,14 @@
         if (exportMsg) exportMsg.textContent = '';
 
         try {
-            var res = await Auth.authedFetch('/api/exports', { method: 'POST' });
+            const res = await Auth.authedFetch('/api/exports', { method: 'POST' });
             if (!res.ok) {
-                var json = await res.json();
+                const json = await res.json();
                 throw new Error(json.error || 'Export failed');
             }
-            var blob = await res.blob();
-            var url = URL.createObjectURL(blob);
-            var a = document.createElement('a');
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
             a.href = url;
             a.download = 'signal-bouncer-export.zip';
             document.body.appendChild(a);
@@ -115,9 +115,9 @@
     }
 
     // --- Import Data ---
-    var fileImport = document.getElementById('file-import');
-    var importBtnText = document.getElementById('import-btn-text');
-    var importMsg = document.getElementById('import-msg');
+    const fileImport = document.getElementById('file-import');
+    const importBtnText = document.getElementById('import-btn-text');
+    const importMsg = document.getElementById('import-msg');
 
     async function importData(file) {
         if (importBtnText) importBtnText.textContent = window.I18n ? I18n.t('settings.importing') : 'Importing...';
@@ -125,17 +125,17 @@
         if (importMsg) importMsg.textContent = '';
 
         try {
-            var formData = new FormData();
+            const formData = new FormData();
             formData.append('file', file);
-            var res = await Auth.authedFetch('/api/imports', {
+            const res = await Auth.authedFetch('/api/imports', {
                 method: 'POST',
                 body: formData,
             });
-            var json = await res.json();
+            const json = await res.json();
             if (!json.success) throw new Error(json.error);
 
-            var d = json.data;
-            var msg = 'Imported: ' + d.sites_imported + ' sites, ' + d.finds_imported + ' finds, ' + d.permissions_imported + ' permissions';
+            const d = json.data;
+            let msg = 'Imported: ' + d.sites_imported + ' sites, ' + d.finds_imported + ' finds, ' + d.permissions_imported + ' permissions';
             if (d.errors && d.errors.length > 0) {
                 msg += ' (' + d.errors.length + ' items skipped)';
             }
@@ -166,16 +166,16 @@
     }
 
     // --- Download Import Template ---
-    var btnDownloadTemplate = document.getElementById('btn-download-template');
+    const btnDownloadTemplate = document.getElementById('btn-download-template');
 
     async function downloadTemplate() {
         if (btnDownloadTemplate) btnDownloadTemplate.disabled = true;
         try {
-            var res = await Auth.authedFetch('/api/imports/template');
+            const res = await Auth.authedFetch('/api/imports/template');
             if (!res.ok) throw new Error('Failed to download template');
-            var blob = await res.blob();
-            var url = URL.createObjectURL(blob);
-            var a = document.createElement('a');
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
             a.href = url;
             a.download = 'signal-bouncer-import-template.zip';
             document.body.appendChild(a);
