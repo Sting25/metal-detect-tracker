@@ -29,9 +29,9 @@ const upload = createUpload('finds');
 function findScopeSQL(user, startIdx) {
   const i = startIdx || 1;
   return {
-    where: ` AND (f.user_id = $${i} OR f.site_id IN (SELECT site_id FROM site_shares WHERE shared_with_id = $${i + 1}))`,
-    params: [user.id, user.id],
-    nextIdx: i + 2,
+    where: ` AND (f.user_id = $${i} OR f.site_id IN (SELECT id FROM sites WHERE user_id = $${i + 1}) OR f.site_id IN (SELECT site_id FROM site_shares WHERE shared_with_id = $${i + 2}))`,
+    params: [user.id, user.id, user.id],
+    nextIdx: i + 3,
   };
 }
 
@@ -41,6 +41,14 @@ function findScopeSQL(user, startIdx) {
 async function canAccessFind(user, find) {
   if (user.role === 'admin') return true;
   if (find.user_id === user.id) return true;
+  // Site owner can always see finds on their sites
+  if (find.site_id) {
+    const ownedSite = await db.queryOne(
+      'SELECT 1 FROM sites WHERE id = $1 AND user_id = $2',
+      [find.site_id, user.id]
+    );
+    if (ownedSite) return true;
+  }
   const share = await db.queryOne(
     'SELECT 1 FROM site_shares WHERE site_id = $1 AND shared_with_id = $2',
     [find.site_id, user.id]
