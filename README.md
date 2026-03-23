@@ -1,6 +1,6 @@
-# Metal Detect Tracker
+# Signal Bouncer
 
-Track your metal detecting sites, finds, and landowner permissions — all in one place.
+**[signalbouncer.com](https://signalbouncer.com)** — Track your metal detecting sites, finds, and landowner permissions — all in one place.
 
 Built for detectorists who want to stay organized, document their finds, and keep landowner relationships on good terms. Works on desktop and mobile.
 
@@ -57,7 +57,7 @@ Built for detectorists who want to stay organized, document their finds, and kee
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/metal-detect-tracker.git
+git clone https://github.com/Sting25/metal-detect-tracker.git
 cd metal-detect-tracker
 npm install
 ```
