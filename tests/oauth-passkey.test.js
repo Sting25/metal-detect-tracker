@@ -78,8 +78,21 @@ describe('Google OAuth - POST /api/auth/google', () => {
         expect(res.body.data.user.id).toBe(user.id);
     });
 
-    it('returns needsLink when Google email matches existing user (no auto-linking)', async () => {
-        mockGoogleToken({ email: 'existing@test.com' });
+    it('auto-links and signs in when Google email matches existing user with verified email', async () => {
+        mockGoogleToken({ email: 'existing@test.com', email_verified: true });
+        await createUser({ email: 'existing@test.com' });
+
+        const res = await request()
+            .post('/api/auth/google')
+            .send({ id_token: 'valid-token' });
+
+        expect(res.status).toBe(200);
+        expect(res.body.data.token).toBeTruthy();
+        expect(res.body.data.user.email).toBe('existing@test.com');
+    });
+
+    it('returns needsLink when Google email matches but email is not verified', async () => {
+        mockGoogleToken({ email: 'existing@test.com', email_verified: false });
         await createUser({ email: 'existing@test.com' });
 
         const res = await request()
@@ -88,7 +101,6 @@ describe('Google OAuth - POST /api/auth/google', () => {
 
         expect(res.status).toBe(200);
         expect(res.body.data.needsLink).toBe(true);
-        expect(res.body.data.message).toMatch(/already exists/i);
     });
 
     it('returns needsTerms for new Google user without terms_accepted', async () => {
