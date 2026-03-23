@@ -19,6 +19,11 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Claude Code local config
+.claude/settings.local.json
+.claude/commands/
+.claude/worktrees/
+
 # Deploy/SSH scripts with credentials
 deploy.py
 deploy-staging.py
